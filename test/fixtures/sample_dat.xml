@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<mame build="0.260 (mame0260)">
+    <machine name="puckman" sourcefile="pacman.cpp">
+        <description>PuckMan (Japan set 1)</description>
+        <year>1980</year>
+        <manufacturer>Namco</manufacturer>
+        <rom name="pm1_prg1.6e" size="4096" crc="0c944964" sha1="d5e2e26f4b8a8f5f3c1b0a1a2b3c4d5e6f708192"/>
+        <driver status="good" emulation="good" cocktail="good" savestate="supported"/>
+    </machine>
+    <machine name="pacman" sourcefile="pacman.cpp" cloneof="puckman" romof="puckman">
+        <description>Pac-Man (Midway)</description>
+        <year>1980</year>
+        <manufacturer>Midway</manufacturer>
+        <rom name="pacman.6e" size="4096" crc="c1e6ab10" sha1="a1b2c3d4e5f60718293a4b5c6d7e8f9012345678"/>
+        <driver status="imperfect" emulation="good" cocktail="good" savestate="supported"/>
+    </machine>
+    <machine name="pacmanbios" isbios="yes" isdevice="no" ismechanical="no" runnable="no">
+        <description>Pac-Man BIOS</description>
+        <year>1980</year>
+        <manufacturer>Namco</manufacturer>
+    </machine>
+</mame>
