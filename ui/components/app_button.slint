@@ -1,0 +1,30 @@
+export component AppButton inherits Rectangle {
+    in property <string> text;
+    in property <bool> primary: false;
+    in property <bool> enabled: true;
+    callback clicked();
+
+    height: 36px;
+    border-radius: 6px;
+    border-width: primary ? 0px : 1px;
+    border-color: #d0d0d0;
+    background: !enabled
+        ? #cfcfcf
+        : (touch.pressed
+            ? (primary ? #005a9e : #e2e2e2)
+            : (touch.has-hover
+                ? (primary ? #106ebe : #ececec)
+                : (primary ? #0078d4 : #f6f6f6)));
+
+    touch := TouchArea {
+        enabled: root.enabled;
+        clicked => { root.clicked(); }
+    }
+
+    Text {
+        text: root.text;
+        color: root.primary ? white : #202020;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+}

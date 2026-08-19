@@ -1,0 +1,27 @@
+export component TextField inherits Rectangle {
+    in property <string> placeholder;
+    in-out property <string> value;
+
+    height: 34px;
+    background: white;
+    border-width: 1px;
+    border-radius: 4px;
+    border-color: input.has-focus ? #0078d4 : #c8c8c8;
+
+    input := TextInput {
+        x: 8px;
+        width: parent.width - 16px;
+        height: parent.height;
+        vertical-alignment: center;
+        font-size: 14px;
+        text <=> root.value;
+    }
+
+    Text {
+        x: 8px;
+        vertical-alignment: center;
+        text: root.placeholder;
+        color: #999999;
+        visible: root.value == "";
+    }
+}

@@ -1,0 +1,43 @@
+export component SegmentedChoice inherits Rectangle {
+    in property <string> option-a;
+    in property <string> option-b;
+    in-out property <bool> selected-b;
+
+    height: 34px;
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: #c8c8c8;
+    clip: true;
+
+    HorizontalLayout {
+        Rectangle {
+            background: !root.selected-b ? #0078d4 : #f3f3f3;
+
+            TouchArea {
+                clicked => { root.selected-b = false; }
+            }
+
+            Text {
+                text: root.option-a;
+                color: !root.selected-b ? white : #202020;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+
+        Rectangle {
+            background: root.selected-b ? #0078d4 : #f3f3f3;
+
+            TouchArea {
+                clicked => { root.selected-b = true; }
+            }
+
+            Text {
+                text: root.option-b;
+                color: root.selected-b ? white : #202020;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+    }
+}

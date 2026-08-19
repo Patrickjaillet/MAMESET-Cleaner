@@ -1,5 +1,13 @@
 # Journal des modifications
 
+## v0.6.0
+- Le logiciel dispose maintenant d'une interface graphique complète avec 5 sections : Scan, Filtres, Résultats, Paramètres et À propos.
+- La sélection des dossiers et fichiers (ROMs, DAT, catver.ini, languages.ini) se fait désormais par une fenêtre de sélection classique de Windows, depuis les Paramètres.
+- Le scan affiche une barre de progression en temps réel et reste utilisable pendant l'analyse.
+- Les critères de filtrage peuvent être réglés visuellement et appliqués en un clic.
+- Les résultats s'affichent dans un tableau avec recherche et tri par nom ou par année, indiquant pour chaque jeu s'il est à garder ou à supprimer.
+- Ajout d'un thème clair et d'un thème sombre, activable dans les Paramètres.
+
 ## v0.5.0
 - Ajout du filtrage des jeux par genre, langue, région, statut de fonctionnement, fabricant, année et type (BIOS, mécanique, adulte).
 - Plusieurs critères peuvent être combinés en même temps (par exemple : un genre précis ET une langue précise).

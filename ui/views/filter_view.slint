@@ -1,14 +1,89 @@
+import { AppButton } from "../components/app_button.slint";
+import { TextField } from "../components/text_field.slint";
+import { ToggleOption } from "../components/toggle_option.slint";
+
 export component FilterView inherits Rectangle {
-    in property <string> title: "Filtres";
+    in-out property <string> filter-categories-text;
+    in-out property <string> filter-languages-text;
+    in-out property <string> filter-regions-text;
+    in-out property <string> filter-manufacturers-text;
+    in-out property <string> filter-year-min-text;
+    in-out property <string> filter-year-max-text;
+    in-out property <bool> filter-status-good;
+    in-out property <bool> filter-status-imperfect;
+    in-out property <bool> filter-status-preliminary;
+    in-out property <bool> filter-status-unknown;
+    in-out property <bool> filter-include-bios;
+    in-out property <bool> filter-include-device;
+    in-out property <bool> filter-include-mechanical;
+    in-out property <bool> filter-include-adult;
+    in property <string> filter-summary-text;
+    callback apply-filters();
 
-    VerticalLayout {
-        padding: 24px;
-        alignment: start;
+    Flickable {
+        VerticalLayout {
+            padding: 24px;
+            spacing: 12px;
+            alignment: start;
 
-        Text {
-            text: title;
-            font-size: 20px;
-            font-weight: 700;
+            Text {
+                text: "Filtres";
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+            Text { text: "Genres (séparés par des virgules)"; }
+            TextField { placeholder: "ex: Maze, Shooter"; value <=> root.filter-categories-text; }
+
+            Text { text: "Langues (séparées par des virgules)"; }
+            TextField { placeholder: "ex: English, French"; value <=> root.filter-languages-text; }
+
+            Text { text: "Régions (séparées par des virgules)"; }
+            TextField { placeholder: "ex: World, USA"; value <=> root.filter-regions-text; }
+
+            Text { text: "Fabricants (séparés par des virgules)"; }
+            TextField { placeholder: "ex: Namco, Capcom"; value <=> root.filter-manufacturers-text; }
+
+            HorizontalLayout {
+                spacing: 12px;
+                VerticalLayout {
+                    spacing: 4px;
+                    Text { text: "Année minimum"; }
+                    TextField { placeholder: "ex: 1980"; value <=> root.filter-year-min-text; }
+                }
+                VerticalLayout {
+                    spacing: 4px;
+                    Text { text: "Année maximum"; }
+                    TextField { placeholder: "ex: 1999"; value <=> root.filter-year-max-text; }
+                }
+            }
+
+            Text { text: "Statut de fonctionnement"; font-weight: 600; }
+            HorizontalLayout {
+                spacing: 16px;
+                ToggleOption { text: "Bon"; checked <=> root.filter-status-good; }
+                ToggleOption { text: "Imparfait"; checked <=> root.filter-status-imperfect; }
+                ToggleOption { text: "Préliminaire"; checked <=> root.filter-status-preliminary; }
+                ToggleOption { text: "Non fonctionnel"; checked <=> root.filter-status-unknown; }
+            }
+
+            Text { text: "Types de contenu"; font-weight: 600; }
+            HorizontalLayout {
+                spacing: 16px;
+                ToggleOption { text: "BIOS"; checked <=> root.filter-include-bios; }
+                ToggleOption { text: "Devices"; checked <=> root.filter-include-device; }
+                ToggleOption { text: "Mécaniques"; checked <=> root.filter-include-mechanical; }
+                ToggleOption { text: "Adulte"; checked <=> root.filter-include-adult; }
+            }
+
+            AppButton {
+                width: 200px;
+                text: "Appliquer les filtres";
+                primary: true;
+                clicked => { root.apply-filters(); }
+            }
+
+            Text { text: root.filter-summary-text; }
         }
     }
 }

@@ -1,0 +1,37 @@
+export component ToggleOption inherits Rectangle {
+    in property <string> text;
+    in-out property <bool> checked;
+
+    height: 26px;
+
+    HorizontalLayout {
+        spacing: 8px;
+        alignment: start;
+
+        box := Rectangle {
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            border-width: 1px;
+            border-color: #888888;
+            background: root.checked ? #0078d4 : white;
+
+            Text {
+                text: "✓";
+                color: white;
+                visible: root.checked;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            TouchArea {
+                clicked => { root.checked = !root.checked; }
+            }
+        }
+
+        Text {
+            text: root.text;
+            vertical-alignment: center;
+        }
+    }
+}

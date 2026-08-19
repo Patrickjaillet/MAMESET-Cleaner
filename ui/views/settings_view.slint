@@ -1,14 +1,85 @@
+import { AppButton } from "../components/app_button.slint";
+import { TextField } from "../components/text_field.slint";
+import { SegmentedChoice } from "../components/segmented_choice.slint";
+
 export component SettingsView inherits Rectangle {
-    in property <string> title: "Paramètres";
+    in-out property <string> rom-set-path;
+    in-out property <string> dat-file-path;
+    in-out property <string> catver-ini-path;
+    in-out property <string> languages-ini-path;
+    in-out property <bool> language-is-english;
+    in-out property <bool> dark-theme;
+    in property <string> settings-status-text;
+    callback browse-rom-set-path();
+    callback browse-dat-file-path();
+    callback browse-catver-ini-path();
+    callback browse-languages-ini-path();
+    callback save-settings();
 
-    VerticalLayout {
-        padding: 24px;
-        alignment: start;
+    Flickable {
+        VerticalLayout {
+            padding: 24px;
+            spacing: 14px;
+            alignment: start;
 
-        Text {
-            text: title;
-            font-size: 20px;
-            font-weight: 700;
+            Text {
+                text: "Paramètres";
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+            Text { text: "Dossier du set de ROMs"; }
+            HorizontalLayout {
+                spacing: 8px;
+                TextField { value <=> root.rom-set-path; placeholder: "Chemin du dossier de ROMs"; }
+                AppButton { width: 120px; text: "Parcourir"; clicked => { root.browse-rom-set-path(); } }
+            }
+
+            Text { text: "Fichier DAT MAME"; }
+            HorizontalLayout {
+                spacing: 8px;
+                TextField { value <=> root.dat-file-path; placeholder: "Chemin du fichier DAT"; }
+                AppButton { width: 120px; text: "Parcourir"; clicked => { root.browse-dat-file-path(); } }
+            }
+
+            Text { text: "Fichier catver.ini"; }
+            HorizontalLayout {
+                spacing: 8px;
+                TextField { value <=> root.catver-ini-path; placeholder: "Chemin de catver.ini"; }
+                AppButton { width: 120px; text: "Parcourir"; clicked => { root.browse-catver-ini-path(); } }
+            }
+
+            Text { text: "Fichier languages.ini"; }
+            HorizontalLayout {
+                spacing: 8px;
+                TextField { value <=> root.languages-ini-path; placeholder: "Chemin de languages.ini"; }
+                AppButton { width: 120px; text: "Parcourir"; clicked => { root.browse-languages-ini-path(); } }
+            }
+
+            Text { text: "Langue de l'interface"; font-weight: 600; }
+            SegmentedChoice {
+                width: 200px;
+                option-a: "Français";
+                option-b: "English";
+                selected-b <=> root.language-is-english;
+            }
+
+            Text { text: "Thème"; font-weight: 600; }
+            SegmentedChoice {
+                width: 200px;
+                option-a: "Clair";
+                option-b: "Sombre";
+                selected-b <=> root.dark-theme;
+            }
+
+            AppButton {
+                width: 200px;
+                text: "Enregistrer";
+                primary: true;
+                clicked => { root.save-settings(); }
+            }
+
+            Text { text: root.settings-status-text; }
         }
     }
 }

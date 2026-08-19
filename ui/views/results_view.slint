@@ -1,14 +1,89 @@
+import { AppButton } from "../components/app_button.slint";
+import { TextField } from "../components/text_field.slint";
+import { ResultRow } from "../common.slint";
+
 export component ResultsView inherits Rectangle {
-    in property <string> title: "Résultats";
+    in-out property <string> search-text;
+    in property <[ResultRow]> result-rows;
+    in property <string> result-count-text;
+    callback search-triggered();
+    callback sort-by(string);
 
     VerticalLayout {
         padding: 24px;
+        spacing: 10px;
         alignment: start;
 
         Text {
-            text: title;
+            text: "Résultats";
             font-size: 20px;
             font-weight: 700;
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            TextField {
+                placeholder: "Rechercher un jeu...";
+                value <=> root.search-text;
+            }
+            AppButton {
+                width: 120px;
+                text: "Rechercher";
+                clicked => { root.search-triggered(); }
+            }
+        }
+
+        Text { text: root.result-count-text; }
+
+        Rectangle {
+            border-width: 1px;
+            border-color: #d8d8d8;
+            background: #f6f6f6;
+            height: 32px;
+
+            HorizontalLayout {
+                padding-left: 8px;
+                padding-right: 8px;
+                spacing: 8px;
+
+                TouchArea {
+                    width: 220px;
+                    clicked => { root.sort-by("name"); }
+                    Text { text: "Nom"; font-weight: 600; vertical-alignment: center; }
+                }
+                TouchArea {
+                    width: 80px;
+                    clicked => { root.sort-by("year"); }
+                    Text { text: "Année"; font-weight: 600; vertical-alignment: center; }
+                }
+                Text { width: 160px; text: "Fabricant"; font-weight: 600; vertical-alignment: center; }
+                Text { width: 140px; text: "Genre"; font-weight: 600; vertical-alignment: center; }
+                Text { width: 120px; text: "Statut"; font-weight: 600; vertical-alignment: center; }
+                Text { width: 100px; text: "Action"; font-weight: 600; vertical-alignment: center; }
+            }
+        }
+
+        Flickable {
+            VerticalLayout {
+                for row in root.result-rows: Rectangle {
+                    height: 30px;
+                    border-width: 1px;
+                    border-color: #ececec;
+
+                    HorizontalLayout {
+                        padding-left: 8px;
+                        padding-right: 8px;
+                        spacing: 8px;
+
+                        Text { width: 220px; text: row.name; vertical-alignment: center; overflow: elide; }
+                        Text { width: 80px; text: row.year; vertical-alignment: center; }
+                        Text { width: 160px; text: row.manufacturer; vertical-alignment: center; overflow: elide; }
+                        Text { width: 140px; text: row.category; vertical-alignment: center; overflow: elide; }
+                        Text { width: 120px; text: row.status; vertical-alignment: center; }
+                        Text { width: 100px; text: row.action; vertical-alignment: center; }
+                    }
+                }
+            }
         }
     }
 }

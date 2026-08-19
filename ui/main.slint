@@ -4,6 +4,7 @@ import { FilterView } from "views/filter_view.slint";
 import { ResultsView } from "views/results_view.slint";
 import { SettingsView } from "views/settings_view.slint";
 import { AboutView } from "views/about_view.slint";
+import { ResultRow } from "common.slint";
 
 export component AppWindow inherits Window {
     title: "MAMESET Cleaner";
@@ -11,9 +12,53 @@ export component AppWindow inherits Window {
     preferred-height: 720px;
     min-width: 800px;
     min-height: 560px;
+    background: dark-theme ? #1f1f1f : #f3f3f3;
 
     in-out property <int> current-view: 0;
     in property <string> app-version: "0.1.0";
+
+    in-out property <string> rom-set-path;
+    in-out property <string> dat-file-path;
+    in-out property <string> catver-ini-path;
+    in-out property <string> languages-ini-path;
+    in-out property <bool> language-is-english;
+    in-out property <bool> dark-theme;
+    in property <string> settings-status-text;
+
+    in property <bool> scan-running;
+    in property <float> scan-progress;
+    in property <string> scan-status-text;
+    in property <string> scan-counts-text;
+
+    in-out property <string> filter-categories-text;
+    in-out property <string> filter-languages-text;
+    in-out property <string> filter-regions-text;
+    in-out property <string> filter-manufacturers-text;
+    in-out property <string> filter-year-min-text;
+    in-out property <string> filter-year-max-text;
+    in-out property <bool> filter-status-good: true;
+    in-out property <bool> filter-status-imperfect: true;
+    in-out property <bool> filter-status-preliminary: true;
+    in-out property <bool> filter-status-unknown: true;
+    in-out property <bool> filter-include-bios: true;
+    in-out property <bool> filter-include-device: true;
+    in-out property <bool> filter-include-mechanical: true;
+    in-out property <bool> filter-include-adult: true;
+    in property <string> filter-summary-text;
+
+    in-out property <string> search-text;
+    in property <[ResultRow]> result-rows;
+    in property <string> result-count-text;
+
+    callback browse-rom-set-path();
+    callback browse-dat-file-path();
+    callback browse-catver-ini-path();
+    callback browse-languages-ini-path();
+    callback save-settings();
+    callback start-scan();
+    callback apply-filters();
+    callback search-triggered();
+    callback sort-by(string);
 
     HorizontalLayout {
         Sidebar {
@@ -30,10 +75,54 @@ export component AppWindow inherits Window {
         Rectangle {
             border-width: 0px;
 
-            if current-view == 0: ScanView {}
-            if current-view == 1: FilterView {}
-            if current-view == 2: ResultsView {}
-            if current-view == 3: SettingsView {}
+            if current-view == 0: ScanView {
+                rom-set-path: root.rom-set-path;
+                dat-file-path: root.dat-file-path;
+                scan-running: root.scan-running;
+                scan-progress: root.scan-progress;
+                scan-status-text: root.scan-status-text;
+                scan-counts-text: root.scan-counts-text;
+                start-scan => { root.start-scan(); }
+            }
+            if current-view == 1: FilterView {
+                filter-categories-text <=> root.filter-categories-text;
+                filter-languages-text <=> root.filter-languages-text;
+                filter-regions-text <=> root.filter-regions-text;
+                filter-manufacturers-text <=> root.filter-manufacturers-text;
+                filter-year-min-text <=> root.filter-year-min-text;
+                filter-year-max-text <=> root.filter-year-max-text;
+                filter-status-good <=> root.filter-status-good;
+                filter-status-imperfect <=> root.filter-status-imperfect;
+                filter-status-preliminary <=> root.filter-status-preliminary;
+                filter-status-unknown <=> root.filter-status-unknown;
+                filter-include-bios <=> root.filter-include-bios;
+                filter-include-device <=> root.filter-include-device;
+                filter-include-mechanical <=> root.filter-include-mechanical;
+                filter-include-adult <=> root.filter-include-adult;
+                filter-summary-text: root.filter-summary-text;
+                apply-filters => { root.apply-filters(); }
+            }
+            if current-view == 2: ResultsView {
+                search-text <=> root.search-text;
+                result-rows: root.result-rows;
+                result-count-text: root.result-count-text;
+                search-triggered => { root.search-triggered(); }
+                sort-by(column) => { root.sort-by(column); }
+            }
+            if current-view == 3: SettingsView {
+                rom-set-path <=> root.rom-set-path;
+                dat-file-path <=> root.dat-file-path;
+                catver-ini-path <=> root.catver-ini-path;
+                languages-ini-path <=> root.languages-ini-path;
+                language-is-english <=> root.language-is-english;
+                dark-theme <=> root.dark-theme;
+                settings-status-text: root.settings-status-text;
+                browse-rom-set-path => { root.browse-rom-set-path(); }
+                browse-dat-file-path => { root.browse-dat-file-path(); }
+                browse-catver-ini-path => { root.browse-catver-ini-path(); }
+                browse-languages-ini-path => { root.browse-languages-ini-path(); }
+                save-settings => { root.save-settings(); }
+            }
             if current-view == 4: AboutView { app-version: root.app-version; }
         }
     }

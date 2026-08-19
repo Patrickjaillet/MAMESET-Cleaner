@@ -1,14 +1,62 @@
+import { AppButton } from "../components/app_button.slint";
+
 export component ScanView inherits Rectangle {
-    in property <string> title: "Scan";
+    in property <string> rom-set-path;
+    in property <string> dat-file-path;
+    in property <bool> scan-running;
+    in property <float> scan-progress;
+    in property <string> scan-status-text;
+    in property <string> scan-counts-text;
+    callback start-scan();
 
     VerticalLayout {
         padding: 24px;
+        spacing: 14px;
         alignment: start;
 
         Text {
-            text: title;
+            text: "Scan";
             font-size: 20px;
             font-weight: 700;
+        }
+
+        Text {
+            text: "Dossier de ROMs : " + (rom-set-path == "" ? "(à définir dans Paramètres)" : rom-set-path);
+            wrap: word-wrap;
+        }
+
+        Text {
+            text: "Fichier DAT : " + (dat-file-path == "" ? "(à définir dans Paramètres)" : dat-file-path);
+            wrap: word-wrap;
+        }
+
+        AppButton {
+            width: 220px;
+            text: scan-running ? "Analyse en cours..." : "Lancer le scan";
+            primary: true;
+            enabled: !scan-running;
+            clicked => { root.start-scan(); }
+        }
+
+        Rectangle {
+            height: 10px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            clip: true;
+
+            Rectangle {
+                width: parent.width * (scan-progress < 0.0 ? 0.0 : (scan-progress > 1.0 ? 1.0 : scan-progress));
+                height: parent.height;
+                background: #0078d4;
+            }
+        }
+
+        Text {
+            text: scan-status-text;
+        }
+
+        Text {
+            text: scan-counts-text;
         }
     }
 }
