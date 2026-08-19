@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## v0.5.0
+- Ajout du filtrage des jeux par genre, langue, région, statut de fonctionnement, fabricant, année et type (BIOS, mécanique, adulte).
+- Plusieurs critères peuvent être combinés en même temps (par exemple : un genre précis ET une langue précise).
+- Ajout de la sauvegarde et du chargement de profils de filtrage personnalisés, pour retrouver facilement ses réglages préférés.
+
 ## v0.4.0
 - Ajout de la détection des jeux en double (un jeu principal et ses variantes).
 - Pour chaque groupe de doublons, le logiciel choisit automatiquement le meilleur exemplaire à conserver selon la région préférée (par exemple Monde puis USA puis Europe puis Japon), l'état de fonctionnement du jeu, puis sa version la plus récente.
