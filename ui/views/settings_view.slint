@@ -1,0 +1,14 @@
+export component SettingsView inherits Rectangle {
+    in property <string> title: "Paramètres";
+
+    VerticalLayout {
+        padding: 24px;
+        alignment: start;
+
+        Text {
+            text: title;
+            font-size: 20px;
+            font-weight: 700;
+        }
+    }
+}

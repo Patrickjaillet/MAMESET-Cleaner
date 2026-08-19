@@ -1,0 +1,53 @@
+import { ListView } from "std-widgets.slint";
+
+export struct NavEntry {
+    label: string,
+    icon: string,
+}
+
+export component Sidebar inherits Rectangle {
+    in property <[NavEntry]> entries;
+    in-out property <int> selected-index: 0;
+    callback selected(int);
+
+    width: 220px;
+    background: Colors.transparent;
+
+    VerticalLayout {
+        padding: 8px;
+        spacing: 4px;
+        alignment: start;
+
+        for entry[index] in entries: Rectangle {
+            height: 44px;
+            border-radius: 6px;
+            background: index == selected-index
+                ? rgba(0, 95, 184, 0.15)
+                : (touch.has-hover ? rgba(128, 128, 128, 0.08) : transparent);
+
+            touch := TouchArea {
+                clicked => {
+                    selected-index = index;
+                    selected(index);
+                }
+            }
+
+            HorizontalLayout {
+                padding-left: 12px;
+                spacing: 10px;
+                alignment: start;
+
+                Text {
+                    text: entry.icon;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: entry.label;
+                    vertical-alignment: center;
+                    font-weight: index == selected-index ? 600 : 400;
+                }
+            }
+        }
+    }
+}

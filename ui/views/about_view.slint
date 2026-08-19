@@ -1,0 +1,26 @@
+export component AboutView inherits Rectangle {
+    in property <string> title: "À propos";
+    in property <string> app-version: "0.1.0";
+    in property <string> copyright-text: "Copyright © 2026 Patrick JAILLET — Tous droits réservés";
+    in property <string> contact-email: "sandefjord.development@proton.me";
+    in property <string> website-url: "https://patrickjaillet.github.io/MAMESET-Cleaner";
+    in property <string> license-name: "MIT";
+
+    VerticalLayout {
+        padding: 24px;
+        spacing: 8px;
+        alignment: start;
+
+        Text {
+            text: title;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        Text { text: "MAMESET Cleaner v" + app-version; }
+        Text { text: copyright-text; }
+        Text { text: contact-email; }
+        Text { text: website-url; }
+        Text { text: "Licence : " + license-name; }
+    }
+}

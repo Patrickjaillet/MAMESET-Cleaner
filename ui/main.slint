@@ -1,0 +1,40 @@
+import { Sidebar, NavEntry } from "components/sidebar.slint";
+import { ScanView } from "views/scan_view.slint";
+import { FilterView } from "views/filter_view.slint";
+import { ResultsView } from "views/results_view.slint";
+import { SettingsView } from "views/settings_view.slint";
+import { AboutView } from "views/about_view.slint";
+
+export component AppWindow inherits Window {
+    title: "MAMESET Cleaner";
+    preferred-width: 1100px;
+    preferred-height: 720px;
+    min-width: 800px;
+    min-height: 560px;
+
+    in-out property <int> current-view: 0;
+    in property <string> app-version: "0.1.0";
+
+    HorizontalLayout {
+        Sidebar {
+            entries: [
+                { label: "Scan", icon: "🔍" },
+                { label: "Filtres", icon: "🧰" },
+                { label: "Résultats", icon: "📋" },
+                { label: "Paramètres", icon: "⚙️" },
+                { label: "À propos", icon: "ℹ️" },
+            ];
+            selected-index <=> current-view;
+        }
+
+        Rectangle {
+            border-width: 0px;
+
+            if current-view == 0: ScanView {}
+            if current-view == 1: FilterView {}
+            if current-view == 2: ResultsView {}
+            if current-view == 3: SettingsView {}
+            if current-view == 4: AboutView { app-version: root.app-version; }
+        }
+    }
+}

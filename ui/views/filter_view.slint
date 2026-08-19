@@ -1,0 +1,14 @@
+export component FilterView inherits Rectangle {
+    in property <string> title: "Filtres";
+
+    VerticalLayout {
+        padding: 24px;
+        alignment: start;
+
+        Text {
+            text: title;
+            font-size: 20px;
+            font-weight: 700;
+        }
+    }
+}

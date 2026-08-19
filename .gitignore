@@ -1,0 +1,7 @@
+/target
+*.pdb
+
+# Fichiers internes de pilotage IA, jamais publiés sur GitHub
+ROADMAP.md
+CLAUDE.md
+.claude/

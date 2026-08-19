@@ -1,0 +1,103 @@
+use std::fs;
+use std::path::PathBuf;
+
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum AppTheme {
+    Light,
+    Dark,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum AppLanguage {
+    Fr,
+    En,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AppConfig {
+    pub language: AppLanguage,
+    pub theme: AppTheme,
+    pub rom_set_path: Option<String>,
+    pub dat_file_path: Option<String>,
+    pub catver_ini_path: Option<String>,
+    pub languages_ini_path: Option<String>,
+}
+
+impl Default for AppConfig {
+    fn default() -> Self {
+        Self {
+            language: AppLanguage::Fr,
+            theme: AppTheme::Light,
+            rom_set_path: None,
+            dat_file_path: None,
+            catver_ini_path: None,
+            languages_ini_path: None,
+        }
+    }
+}
+
+impl AppConfig {
+    pub fn config_file_path() -> PathBuf {
+        config_dir().join("config.json")
+    }
+
+    pub fn load() -> Self {
+        let path = Self::config_file_path();
+        match fs::read_to_string(&path) {
+            Ok(content) => match serde_json::from_str(&content) {
+                Ok(config) => config,
+                Err(err) => {
+                    tracing::warn!(error = %err, "configuration invalide, utilisation des valeurs par défaut");
+                    Self::default()
+                }
+            },
+            Err(_) => Self::default(),
+        }
+    }
+
+    pub fn save(&self) -> std::io::Result<()> {
+        let dir = config_dir();
+        fs::create_dir_all(&dir)?;
+        let content = serde_json::to_string_pretty(self)?;
+        fs::write(Self::config_file_path(), content)
+    }
+}
+
+fn config_dir() -> PathBuf {
+    let base = std::env::var("APPDATA")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default());
+    base.join("MAMESET-Cleaner")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_config_has_french_language_and_light_theme() {
+        let config = AppConfig::default();
+        assert_eq!(config.language, AppLanguage::Fr);
+        assert_eq!(config.theme, AppTheme::Light);
+        assert!(config.rom_set_path.is_none());
+    }
+
+    #[test]
+    fn config_round_trips_through_json() {
+        let config = AppConfig {
+            language: AppLanguage::En,
+            theme: AppTheme::Dark,
+            rom_set_path: Some("C:/roms".to_string()),
+            dat_file_path: None,
+            catver_ini_path: None,
+            languages_ini_path: None,
+        };
+        let json = serde_json::to_string(&config).unwrap();
+        let restored: AppConfig = serde_json::from_str(&json).unwrap();
+        assert_eq!(restored.language, AppLanguage::En);
+        assert_eq!(restored.theme, AppTheme::Dark);
+        assert_eq!(restored.rom_set_path.as_deref(), Some("C:/roms"));
+    }
+}
