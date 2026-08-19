@@ -173,7 +173,7 @@ fn classify_status(result: &CandidateResult, metadata: Option<&RomEntry>) -> Rom
         Some(entry) => {
             let all_match = entry.roms.iter().all(|expected| {
                 result.files.iter().any(|(name, crc)| {
-                    *name == expected.name && expected.crc32.map_or(true, |c| c == *crc)
+                    *name == expected.name && expected.crc32.is_none_or(|c| c == *crc)
                 })
             });
 

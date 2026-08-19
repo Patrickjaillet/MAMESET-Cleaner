@@ -9,7 +9,7 @@ pub enum DriverStatus {
 }
 
 impl DriverStatus {
-    pub fn from_str(value: &str) -> Self {
+    pub fn parse_status(value: &str) -> Self {
         match value {
             "good" => DriverStatus::Good,
             "imperfect" => DriverStatus::Imperfect,
@@ -61,13 +61,13 @@ mod tests {
 
     #[test]
     fn driver_status_parses_known_values() {
-        assert_eq!(DriverStatus::from_str("good"), DriverStatus::Good);
-        assert_eq!(DriverStatus::from_str("imperfect"), DriverStatus::Imperfect);
+        assert_eq!(DriverStatus::parse_status("good"), DriverStatus::Good);
+        assert_eq!(DriverStatus::parse_status("imperfect"), DriverStatus::Imperfect);
         assert_eq!(
-            DriverStatus::from_str("preliminary"),
+            DriverStatus::parse_status("preliminary"),
             DriverStatus::Preliminary
         );
-        assert_eq!(DriverStatus::from_str("weird"), DriverStatus::Unknown);
+        assert_eq!(DriverStatus::parse_status("weird"), DriverStatus::Unknown);
     }
 
     #[test]

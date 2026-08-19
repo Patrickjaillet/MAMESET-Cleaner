@@ -156,8 +156,10 @@ mod tests {
     #[test]
     fn category_filter_is_an_or_within_the_list() {
         let entry = base_entry();
-        let mut profile = FilterProfile::default();
-        profile.categories = vec!["Shooter".to_string(), "Maze".to_string()];
+        let mut profile = FilterProfile {
+            categories: vec!["Shooter".to_string(), "Maze".to_string()],
+            ..Default::default()
+        };
         assert!(matches(&entry, &profile));
 
         profile.categories = vec!["Shooter".to_string()];
@@ -167,9 +169,11 @@ mod tests {
     #[test]
     fn multiple_criteria_are_combined_with_and() {
         let entry = base_entry();
-        let mut profile = FilterProfile::default();
-        profile.categories = vec!["Maze".to_string()];
-        profile.manufacturers = vec!["Other".to_string()];
+        let profile = FilterProfile {
+            categories: vec!["Maze".to_string()],
+            manufacturers: vec!["Other".to_string()],
+            ..Default::default()
+        };
 
         // La catégorie correspond mais pas le fabricant : le ET doit exclure l'entrée.
         assert!(!matches(&entry, &profile));
@@ -178,8 +182,10 @@ mod tests {
     #[test]
     fn year_range_filter() {
         let entry = base_entry();
-        let mut profile = FilterProfile::default();
-        profile.year_min = Some(1991);
+        let mut profile = FilterProfile {
+            year_min: Some(1991),
+            ..Default::default()
+        };
         assert!(!matches(&entry, &profile));
 
         profile.year_min = Some(1980);
@@ -190,8 +196,10 @@ mod tests {
     #[test]
     fn region_filter_uses_description_parsing() {
         let entry = base_entry();
-        let mut profile = FilterProfile::default();
-        profile.regions = vec!["Japan".to_string()];
+        let mut profile = FilterProfile {
+            regions: vec!["Japan".to_string()],
+            ..Default::default()
+        };
         assert!(!matches(&entry, &profile));
 
         profile.regions = vec!["USA".to_string()];
@@ -201,8 +209,10 @@ mod tests {
     #[test]
     fn driver_status_filter() {
         let entry = base_entry();
-        let mut profile = FilterProfile::default();
-        profile.driver_statuses = vec![DriverStatus::Preliminary];
+        let mut profile = FilterProfile {
+            driver_statuses: vec![DriverStatus::Preliminary],
+            ..Default::default()
+        };
         assert!(!matches(&entry, &profile));
 
         profile.driver_statuses = vec![DriverStatus::Good, DriverStatus::Imperfect];
@@ -220,11 +230,13 @@ mod tests {
         let mut adult = base_entry();
         adult.category = Some("Mahjong * Mature *".to_string());
 
-        let mut profile = FilterProfile::default();
-        profile.include_bios = false;
-        profile.include_device = false;
-        profile.include_mechanical = false;
-        profile.include_adult = false;
+        let profile = FilterProfile {
+            include_bios: false,
+            include_device: false,
+            include_mechanical: false,
+            include_adult: false,
+            ..Default::default()
+        };
 
         assert!(!matches(&bios, &profile));
         assert!(!matches(&device, &profile));
@@ -242,8 +254,10 @@ mod tests {
         other.manufacturer = "Other".to_string();
         entries.insert("gameb".to_string(), other);
 
-        let mut profile = FilterProfile::default();
-        profile.manufacturers = vec!["Acme".to_string()];
+        let profile = FilterProfile {
+            manufacturers: vec!["Acme".to_string()],
+            ..Default::default()
+        };
 
         let result = apply_filter(&entries, &profile);
         assert_eq!(result.len(), 1);

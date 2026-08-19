@@ -190,7 +190,7 @@ fn parse_rom_attributes(e: &quick_xml::events::BytesStart) -> Result<RomFile, Da
 
 fn parse_driver_status(e: &quick_xml::events::BytesStart) -> Result<DriverStatus, DatError> {
     let status = attr_value(e, "status")?.unwrap_or_default();
-    Ok(DriverStatus::from_str(&status))
+    Ok(DriverStatus::parse_status(&status))
 }
 
 /// Lit l'attribut de version (`build` pour `-listxml`, `version` pour un

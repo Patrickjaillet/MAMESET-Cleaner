@@ -298,6 +298,8 @@ fn setup_cancel_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
     });
 }
 
+type ScanPipelineResult = Result<(HashMap<String, RomEntry>, RomSet, HashSet<String>, HashSet<String>), String>;
+
 fn run_scan_pipeline(
     rom_set_path: &str,
     dat_file_path: &str,
@@ -305,7 +307,7 @@ fn run_scan_pipeline(
     languages_ini_path: Option<&str>,
     cancel_flag: &AtomicBool,
     weak_shared: Arc<Mutex<Weak<AppWindow>>>,
-) -> Result<(HashMap<String, RomEntry>, RomSet, HashSet<String>, HashSet<String>), String> {
+) -> ScanPipelineResult {
     let mut dat_entries =
         dat_parser::parse_dat_file(Path::new(dat_file_path)).map_err(|e| e.to_string())?;
 

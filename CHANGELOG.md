@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## v1.0.0
+- Première version stable de MAMESET Cleaner.
+- Le logiciel a été entièrement testé (plus de 60 vérifications automatiques) et relu pour ne laisser aucun problème connu.
+- Documentation complète pour les utilisateurs (guide d'installation, présentation des fonctionnalités, captures d'écran) et pour les développeurs souhaitant compiler le logiciel eux-mêmes.
+
 ## v0.9.0
 - Ajout d'une icône pour le logiciel et pour son installateur.
 - Correction d'un bug important : une fenêtre noire de console s'affichait au lancement du logiciel en plus de la fenêtre principale ; ce n'est plus le cas.

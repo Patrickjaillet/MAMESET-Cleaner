@@ -131,9 +131,11 @@ mod tests {
         let dir = temp_dir("roundtrip");
         let _ = fs::remove_dir_all(&dir);
 
-        let mut profile = FilterProfile::default();
-        profile.name = "Arcade FR".to_string();
-        profile.languages = vec!["French".to_string()];
+        let profile = FilterProfile {
+            name: "Arcade FR".to_string(),
+            languages: vec!["French".to_string()],
+            ..Default::default()
+        };
 
         save_profile_to(&dir, &profile).unwrap();
         let loaded = load_profile_from(&dir, "Arcade FR").unwrap();
@@ -149,10 +151,14 @@ mod tests {
         let dir = temp_dir("list");
         let _ = fs::remove_dir_all(&dir);
 
-        let mut a = FilterProfile::default();
-        a.name = "ProfileA".to_string();
-        let mut b = FilterProfile::default();
-        b.name = "ProfileB".to_string();
+        let a = FilterProfile {
+            name: "ProfileA".to_string(),
+            ..Default::default()
+        };
+        let b = FilterProfile {
+            name: "ProfileB".to_string(),
+            ..Default::default()
+        };
 
         save_profile_to(&dir, &a).unwrap();
         save_profile_to(&dir, &b).unwrap();
@@ -180,8 +186,10 @@ mod tests {
         let dir = temp_dir("delete");
         let _ = fs::remove_dir_all(&dir);
 
-        let mut profile = FilterProfile::default();
-        profile.name = "ToDelete".to_string();
+        let profile = FilterProfile {
+            name: "ToDelete".to_string(),
+            ..Default::default()
+        };
         save_profile_to(&dir, &profile).unwrap();
 
         delete_profile_from(&dir, "ToDelete").unwrap();
@@ -195,8 +203,10 @@ mod tests {
         let dir = temp_dir("sanitize");
         let _ = fs::remove_dir_all(&dir);
 
-        let mut profile = FilterProfile::default();
-        profile.name = "Set / Spécial: 1".to_string();
+        let profile = FilterProfile {
+            name: "Set / Spécial: 1".to_string(),
+            ..Default::default()
+        };
         save_profile_to(&dir, &profile).unwrap();
 
         let loaded = load_profile_from(&dir, "Set / Spécial: 1").unwrap();
