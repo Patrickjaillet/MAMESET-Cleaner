@@ -1,5 +1,6 @@
 /target
 *.pdb
+/installer/output/
 
 # Fichiers internes de pilotage IA, jamais publiés sur GitHub
 ROADMAP.md
