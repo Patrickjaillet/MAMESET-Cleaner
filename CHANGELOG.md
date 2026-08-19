@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## v0.9.0
+- Ajout d'une icône pour le logiciel et pour son installateur.
+- Correction d'un bug important : une fenêtre noire de console s'affichait au lancement du logiciel en plus de la fenêtre principale ; ce n'est plus le cas.
+- Préparation de l'installateur Windows (à finaliser lors de la prochaine étape avec Inno Setup installé).
+- Ajout d'un guide de compilation pour les développeurs (`docs/COMPILATION.md`).
+
 ## v0.8.0
 - Le scan détecte maintenant les archives réellement corrompues (et pas seulement les ROMs différentes de celles attendues), en relisant entièrement chaque fichier au lieu de se fier à une simple étiquette.
 - Un fichier de référence MAME illisible ou vide affiche désormais un message d'erreur clair au lieu de produire un résultat trompeur.
