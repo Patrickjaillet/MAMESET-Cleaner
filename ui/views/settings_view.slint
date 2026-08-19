@@ -1,12 +1,15 @@
 import { AppButton } from "../components/app_button.slint";
 import { TextField } from "../components/text_field.slint";
 import { SegmentedChoice } from "../components/segmented_choice.slint";
+import { ToggleOption } from "../components/toggle_option.slint";
 
 export component SettingsView inherits Rectangle {
     in-out property <string> rom-set-path;
     in-out property <string> dat-file-path;
     in-out property <string> catver-ini-path;
     in-out property <string> languages-ini-path;
+    in-out property <string> backup-dir-path;
+    in-out property <bool> use-recycle-bin: true;
     in-out property <bool> language-is-english;
     in-out property <bool> dark-theme;
     in property <string> settings-status-text;
@@ -14,6 +17,7 @@ export component SettingsView inherits Rectangle {
     callback browse-dat-file-path();
     callback browse-catver-ini-path();
     callback browse-languages-ini-path();
+    callback browse-backup-dir-path();
     callback save-settings();
 
     Flickable {
@@ -54,6 +58,18 @@ export component SettingsView inherits Rectangle {
                 spacing: 8px;
                 TextField { value <=> root.languages-ini-path; placeholder: "Chemin de languages.ini"; }
                 AppButton { width: 120px; text: "Parcourir"; clicked => { root.browse-languages-ini-path(); } }
+            }
+
+            Text { text: "Dossier de sauvegarde avant nettoyage (optionnel)"; }
+            HorizontalLayout {
+                spacing: 8px;
+                TextField { value <=> root.backup-dir-path; placeholder: "Aucune sauvegarde si vide"; }
+                AppButton { width: 120px; text: "Parcourir"; clicked => { root.browse-backup-dir-path(); } }
+            }
+
+            ToggleOption {
+                text: "Déplacer vers la corbeille Windows plutôt que supprimer définitivement";
+                checked <=> root.use-recycle-bin;
             }
 
             Text { text: "Langue de l'interface"; font-weight: 600; }

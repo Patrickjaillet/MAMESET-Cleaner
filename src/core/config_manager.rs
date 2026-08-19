@@ -15,6 +15,10 @@ pub enum AppLanguage {
     En,
 }
 
+fn default_use_recycle_bin() -> bool {
+    true
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub language: AppLanguage,
@@ -23,6 +27,10 @@ pub struct AppConfig {
     pub dat_file_path: Option<String>,
     pub catver_ini_path: Option<String>,
     pub languages_ini_path: Option<String>,
+    #[serde(default)]
+    pub backup_dir_path: Option<String>,
+    #[serde(default = "default_use_recycle_bin")]
+    pub use_recycle_bin: bool,
 }
 
 impl Default for AppConfig {
@@ -34,6 +42,8 @@ impl Default for AppConfig {
             dat_file_path: None,
             catver_ini_path: None,
             languages_ini_path: None,
+            backup_dir_path: None,
+            use_recycle_bin: true,
         }
     }
 }
@@ -93,6 +103,8 @@ mod tests {
             dat_file_path: None,
             catver_ini_path: None,
             languages_ini_path: None,
+            backup_dir_path: None,
+            use_recycle_bin: false,
         };
         let json = serde_json::to_string(&config).unwrap();
         let restored: AppConfig = serde_json::from_str(&json).unwrap();

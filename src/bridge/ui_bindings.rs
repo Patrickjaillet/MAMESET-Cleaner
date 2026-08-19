@@ -1,12 +1,16 @@
 use std::collections::{HashMap, HashSet};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
 use slint::{ModelRc, VecModel, Weak};
 
+use crate::core::cleanup_engine::{CleanupOptions, CleanupTarget};
 use crate::core::config_manager::{AppConfig, AppLanguage, AppTheme};
 use crate::core::i18n::Translator;
-use crate::core::{catver_parser, dat_parser, dedup_engine, filter_engine, languages_parser, rom_scanner};
+use crate::core::{
+    catver_parser, cleanup_engine, dat_parser, dedup_engine, filter_engine, languages_parser,
+    report_generator, rom_scanner,
+};
 use crate::models::filter_profile::FilterProfile;
 use crate::models::rom_entry::{DriverStatus, RomEntry};
 use crate::models::rom_set::{RomSet, RomStatus};
@@ -18,6 +22,7 @@ struct AppState {
     dat_entries: HashMap<String, RomEntry>,
     rom_set: RomSet,
     dedup_remove: HashSet<String>,
+    dedup_keep: HashSet<String>,
     filter_profile: FilterProfile,
     sort_column: String,
     sort_ascending: bool,
@@ -30,6 +35,7 @@ impl AppState {
             dat_entries: HashMap::new(),
             rom_set: RomSet::new(),
             dedup_remove: HashSet::new(),
+            dedup_keep: HashSet::new(),
             filter_profile: FilterProfile::default(),
             sort_column: "name".to_string(),
             sort_ascending: true,
@@ -46,6 +52,8 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     window.set_dat_file_path(config.dat_file_path.clone().unwrap_or_default().into());
     window.set_catver_ini_path(config.catver_ini_path.clone().unwrap_or_default().into());
     window.set_languages_ini_path(config.languages_ini_path.clone().unwrap_or_default().into());
+    window.set_backup_dir_path(config.backup_dir_path.clone().unwrap_or_default().into());
+    window.set_use_recycle_bin(config.use_recycle_bin);
     window.set_language_is_english(config.language == AppLanguage::En);
     window.set_dark_theme(config.theme == AppTheme::Dark);
     window.set_scan_progress(0.0);
@@ -53,6 +61,7 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     window.set_scan_counts_text(String::new().into());
     window.set_filter_summary_text(String::new().into());
     window.set_result_count_text(String::new().into());
+    window.set_cleanup_status_text(String::new().into());
 
     let state = Arc::new(Mutex::new(AppState::new(config.clone())));
 
@@ -62,6 +71,7 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     setup_apply_filters(&window, &state);
     setup_search(&window, &state);
     setup_sort(&window, &state);
+    setup_cleanup(&window, &state);
 
     tracing::info!("fenêtre principale initialisée");
 
@@ -113,6 +123,15 @@ fn setup_browse_callbacks(window: &AppWindow) {
             }
         }
     });
+
+    let weak = window.as_weak();
+    window.on_browse_backup_dir_path(move || {
+        if let Some(window) = weak.upgrade() {
+            if let Some(path) = rfd::FileDialog::new().pick_folder() {
+                window.set_backup_dir_path(path.display().to_string().into());
+            }
+        }
+    });
 }
 
 fn setup_save_settings(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
@@ -142,6 +161,8 @@ fn setup_save_settings(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
             dat_file_path: non_empty(window.get_dat_file_path().to_string()),
             catver_ini_path: non_empty(window.get_catver_ini_path().to_string()),
             languages_ini_path: non_empty(window.get_languages_ini_path().to_string()),
+            backup_dir_path: non_empty(window.get_backup_dir_path().to_string()),
+            use_recycle_bin: window.get_use_recycle_bin(),
         };
 
         let status = match config.save() {
@@ -209,13 +230,14 @@ fn setup_start_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
 
             let weak_done = weak_for_thread.clone();
             match result {
-                Ok((dat_entries, rom_set, dedup_remove)) => {
+                Ok((dat_entries, rom_set, dedup_remove, dedup_keep)) => {
                     let counts_text = format_scan_counts(&rom_set);
                     {
                         let mut guard = state_for_thread.lock().unwrap();
                         guard.dat_entries = dat_entries;
                         guard.rom_set = rom_set;
                         guard.dedup_remove = dedup_remove;
+                        guard.dedup_keep = dedup_keep;
                     }
 
                     let state_after = Arc::clone(&state_for_thread);
@@ -248,7 +270,7 @@ fn run_scan_pipeline(
     catver_ini_path: Option<&str>,
     languages_ini_path: Option<&str>,
     weak_shared: Arc<Mutex<Weak<AppWindow>>>,
-) -> Result<(HashMap<String, RomEntry>, RomSet, HashSet<String>), String> {
+) -> Result<(HashMap<String, RomEntry>, RomSet, HashSet<String>, HashSet<String>), String> {
     let mut dat_entries =
         dat_parser::parse_dat_file(Path::new(dat_file_path)).map_err(|e| e.to_string())?;
 
@@ -291,8 +313,9 @@ fn run_scan_pipeline(
     let dedup_plan =
         dedup_engine::build_dedup_plan(&dat_entries, &dedup_engine::RegionPriority::default_profile());
     let dedup_remove: HashSet<String> = dedup_plan.roms_to_remove().into_iter().collect();
+    let dedup_keep: HashSet<String> = dedup_plan.roms_to_keep().into_iter().collect();
 
-    Ok((dat_entries, rom_set, dedup_remove))
+    Ok((dat_entries, rom_set, dedup_remove, dedup_keep))
 }
 
 fn format_scan_counts(rom_set: &RomSet) -> String {
@@ -373,6 +396,154 @@ fn setup_sort(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
                 guard.sort_ascending = true;
             }
         }
+
+        refresh_results(&window, &state);
+    });
+}
+
+fn collect_cleanup_targets(state: &AppState) -> Vec<CleanupTarget> {
+    state
+        .dedup_remove
+        .iter()
+        .filter_map(|name| {
+            let scanned = state.rom_set.entries.get(name)?;
+            let path = scanned.file_path.clone()?;
+            Some(CleanupTarget {
+                name: name.clone(),
+                file_path: path,
+                reason: "doublon (1G1R)".to_string(),
+            })
+        })
+        .collect()
+}
+
+fn setup_cleanup(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let weak = window.as_weak();
+    let state_request = Arc::clone(state);
+    window.on_request_cleanup(move || {
+        let Some(window) = weak.upgrade() else {
+            return;
+        };
+
+        let count = {
+            let guard = state_request.lock().unwrap();
+            collect_cleanup_targets(&guard).len()
+        };
+
+        if count == 0 {
+            window
+                .set_cleanup_status_text("Aucune ROM en double à nettoyer pour le moment.".into());
+            return;
+        }
+
+        window.set_cleanup_target_count_text(
+            format!("{count} ROM(s) en double vont être traitées.").into(),
+        );
+        window.set_cleanup_confirm_visible(true);
+    });
+
+    let weak = window.as_weak();
+    window.on_cancel_cleanup(move || {
+        if let Some(window) = weak.upgrade() {
+            window.set_cleanup_confirm_visible(false);
+        }
+    });
+
+    let weak = window.as_weak();
+    let state = Arc::clone(state);
+    window.on_confirm_cleanup(move || {
+        let Some(window) = weak.upgrade() else {
+            return;
+        };
+        window.set_cleanup_confirm_visible(false);
+
+        let (targets, use_recycle_bin, backup_dir) = {
+            let guard = state.lock().unwrap();
+            let targets = collect_cleanup_targets(&guard);
+            (
+                targets,
+                guard.config.use_recycle_bin,
+                guard.config.backup_dir_path.clone(),
+            )
+        };
+
+        let options = CleanupOptions {
+            use_recycle_bin,
+            backup_dir: backup_dir
+                .map(PathBuf::from)
+                .filter(|p| !p.as_os_str().is_empty()),
+            confirmed: true,
+        };
+
+        let records = match cleanup_engine::run_cleanup(&targets, &options) {
+            Ok(records) => records,
+            Err(err) => {
+                window.set_cleanup_status_text(format!("Nettoyage annulé : {err}").into());
+                return;
+            }
+        };
+
+        let success_count = records.iter().filter(|r| r.error.is_none()).count();
+        let failure_count = records.len() - success_count;
+
+        let kept_records: Vec<cleanup_engine::CleanupRecord> = {
+            let guard = state.lock().unwrap();
+            guard
+                .dedup_keep
+                .iter()
+                .map(|name| {
+                    let file_path = guard
+                        .rom_set
+                        .entries
+                        .get(name)
+                        .and_then(|scanned| scanned.file_path.clone())
+                        .map(|p| p.display().to_string())
+                        .unwrap_or_default();
+                    cleanup_engine::CleanupRecord {
+                        name: name.clone(),
+                        file_path,
+                        reason: "meilleur exemplaire du groupe (1G1R)".to_string(),
+                        action: "conservé".to_string(),
+                        backed_up_to: None,
+                        error: None,
+                    }
+                })
+                .collect()
+        };
+        let mut full_report = records.clone();
+        full_report.extend(kept_records);
+
+        let reports_dir = crate::core::config_manager::config_dir().join("reports");
+        let _ = std::fs::create_dir_all(&reports_dir);
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        let json_path = reports_dir.join(format!("cleanup_report_{timestamp}.json"));
+        let csv_path = reports_dir.join(format!("cleanup_report_{timestamp}.csv"));
+        let _ = report_generator::write_json_report(&full_report, &json_path);
+        let _ = report_generator::write_csv_report(&full_report, &csv_path);
+
+        {
+            let mut guard = state.lock().unwrap();
+            for record in &records {
+                if record.error.is_none() {
+                    guard.dedup_remove.remove(&record.name);
+                    if let Some(scanned) = guard.rom_set.entries.get_mut(&record.name) {
+                        scanned.file_path = None;
+                        scanned.status = RomStatus::Missing;
+                    }
+                }
+            }
+        }
+
+        window.set_cleanup_status_text(
+            format!(
+                "Nettoyage terminé : {success_count} ROM(s) traitées, {failure_count} échec(s). Rapport : {}",
+                json_path.display()
+            )
+            .into(),
+        );
 
         refresh_results(&window, &state);
     });

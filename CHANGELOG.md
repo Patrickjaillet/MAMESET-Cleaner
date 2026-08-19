@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## v0.7.0
+- Ajout du nettoyage réel des ROMs en double détectées : elles sont déplacées vers la corbeille Windows par défaut, ou supprimées définitivement si l'utilisateur le choisit.
+- Ajout d'une option de sauvegarde : les ROMs peuvent être copiées dans un dossier de sécurité avant tout nettoyage.
+- Une confirmation est désormais toujours demandée avant de nettoyer, avec le nombre de ROMs concernées.
+- Chaque nettoyage génère un rapport détaillé (JSON et CSV) listant les ROMs supprimées et conservées avec leur motif, enregistré automatiquement sur l'ordinateur.
+
 ## v0.6.0
 - Le logiciel dispose maintenant d'une interface graphique complète avec 5 sections : Scan, Filtres, Résultats, Paramètres et À propos.
 - La sélection des dossiers et fichiers (ROMs, DAT, catver.ini, languages.ini) se fait désormais par une fenêtre de sélection classique de Windows, depuis les Paramètres.

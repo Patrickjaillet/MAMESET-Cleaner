@@ -21,6 +21,8 @@ export component AppWindow inherits Window {
     in-out property <string> dat-file-path;
     in-out property <string> catver-ini-path;
     in-out property <string> languages-ini-path;
+    in-out property <string> backup-dir-path;
+    in-out property <bool> use-recycle-bin: true;
     in-out property <bool> language-is-english;
     in-out property <bool> dark-theme;
     in property <string> settings-status-text;
@@ -49,16 +51,23 @@ export component AppWindow inherits Window {
     in-out property <string> search-text;
     in property <[ResultRow]> result-rows;
     in property <string> result-count-text;
+    in property <bool> cleanup-confirm-visible;
+    in property <string> cleanup-target-count-text;
+    in property <string> cleanup-status-text;
 
     callback browse-rom-set-path();
     callback browse-dat-file-path();
     callback browse-catver-ini-path();
     callback browse-languages-ini-path();
+    callback browse-backup-dir-path();
     callback save-settings();
     callback start-scan();
     callback apply-filters();
     callback search-triggered();
     callback sort-by(string);
+    callback request-cleanup();
+    callback confirm-cleanup();
+    callback cancel-cleanup();
 
     HorizontalLayout {
         Sidebar {
@@ -106,14 +115,22 @@ export component AppWindow inherits Window {
                 search-text <=> root.search-text;
                 result-rows: root.result-rows;
                 result-count-text: root.result-count-text;
+                cleanup-confirm-visible: root.cleanup-confirm-visible;
+                cleanup-target-count-text: root.cleanup-target-count-text;
+                cleanup-status-text: root.cleanup-status-text;
                 search-triggered => { root.search-triggered(); }
                 sort-by(column) => { root.sort-by(column); }
+                request-cleanup => { root.request-cleanup(); }
+                confirm-cleanup => { root.confirm-cleanup(); }
+                cancel-cleanup => { root.cancel-cleanup(); }
             }
             if current-view == 3: SettingsView {
                 rom-set-path <=> root.rom-set-path;
                 dat-file-path <=> root.dat-file-path;
                 catver-ini-path <=> root.catver-ini-path;
                 languages-ini-path <=> root.languages-ini-path;
+                backup-dir-path <=> root.backup-dir-path;
+                use-recycle-bin <=> root.use-recycle-bin;
                 language-is-english <=> root.language-is-english;
                 dark-theme <=> root.dark-theme;
                 settings-status-text: root.settings-status-text;
@@ -121,6 +138,7 @@ export component AppWindow inherits Window {
                 browse-dat-file-path => { root.browse-dat-file-path(); }
                 browse-catver-ini-path => { root.browse-catver-ini-path(); }
                 browse-languages-ini-path => { root.browse-languages-ini-path(); }
+                browse-backup-dir-path => { root.browse-backup-dir-path(); }
                 save-settings => { root.save-settings(); }
             }
             if current-view == 4: AboutView { app-version: root.app-version; }

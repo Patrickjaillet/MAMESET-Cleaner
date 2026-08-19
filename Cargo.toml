@@ -20,6 +20,7 @@ zip = "2.2"
 sevenz-rust = "0.6"
 ureq = "2.10"
 rfd = "0.15"
+trash = "5.2"
 
 [lib]
 name = "mameset_cleaner"
@@ -36,6 +37,10 @@ path = "test/structure_test.rs"
 [[test]]
 name = "dat_parsing_test"
 path = "test/dat_parsing_test.rs"
+
+[[test]]
+name = "cleanup_test"
+path = "test/cleanup_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

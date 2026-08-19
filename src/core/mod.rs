@@ -1,5 +1,6 @@
 pub mod catver_parser;
 pub mod checksum;
+pub mod cleanup_engine;
 pub mod config_manager;
 pub mod dat_parser;
 pub mod dedup_engine;
@@ -8,4 +9,5 @@ pub mod i18n;
 pub mod languages_parser;
 pub mod logging;
 pub mod profile_manager;
+pub mod report_generator;
 pub mod rom_scanner;
