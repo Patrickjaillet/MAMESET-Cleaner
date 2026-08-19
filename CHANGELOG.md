@@ -1,5 +1,10 @@
 # Journal des modifications
 
+## v0.3.0
+- Ajout de l'analyse du dossier de ROMs de l'utilisateur (fichiers `.zip`, `.7z` et dossiers non compressés), y compris dans les sous-dossiers.
+- Le logiciel compare désormais chaque ROM trouvée avec la liste de référence MAME et indique si elle est correcte, corrompue, manquante ou non reconnue.
+- L'analyse s'exécute en parallèle sur plusieurs cœurs du processeur pour rester rapide même sur de très gros sets de ROMs.
+
 ## v0.2.0
 - Ajout de la lecture des fichiers de référence MAME : liste officielle des jeux (DAT), catégories de jeux et langues des jeux.
 - Le logiciel peut désormais reconnaître automatiquement le nom, la description, l'année, le fabricant, le statut (jeu principal ou variante), l'état de fonctionnement, le genre et la langue de chaque jeu.
