@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use slint::{ModelRc, VecModel, Weak};
@@ -26,6 +27,7 @@ struct AppState {
     filter_profile: FilterProfile,
     sort_column: String,
     sort_ascending: bool,
+    scan_cancel_flag: Arc<AtomicBool>,
 }
 
 impl AppState {
@@ -39,6 +41,7 @@ impl AppState {
             filter_profile: FilterProfile::default(),
             sort_column: "name".to_string(),
             sort_ascending: true,
+            scan_cancel_flag: Arc::new(AtomicBool::new(false)),
         }
     }
 }
@@ -62,12 +65,14 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     window.set_filter_summary_text(String::new().into());
     window.set_result_count_text(String::new().into());
     window.set_cleanup_status_text(String::new().into());
+    window.set_integrity_status_text(String::new().into());
 
     let state = Arc::new(Mutex::new(AppState::new(config.clone())));
 
     setup_browse_callbacks(&window);
     setup_save_settings(&window, &state);
     setup_start_scan(&window, &state);
+    setup_cancel_scan(&window, &state);
     setup_apply_filters(&window, &state);
     setup_search(&window, &state);
     setup_sort(&window, &state);
@@ -214,6 +219,12 @@ fn setup_start_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
         window.set_scan_progress(0.0);
         window.set_scan_status_text("Analyse en cours...".into());
 
+        let cancel_flag = Arc::new(AtomicBool::new(false));
+        {
+            let mut guard = state.lock().unwrap();
+            guard.scan_cancel_flag = Arc::clone(&cancel_flag);
+        }
+
         let state_for_thread = Arc::clone(&state);
         let weak_for_thread = weak.clone();
 
@@ -225,9 +236,11 @@ fn setup_start_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
                 &dat_file_path,
                 catver_ini_path.as_deref(),
                 languages_ini_path.as_deref(),
+                &cancel_flag,
                 Arc::clone(&weak_shared),
             );
 
+            let was_cancelled = cancel_flag.load(Ordering::Relaxed);
             let weak_done = weak_for_thread.clone();
             match result {
                 Ok((dat_entries, rom_set, dedup_remove, dedup_keep)) => {
@@ -241,11 +254,16 @@ fn setup_start_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
                     }
 
                     let state_after = Arc::clone(&state_for_thread);
+                    let status_text = if was_cancelled {
+                        "Scan annulé (résultats partiels)."
+                    } else {
+                        "Scan terminé."
+                    };
                     let _ = slint::invoke_from_event_loop(move || {
                         if let Some(window) = weak_done.upgrade() {
                             window.set_scan_running(false);
                             window.set_scan_progress(1.0);
-                            window.set_scan_status_text("Scan terminé.".into());
+                            window.set_scan_status_text(status_text.into());
                             window.set_scan_counts_text(counts_text.into());
                             refresh_results(&window, &state_after);
                         }
@@ -264,11 +282,28 @@ fn setup_start_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
     });
 }
 
+fn setup_cancel_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let weak = window.as_weak();
+    let state = Arc::clone(state);
+
+    window.on_cancel_scan(move || {
+        if let Some(window) = weak.upgrade() {
+            state
+                .lock()
+                .unwrap()
+                .scan_cancel_flag
+                .store(true, Ordering::Relaxed);
+            window.set_scan_status_text("Annulation en cours...".into());
+        }
+    });
+}
+
 fn run_scan_pipeline(
     rom_set_path: &str,
     dat_file_path: &str,
     catver_ini_path: Option<&str>,
     languages_ini_path: Option<&str>,
+    cancel_flag: &AtomicBool,
     weak_shared: Arc<Mutex<Weak<AppWindow>>>,
 ) -> Result<(HashMap<String, RomEntry>, RomSet, HashSet<String>, HashSet<String>), String> {
     let mut dat_entries =
@@ -289,6 +324,7 @@ fn run_scan_pipeline(
     let rom_set = rom_scanner::scan_rom_directory(
         Path::new(rom_set_path),
         &dat_entries,
+        cancel_flag,
         move |progress: rom_scanner::ScanProgress| {
             let ratio = if progress.total == 0 {
                 1.0
@@ -546,7 +582,70 @@ fn setup_cleanup(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
         );
 
         refresh_results(&window, &state);
+
+        window.set_integrity_status_text("Vérification d'intégrité en cours...".into());
+        let weak_verify = weak.clone();
+        let state_verify = Arc::clone(&state);
+        std::thread::spawn(move || {
+            let text = run_post_cleanup_verification(&state_verify);
+            let _ = slint::invoke_from_event_loop(move || {
+                if let Some(window) = weak_verify.upgrade() {
+                    window.set_integrity_status_text(text.into());
+                    refresh_results(&window, &state_verify);
+                }
+            });
+        });
     });
+}
+
+/// Re-scanne le dossier de ROMs après un nettoyage et vérifie que toutes
+/// les ROMs qui devaient être conservées (plan 1G1R) sont bien présentes
+/// et intactes sur le disque final.
+fn run_post_cleanup_verification(state: &Arc<Mutex<AppState>>) -> String {
+    let (rom_set_path, dat_entries, dedup_keep) = {
+        let guard = state.lock().unwrap();
+        (
+            guard.config.rom_set_path.clone(),
+            guard.dat_entries.clone(),
+            guard.dedup_keep.clone(),
+        )
+    };
+
+    let Some(rom_set_path) = rom_set_path else {
+        return String::new();
+    };
+
+    let cancel_flag = AtomicBool::new(false);
+    let rescanned = match rom_scanner::scan_rom_directory(
+        Path::new(&rom_set_path),
+        &dat_entries,
+        &cancel_flag,
+        |_| {},
+    ) {
+        Ok(rom_set) => rom_set,
+        Err(err) => return format!("Vérification d'intégrité impossible : {err}"),
+    };
+
+    let report = rom_scanner::verify_integrity(&rescanned, &dedup_keep);
+
+    {
+        let mut guard = state.lock().unwrap();
+        guard.rom_set = rescanned;
+    }
+
+    if report.problems.is_empty() {
+        format!(
+            "Vérification d'intégrité : {} ROM(s) conservée(s) confirmée(s) intactes.",
+            report.verified_ok.len()
+        )
+    } else {
+        format!(
+            "Vérification d'intégrité : {} ROM(s) confirmée(s), {} problème(s) détecté(s) ({}).",
+            report.verified_ok.len(),
+            report.problems.len(),
+            report.problems.join(", ")
+        )
+    }
 }
 
 fn refresh_results(window: &AppWindow, state: &Arc<Mutex<AppState>>) {

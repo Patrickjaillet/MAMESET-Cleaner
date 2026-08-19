@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## v0.8.0
+- Le scan détecte maintenant les archives réellement corrompues (et pas seulement les ROMs différentes de celles attendues), en relisant entièrement chaque fichier au lieu de se fier à une simple étiquette.
+- Un fichier de référence MAME illisible ou vide affiche désormais un message d'erreur clair au lieu de produire un résultat trompeur.
+- Ajout d'un bouton Annuler pendant un scan en cours.
+- Après un nettoyage, le logiciel revérifie automatiquement que toutes les ROMs conservées sont bien présentes et intactes, et affiche le résultat de cette vérification.
+
 ## v0.7.0
 - Ajout du nettoyage réel des ROMs en double détectées : elles sont déplacées vers la corbeille Windows par défaut, ou supprimées définitivement si l'utilisateur le choisit.
 - Ajout d'une option de sauvegarde : les ROMs peuvent être copiées dans un dossier de sécurité avant tout nettoyage.

@@ -9,6 +9,7 @@ export component ResultsView inherits Rectangle {
     in property <bool> cleanup-confirm-visible;
     in property <string> cleanup-target-count-text;
     in property <string> cleanup-status-text;
+    in property <string> integrity-status-text;
     callback search-triggered();
     callback sort-by(string);
     callback request-cleanup();
@@ -45,7 +46,8 @@ export component ResultsView inherits Rectangle {
         }
 
         Text { text: root.result-count-text; }
-        Text { text: root.cleanup-status-text; }
+        Text { text: root.cleanup-status-text; wrap: word-wrap; }
+        Text { text: root.integrity-status-text; wrap: word-wrap; }
 
         Rectangle {
             border-width: 1px;

@@ -8,6 +8,7 @@ export component ScanView inherits Rectangle {
     in property <string> scan-status-text;
     in property <string> scan-counts-text;
     callback start-scan();
+    callback cancel-scan();
 
     VerticalLayout {
         padding: 24px;
@@ -30,12 +31,21 @@ export component ScanView inherits Rectangle {
             wrap: word-wrap;
         }
 
-        AppButton {
-            width: 220px;
-            text: scan-running ? "Analyse en cours..." : "Lancer le scan";
-            primary: true;
-            enabled: !scan-running;
-            clicked => { root.start-scan(); }
+        HorizontalLayout {
+            spacing: 8px;
+            AppButton {
+                width: 220px;
+                text: scan-running ? "Analyse en cours..." : "Lancer le scan";
+                primary: true;
+                enabled: !scan-running;
+                clicked => { root.start-scan(); }
+            }
+            AppButton {
+                width: 140px;
+                text: "Annuler";
+                visible: scan-running;
+                clicked => { root.cancel-scan(); }
+            }
         }
 
         Rectangle {

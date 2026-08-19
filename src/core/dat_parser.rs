@@ -13,6 +13,7 @@ pub enum DatError {
     Io(std::io::Error),
     Xml(quick_xml::Error),
     Http(String),
+    NoMachinesFound,
 }
 
 impl fmt::Display for DatError {
@@ -21,6 +22,10 @@ impl fmt::Display for DatError {
             DatError::Io(err) => write!(f, "erreur de lecture du fichier DAT : {err}"),
             DatError::Xml(err) => write!(f, "erreur de parsing XML du DAT : {err}"),
             DatError::Http(msg) => write!(f, "erreur de téléchargement du DAT : {msg}"),
+            DatError::NoMachinesFound => write!(
+                f,
+                "le fichier DAT est lisible mais ne contient aucune machine reconnue"
+            ),
         }
     }
 }
@@ -112,6 +117,10 @@ pub fn parse_dat_str(xml: &str) -> Result<HashMap<String, RomEntry>, DatError> {
             }
             _ => {}
         }
+    }
+
+    if entries.is_empty() {
+        return Err(DatError::NoMachinesFound);
     }
 
     Ok(entries)
@@ -336,5 +345,23 @@ mod tests {
         let clone = &entries["pacman"];
         assert_eq!(clone.category, None);
         assert!(clone.languages.is_empty());
+    }
+
+    #[test]
+    fn invalid_xml_is_reported_without_panicking() {
+        let result = parse_dat_str("<mame><machine name=\"broken\"></mame>");
+        assert!(matches!(result, Err(DatError::Xml(_))));
+    }
+
+    #[test]
+    fn valid_xml_without_any_machine_is_reported_clearly() {
+        let result = parse_dat_str(r#"<?xml version="1.0"?><mame build="0.260"></mame>"#);
+        assert!(matches!(result, Err(DatError::NoMachinesFound)));
+    }
+
+    #[test]
+    fn empty_file_is_reported_clearly() {
+        let result = parse_dat_str("");
+        assert!(matches!(result, Err(DatError::NoMachinesFound)));
     }
 }

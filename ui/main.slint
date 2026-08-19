@@ -54,6 +54,7 @@ export component AppWindow inherits Window {
     in property <bool> cleanup-confirm-visible;
     in property <string> cleanup-target-count-text;
     in property <string> cleanup-status-text;
+    in property <string> integrity-status-text;
 
     callback browse-rom-set-path();
     callback browse-dat-file-path();
@@ -62,6 +63,7 @@ export component AppWindow inherits Window {
     callback browse-backup-dir-path();
     callback save-settings();
     callback start-scan();
+    callback cancel-scan();
     callback apply-filters();
     callback search-triggered();
     callback sort-by(string);
@@ -92,6 +94,7 @@ export component AppWindow inherits Window {
                 scan-status-text: root.scan-status-text;
                 scan-counts-text: root.scan-counts-text;
                 start-scan => { root.start-scan(); }
+                cancel-scan => { root.cancel-scan(); }
             }
             if current-view == 1: FilterView {
                 filter-categories-text <=> root.filter-categories-text;
@@ -118,6 +121,7 @@ export component AppWindow inherits Window {
                 cleanup-confirm-visible: root.cleanup-confirm-visible;
                 cleanup-target-count-text: root.cleanup-target-count-text;
                 cleanup-status-text: root.cleanup-status-text;
+                integrity-status-text: root.integrity-status-text;
                 search-triggered => { root.search-triggered(); }
                 sort-by(column) => { root.sort-by(column); }
                 request-cleanup => { root.request-cleanup(); }

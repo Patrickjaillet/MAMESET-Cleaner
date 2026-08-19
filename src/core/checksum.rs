@@ -4,7 +4,7 @@ pub fn crc32_of_bytes(data: &[u8]) -> u32 {
     crc32fast::hash(data)
 }
 
-pub fn crc32_of_reader<R: Read>(reader: &mut R) -> io::Result<u32> {
+pub fn crc32_of_reader<R: Read + ?Sized>(reader: &mut R) -> io::Result<u32> {
     let mut hasher = crc32fast::Hasher::new();
     let mut buffer = [0u8; 64 * 1024];
 
