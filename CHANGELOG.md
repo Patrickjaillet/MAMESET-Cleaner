@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## v0.4.0
+- Ajout de la détection des jeux en double (un jeu principal et ses variantes).
+- Pour chaque groupe de doublons, le logiciel choisit automatiquement le meilleur exemplaire à conserver selon la région préférée (par exemple Monde puis USA puis Europe puis Japon), l'état de fonctionnement du jeu, puis sa version la plus récente.
+- La région préférée pourra être personnalisée par l'utilisateur.
+- Cette étape prépare seulement la liste des jeux à garder et à retirer : aucune suppression de fichier n'a lieu à ce stade.
+
 ## v0.3.0
 - Ajout de l'analyse du dossier de ROMs de l'utilisateur (fichiers `.zip`, `.7z` et dossiers non compressés), y compris dans les sous-dossiers.
 - Le logiciel compare désormais chaque ROM trouvée avec la liste de référence MAME et indique si elle est correcte, corrompue, manquante ou non reconnue.
