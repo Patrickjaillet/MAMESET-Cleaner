@@ -96,7 +96,7 @@ members = [
 
 [package]
 name = "mameset_cleaner"
-version = "3.2.0"
+version = "3.3.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"

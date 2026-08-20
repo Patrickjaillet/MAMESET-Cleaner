@@ -1,5 +1,6 @@
 import { AppButton } from "../components/app_button.slint";
 import { TextField } from "../components/text_field.slint";
+import { EmptyState } from "../components/empty_state.slint";
 import { ResultRow } from "../common.slint";
 import { Theme } from "../theme.slint";
 
@@ -20,6 +21,8 @@ export component ResultsView inherits Rectangle {
     callback request-cleanup();
     callback confirm-cleanup();
     callback cancel-cleanup();
+
+    property <bool> has-content: root.result-count-text != "" || root.result-rows.length > 0;
 
     VerticalLayout {
         padding: 24px;
@@ -54,7 +57,14 @@ export component ResultsView inherits Rectangle {
         Text { text: root.cleanup-status-text; wrap: word-wrap; }
         Text { text: root.integrity-status-text; wrap: word-wrap; }
 
-        Rectangle {
+        if !root.has-content: EmptyState {
+            vertical-stretch: 1;
+            icon: "📋";
+            title-text: "Aucun résultat pour l'instant";
+            subtitle-text: "Lancez d'abord un scan depuis l'onglet Scan pour voir apparaître les ROMs ici.";
+        }
+
+        if root.has-content: Rectangle {
             border-width: 1px;
             border-color: #d8d8d8;
             background: #f6f6f6;
@@ -66,23 +76,26 @@ export component ResultsView inherits Rectangle {
                 spacing: 8px;
 
                 TouchArea {
-                    width: 220px;
+                    horizontal-stretch: 26;
+                    min-width: 60px;
                     clicked => { root.sort-by("name"); }
                     Text { text: "Nom"; font-weight: 600; vertical-alignment: center; }
                 }
                 TouchArea {
-                    width: 80px;
+                    horizontal-stretch: 9;
+                    min-width: 40px;
                     clicked => { root.sort-by("year"); }
                     Text { text: "Année"; font-weight: 600; vertical-alignment: center; }
                 }
-                Text { width: 160px; text: "Fabricant"; font-weight: 600; vertical-alignment: center; }
-                Text { width: 140px; text: "Genre"; font-weight: 600; vertical-alignment: center; }
-                Text { width: 120px; text: "Statut"; font-weight: 600; vertical-alignment: center; }
-                Text { width: 130px; text: "Action"; font-weight: 600; vertical-alignment: center; }
+                Text { horizontal-stretch: 19; min-width: 60px; text: "Fabricant"; font-weight: 600; vertical-alignment: center; }
+                Text { horizontal-stretch: 16; min-width: 60px; text: "Genre"; font-weight: 600; vertical-alignment: center; }
+                Text { horizontal-stretch: 14; min-width: 60px; text: "Statut"; font-weight: 600; vertical-alignment: center; }
+                Text { horizontal-stretch: 15; min-width: 60px; text: "Action"; font-weight: 600; vertical-alignment: center; }
             }
         }
 
-        Flickable {
+        if root.has-content: Flickable {
+            vertical-stretch: 1;
             VerticalLayout {
                 for row in root.result-rows: Rectangle {
                     height: 30px;
@@ -102,12 +115,12 @@ export component ResultsView inherits Rectangle {
                         padding-right: 8px;
                         spacing: 8px;
 
-                        Text { width: 220px; text: row.name; vertical-alignment: center; overflow: elide; }
-                        Text { width: 80px; text: row.year; vertical-alignment: center; }
-                        Text { width: 160px; text: row.manufacturer; vertical-alignment: center; overflow: elide; }
-                        Text { width: 140px; text: row.category; vertical-alignment: center; overflow: elide; }
-                        Text { width: 120px; text: row.status; vertical-alignment: center; }
-                        Text { width: 130px; text: row.action; vertical-alignment: center; }
+                        Text { horizontal-stretch: 26; min-width: 60px; text: row.name; vertical-alignment: center; overflow: elide; }
+                        Text { horizontal-stretch: 9; min-width: 40px; text: row.year; vertical-alignment: center; }
+                        Text { horizontal-stretch: 19; min-width: 60px; text: row.manufacturer; vertical-alignment: center; overflow: elide; }
+                        Text { horizontal-stretch: 16; min-width: 60px; text: row.category; vertical-alignment: center; overflow: elide; }
+                        Text { horizontal-stretch: 14; min-width: 60px; text: row.status; vertical-alignment: center; }
+                        Text { horizontal-stretch: 15; min-width: 60px; text: row.action; vertical-alignment: center; }
                     }
                 }
             }

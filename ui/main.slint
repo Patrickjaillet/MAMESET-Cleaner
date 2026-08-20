@@ -89,12 +89,12 @@ export component AppWindow inherits Window {
     HorizontalLayout {
         Sidebar {
             entries: [
-                { label: "Scan", icon: "🔍" },
-                { label: "Filtres", icon: "🧰" },
-                { label: "Résultats", icon: "📋" },
-                { label: "Paramètres", icon: "⚙️" },
-                { label: "Plugins", icon: "🧩" },
-                { label: "À propos", icon: "ℹ️" },
+                { label: "Scan", icon: "🔍", group-start: false },
+                { label: "Filtres", icon: "🧰", group-start: false },
+                { label: "Résultats", icon: "📋", group-start: false },
+                { label: "Paramètres", icon: "⚙️", group-start: false },
+                { label: "Plugins", icon: "🧩", group-start: true },
+                { label: "À propos", icon: "ℹ️", group-start: false },
             ];
             selected-index <=> current-view;
         }

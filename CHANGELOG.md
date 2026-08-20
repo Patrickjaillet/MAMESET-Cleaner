@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.3.0
+- The sidebar now shows a smoothly animated accent indicator that slides to the active section, and a subtle divider separates the core workflow (Scan, Filters, Results, Settings) from Plugins and About.
+- Fixed the Results table so its columns resize to fit the window instead of overflowing off the edge when the window is small.
+- The Scan and Results views now show a proper designed placeholder ("Aucune analyse effectuée" / "Aucun résultat pour l'instant") instead of a bare sentence before you've run a scan.
+
 ## v3.2.0
 - Added smooth animations throughout the interface: buttons, sidebar items, toggles and choice controls now transition instead of snapping instantly; views fade in when switching between sections; progress bars (scanning, plugin downloads) animate smoothly instead of jumping; text fields highlight more clearly when focused; cards and dialogs now have subtle shadows for better visual depth.
 

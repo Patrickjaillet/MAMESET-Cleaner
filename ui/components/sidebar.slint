@@ -3,6 +3,7 @@ import { Theme } from "../theme.slint";
 export struct NavEntry {
     label: string,
     icon: string,
+    group-start: bool,
 }
 
 export component Sidebar inherits Rectangle {
@@ -13,13 +14,17 @@ export component Sidebar inherits Rectangle {
     width: 220px;
     background: transparent;
 
+    property <length> row-height: 44px;
+    property <length> row-spacing: Theme.space-xs;
+    property <length> indicator-height: 22px;
+
     VerticalLayout {
         padding: Theme.space-sm;
-        spacing: Theme.space-xs;
+        spacing: root.row-spacing;
         alignment: start;
 
         for entry[index] in entries: Rectangle {
-            height: 44px;
+            height: root.row-height;
             border-radius: Theme.radius-md;
             background: index == selected-index
                 ? Theme.color-accent-soft
@@ -52,5 +57,38 @@ export component Sidebar inherits Rectangle {
                 }
             }
         }
+    }
+
+    // Group-divider lines, drawn as absolutely-positioned overlays rather than
+    // flow content, so they don't perturb the row spacing the indicator's
+    // position math below depends on.
+    for entry[index] in entries: Rectangle {
+        x: 0px;
+        y: 0px;
+        width: 0px;
+        height: 0px;
+
+        if entry.group-start: Rectangle {
+            x: Theme.space-sm;
+            y: Theme.space-sm + index * (root.row-height + root.row-spacing) - root.row-spacing / 2 - 0.5px;
+            width: root.width - 2 * Theme.space-sm;
+            height: 1px;
+            background: Theme.color-border-subtle;
+        }
+    }
+
+    // Animated accent pill that slides to track the selected row. Positioned
+    // independently of the VerticalLayout above so it can move smoothly across
+    // row boundaries instead of jumping between per-row highlight states.
+    indicator := Rectangle {
+        x: 0px;
+        y: Theme.space-sm
+            + root.selected-index * (root.row-height + root.row-spacing)
+            + (root.row-height - root.indicator-height) / 2;
+        width: 3px;
+        height: root.indicator-height;
+        border-radius: 1.5px;
+        background: Theme.color-accent;
+        animate y { duration: Theme.duration-medium; easing: ease-out; }
     }
 }

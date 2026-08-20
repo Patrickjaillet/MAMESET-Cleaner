@@ -1,0 +1,40 @@
+import { Theme } from "../theme.slint";
+
+export component EmptyState inherits Rectangle {
+    in property <string> icon: "📭";
+    in property <string> title-text: "";
+    in property <string> subtitle-text: "";
+
+    border-radius: Theme.radius-lg;
+    border-width: 1px;
+    border-color: Theme.color-border-subtle;
+    background: Theme.color-surface-alt;
+
+    VerticalLayout {
+        padding: Theme.space-xl;
+        spacing: Theme.space-sm;
+        alignment: center;
+
+        Text {
+            text: root.icon;
+            font-size: 32px;
+            horizontal-alignment: center;
+        }
+
+        Text {
+            text: root.title-text;
+            font-size: Theme.font-size-heading;
+            font-weight: 600;
+            color: Theme.color-text;
+            horizontal-alignment: center;
+        }
+
+        if root.subtitle-text != "": Text {
+            text: root.subtitle-text;
+            font-size: Theme.font-size-caption;
+            color: Theme.color-text-secondary;
+            horizontal-alignment: center;
+            wrap: word-wrap;
+        }
+    }
+}
