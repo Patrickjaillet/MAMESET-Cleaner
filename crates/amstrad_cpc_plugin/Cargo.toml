@@ -1,0 +1,13 @@
+[package]
+name = "amstrad_cpc_plugin"
+version = "1.7.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+plugin_interface = { path = "../plugin_interface" }
+dat_common = { path = "../dat_common" }
+abi_stable = "0.11.3"

@@ -29,11 +29,16 @@ members = [
     "crates/turbografx16_plugin",
     "crates/wonderswan_plugin",
     "crates/threedo_plugin",
+    "crates/c64_plugin",
+    "crates/amiga_plugin",
+    "crates/zx_spectrum_plugin",
+    "crates/amstrad_cpc_plugin",
+    "crates/msx_plugin",
 ]
 
 [package]
 name = "mameset_cleaner"
-version = "1.6.0"
+version = "1.7.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -186,6 +191,26 @@ path = "test/wonderswan_plugin_test.rs"
 [[test]]
 name = "threedo_plugin_test"
 path = "test/threedo_plugin_test.rs"
+
+[[test]]
+name = "c64_plugin_test"
+path = "test/c64_plugin_test.rs"
+
+[[test]]
+name = "amiga_plugin_test"
+path = "test/amiga_plugin_test.rs"
+
+[[test]]
+name = "zx_spectrum_plugin_test"
+path = "test/zx_spectrum_plugin_test.rs"
+
+[[test]]
+name = "amstrad_cpc_plugin_test"
+path = "test/amstrad_cpc_plugin_test.rs"
+
+[[test]]
+name = "msx_plugin_test"
+path = "test/msx_plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

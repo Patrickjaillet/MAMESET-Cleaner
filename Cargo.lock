@@ -238,6 +238,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
+name = "amiga_plugin"
+version = "1.7.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
+]
+
+[[package]]
+name = "amstrad_cpc_plugin"
+version = "1.7.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
+]
+
+[[package]]
 name = "android-activity"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -872,6 +890,15 @@ checksum = "225bff33b2141874fe80d71e07d6eec4f85c5c216453dd96388240f96e1acc14"
 dependencies = [
  "cc",
  "pkg-config",
+]
+
+[[package]]
+name = "c64_plugin"
+version = "1.7.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
 ]
 
 [[package]]
@@ -3245,7 +3272,7 @@ dependencies = [
 
 [[package]]
 name = "mameset_cleaner"
-version = "1.6.0"
+version = "1.7.0"
 dependencies = [
  "abi_stable",
  "configparser",
@@ -3336,6 +3363,15 @@ checksum = "bb85c154ba489f01b25c0d36ae69a87e4a1c73a72631fc6c0eb6dde34a73e44b"
 dependencies = [
  "num-traits",
  "pxfm",
+]
+
+[[package]]
+name = "msx_plugin"
+version = "1.7.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
 ]
 
 [[package]]
@@ -7447,4 +7483,13 @@ dependencies = [
  "serde",
  "syn 3.0.3",
  "winnow",
+]
+
+[[package]]
+name = "zx_spectrum_plugin"
+version = "1.7.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
 ]
