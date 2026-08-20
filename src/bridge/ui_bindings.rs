@@ -89,6 +89,7 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     let state = Arc::new(Mutex::new(AppState::new(config.clone())));
 
     refresh_available_systems(&window, &state);
+    reset_selected_system_if_uninstalled(&window, &state);
 
     setup_browse_callbacks(&window);
     setup_save_settings(&window, &state);
@@ -340,6 +341,11 @@ fn load_reference_database(
     }
 
     let dll_path = registry::plugin_dll_path(plugins_dir, selected_system);
+    if !dll_path.exists() {
+        return Err(format!(
+            "le système « {selected_system} » n'est plus installé — sélectionnez un autre système dans Paramètres"
+        ));
+    }
     let loaded_plugin = loader::load_plugin_from_file_expecting_id(&dll_path, selected_system)
         .map_err(|err| format!("impossible de charger le plugin « {selected_system} » : {err}"))?;
     let plugin_entries = loaded_plugin.parse_reference_database(dat_file_path)?;
@@ -805,6 +811,39 @@ fn refresh_available_systems(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
     window.set_available_systems(ModelRc::new(VecModel::from(systems)));
 }
 
+/// Guards against a saved (or just-changed) `selected_system` pointing at a
+/// plugin that is not actually installed on disk — e.g. a `config.json`
+/// left over from a plugin that was later removed, or removed by hand
+/// outside the app. Without this, `load_reference_database` would fail with
+/// a low-level, unhelpful OS error (`LoadLibraryExW failed`) on every scan
+/// attempt, and the user would have no way to recover except manually
+/// reselecting a system in Settings. If the selected system is missing,
+/// this falls back to the built-in `"mame"` system and explains why.
+fn reset_selected_system_if_uninstalled(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let mut guard = state.lock().unwrap();
+    if guard.config.selected_system == "mame" {
+        return;
+    }
+
+    let installed = registry::list_installed(&guard.plugins_dir);
+    let still_installed = installed.iter().any(|m| m.id == guard.config.selected_system);
+    if still_installed {
+        return;
+    }
+
+    let missing_id = guard.config.selected_system.clone();
+    guard.config.selected_system = "mame".to_string();
+    drop(guard);
+
+    window.set_selected_system_id("mame".into());
+    window.set_settings_status_text(
+        format!(
+            "Le système « {missing_id} » n'est plus installé : MAME a été sélectionné automatiquement."
+        )
+        .into(),
+    );
+}
+
 /// Fetches the list of plugin manifests published in the repository's
 /// `plugins` directory. Pairs each `<id>.json` manifest with its sibling
 /// `<id>.dll` download URL.
@@ -998,6 +1037,7 @@ fn setup_plugins(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
             }
         }
         refresh_plugin_rows(&window, &state_remove);
+        reset_selected_system_if_uninstalled(&window, &state_remove);
     });
 }
 

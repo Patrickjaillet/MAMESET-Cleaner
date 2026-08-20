@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.1.1
+- Fixed a bug where scanning would fail with a confusing error if the active system (selected in Settings) pointed to a plugin that was no longer installed. The application now automatically falls back to MAME in that case and explains why, instead of getting stuck.
+
 ## v3.1.0
 - Removed the dark theme in favor of a single, more consistent visual design (the dark theme had grown inconsistent over time, with several elements not actually changing color when toggled).
 - Laid the groundwork for further visual improvements to the interface, coming in upcoming releases.
