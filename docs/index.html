@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAMESET Cleaner</title>
-<meta name="description" content="MAMESET Cleaner — Windows software to clean and organize a MAME ROM set, plus 30 other console systems via plugins (duplicates, filters, reports).">
+<meta name="description" content="MAMESET Cleaner — Windows software to clean and organize a MAME ROM set, plus 87 other console systems via plugins (duplicates, filters, reports).">
 <style>
   :root {
     --accent: #0078d4;
@@ -144,6 +144,33 @@
   .system-group li {
     margin-bottom: 4px;
   }
+  .system-catalog details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    padding: 14px 20px;
+  }
+  .system-catalog summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--accent-dark);
+    font-size: 1.05rem;
+  }
+  .system-catalog ul {
+    columns: 2;
+    margin: 12px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .system-catalog li {
+    margin-bottom: 4px;
+    break-inside: avoid;
+  }
+  @media (max-width: 640px) {
+    .system-catalog ul { columns: 1; }
+  }
   footer {
     text-align: center;
     padding: 32px 24px;
@@ -164,7 +191,7 @@
 
 <header>
   <h1>MAMESET Cleaner</h1>
-  <p class="tagline">Clean and organize your MAME ROM set — and 30 other console systems — with duplicate detection, filters and detailed reports, safely.</p>
+  <p class="tagline">Clean and organize your MAME ROM set — and 87 other console systems — with duplicate detection, filters and detailed reports, safely.</p>
   <div class="buttons">
     <a class="btn btn-primary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner/releases">Download (Windows)</a>
     <a class="btn btn-secondary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner">View source code</a>
@@ -216,11 +243,12 @@
     <h2>Multi-console plugins</h2>
     <p>
       Beyond its native MAME support, MAMESET Cleaner can install a plugin for another console system directly
-      from its "Plugins" section. 30 systems are available today:
+      from its "Plugins" section, which — like the active-system selector in Settings — is grouped by
+      manufacturer with a search box. 87 systems are available today:
     </p>
-    <div class="system-groups">
-      <div class="system-group">
-        <h3>Nintendo</h3>
+    <div class="system-catalog">
+      <details open>
+        <summary>Nintendo (10)</summary>
         <ul>
           <li>NES / Famicom</li>
           <li>SNES / Super Famicom</li>
@@ -229,10 +257,13 @@
           <li>Game Boy Advance</li>
           <li>Nintendo DS</li>
           <li>GameCube / Wii</li>
+          <li>Nintendo Virtual Boy</li>
+          <li>Pokémon Mini</li>
+          <li>Nintendo Wii U</li>
         </ul>
-      </div>
-      <div class="system-group">
-        <h3>Sega</h3>
+      </details>
+      <details>
+        <summary>Sega (8)</summary>
         <ul>
           <li>Master System</li>
           <li>Mega Drive / Genesis</li>
@@ -240,40 +271,94 @@
           <li>Sega CD / Mega-CD</li>
           <li>Sega Saturn</li>
           <li>Dreamcast</li>
+          <li>SG-1000</li>
+          <li>Sega Pico</li>
         </ul>
-      </div>
-      <div class="system-group">
-        <h3>Sony</h3>
+      </details>
+      <details>
+        <summary>Sony &amp; Microsoft (6)</summary>
         <ul>
           <li>PlayStation</li>
           <li>PlayStation 2</li>
+          <li>PlayStation 3</li>
           <li>PSP</li>
+          <li>Xbox</li>
+          <li>Xbox 360</li>
         </ul>
-      </div>
-      <div class="system-group">
-        <h3>SNK, Atari &amp; others</h3>
+      </details>
+      <details>
+        <summary>SNK, Atari &amp; other consoles (36)</summary>
         <ul>
           <li>Neo Geo AES / MVS</li>
           <li>Neo Geo Pocket / Pocket Color</li>
+          <li>Neo Geo CD</li>
           <li>Atari 2600</li>
           <li>Atari 5200 / 7800</li>
           <li>Atari Lynx</li>
           <li>Atari Jaguar</li>
+          <li>Atari Jaguar CD</li>
+          <li>Atari 8-bit (400/800/XL/XE)</li>
+          <li>Atari ST</li>
           <li>TurboGrafx-16 / PC Engine</li>
+          <li>TurboGrafx-CD / PC Engine CD</li>
+          <li>PC-FX</li>
+          <li>ColecoVision</li>
+          <li>Intellivision</li>
+          <li>Vectrex</li>
+          <li>Odyssey² / Videopac</li>
+          <li>Channel F</li>
+          <li>Astrocade</li>
+          <li>Arcadia 2001</li>
+          <li>VC 4000</li>
+          <li>Studio II</li>
+          <li>Watara Supervision</li>
+          <li>Game.com</li>
+          <li>N-Gage</li>
+          <li>Tapwave Zodiac</li>
+          <li>CreatiVision</li>
+          <li>V.Smile</li>
+          <li>MP1000</li>
+          <li>PV-1000</li>
+          <li>Loopy</li>
           <li>WonderSwan / WonderSwan Color</li>
+          <li>Playdia</li>
           <li>3DO</li>
+          <li>CD-i</li>
+          <li>Pippin</li>
         </ul>
-      </div>
-      <div class="system-group">
-        <h3>8/16-bit computers</h3>
+      </details>
+      <details>
+        <summary>Classic computers (27)</summary>
         <ul>
+          <li>Apple II</li>
+          <li>Apple IIGS</li>
+          <li>Amstrad CPC</li>
           <li>Commodore 64</li>
           <li>Commodore Amiga</li>
+          <li>Amiga CD32</li>
+          <li>CDTV</li>
+          <li>Commodore Plus/4</li>
+          <li>Commodore VIC-20</li>
+          <li>Commodore 128</li>
+          <li>Dragon 32/64</li>
+          <li>Enterprise 128</li>
+          <li>FM Towns</li>
+          <li>FM-7</li>
+          <li>Sharp X1</li>
+          <li>Sharp X68000</li>
+          <li>Sinclair QL</li>
           <li>ZX Spectrum</li>
-          <li>Amstrad CPC</li>
+          <li>Sord M5</li>
+          <li>Oric-1 / Atmos</li>
+          <li>SAM Coupé</li>
+          <li>NEC PC-88</li>
+          <li>NEC PC-98</li>
+          <li>Acorn Archimedes</li>
+          <li>Acorn BBC Micro</li>
+          <li>Acorn Electron</li>
           <li>MSX / MSX2</li>
         </ul>
-      </div>
+      </details>
     </div>
   </section>
 

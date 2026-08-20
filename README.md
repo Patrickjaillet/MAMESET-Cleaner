@@ -1,6 +1,6 @@
 # MAMESET Cleaner
 
-MAMESET Cleaner is a Windows desktop application that helps clean and organize a MAME ROM set — and, through downloadable plugins, ROM sets for 30 other console systems: detecting and removing duplicates (clones/parents), filtering by genre, language, region, working status, manufacturer and year, to produce a clean, consistent, minimal ROM set (1 game = 1 ROM).
+MAMESET Cleaner is a Windows desktop application that helps clean and organize a MAME ROM set — and, through downloadable plugins, ROM sets for 87 other console systems: detecting and removing duplicates (clones/parents), filtering by genre, language, region, working status, manufacturer and year, to produce a clean, consistent, minimal ROM set (1 game = 1 ROM).
 
 ![MAMESET Cleaner Filters view](docs/screenshots/filters_view.png)
 
@@ -13,7 +13,7 @@ MAMESET Cleaner is a Windows desktop application that helps clean and organize a
 - **Detailed report** for every cleanup operation (JSON and CSV)
 - **Automatic integrity check** of the set after a cleanup
 - **French and English** interface, **light and dark** theme
-- **Multi-console plugin system**: beyond its native MAME support, the application can load a plugin to clean ROM sets for other consoles. As of v2.0.0, 30 systems are available for download directly from the in-app "Plugins" section: NES/Famicom, SNES/Super Famicom, Nintendo 64, Game Boy/Game Boy Color, Game Boy Advance, Nintendo DS, GameCube/Wii, Master System, Mega Drive/Genesis, Game Gear, Sega CD, Saturn, Dreamcast, PlayStation, PlayStation 2, PSP, Neo Geo AES/MVS, Neo Geo Pocket, Atari 2600/5200/7800/Lynx/Jaguar, TurboGrafx-16/PC Engine, WonderSwan, 3DO, Commodore 64, Amiga, ZX Spectrum, Amstrad CPC and MSX/MSX2
+- **Multi-console plugin system**: beyond its native MAME support, the application can load a plugin to clean ROM sets for other consoles. As of v3.0.0, 87 systems are available for download directly from the in-app "Plugins" section — every major Nintendo, Sega, Sony, SNK and Atari console, plus dozens of classic 8/16-bit computers and handhelds. The "Plugins" section and the active-system selector in Settings are both grouped by manufacturer with a search box. See the [full list](https://patrickjaillet.github.io/MAMESET-Cleaner) on the project website
 
 ![MAMESET Cleaner Results view](docs/screenshots/results_view.png)
 

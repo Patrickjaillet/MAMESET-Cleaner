@@ -41,7 +41,7 @@ The final binary is generated in `target\release\mameset_cleaner.exe`, and each 
 cargo test
 ```
 
-Includes unit tests (in each module under `src/`) and integration tests (`test/*.rs`), for a total of more than 150 tests covering parsing, scanning, deduplication, filtering, cleanup and the plugin system (every console plugin is loaded and exercised as a real compiled `.dll`).
+Includes unit tests (in each module under `src/`) and integration tests (`test/*.rs`), for a total of more than 270 tests covering parsing, scanning, deduplication, filtering, cleanup and the plugin system (every one of the 87 console plugins is loaded and exercised as a real compiled `.dll`).
 
 ## Publishing plugins (maintainers only)
 

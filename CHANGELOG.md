@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.0.0
+- First stable release with full multi-console catalog coverage: 87 systems, spanning every major Nintendo, Sega, Sony, SNK and Atari console plus dozens of classic 8/16-bit computers and handhelds, all available for download from the "Plugins" section.
+- The project website now lists every supported system, grouped by manufacturer.
+
 ## v2.9.0
 - Added support for 15 more systems — Apple II, Apple IIGS, Atari ST, Sharp X1, Sharp X68000, Fujitsu FM-7, Acorn BBC Micro, Acorn Electron, Acorn Archimedes, Oric-1/Atmos, Dragon 32/64, SAM Coupé, Enterprise 128, NEC PC-88 and NEC PC-98 — available for download from the "Plugins" section.
 - The "Plugins" section now groups systems by manufacturer and has a search box, and the "Système actif" selector in Settings does the same, now that the catalog has grown to 87 systems.
