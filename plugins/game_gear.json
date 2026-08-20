@@ -1,0 +1,10 @@
+{
+  "id": "game_gear",
+  "name": "Sega Game Gear",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sega",
+  "version": "1.4.0",
+  "dat_format": "No-Intro",
+  "sha256": "2b39dfca8c4f024b26cee2edb91820360012ab98c40267c927bd2ba4b7bb570d",
+  "min_app_version": "1.4.0"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "amstrad_cpc",
+  "name": "Amstrad CPC",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Amstrad",
+  "version": "1.7.0",
+  "dat_format": "TOSEC",
+  "sha256": "0b1de219bfb33eb0f569575d40707ee6a64985fa8d53636e3235903c3ab0a52c",
+  "min_app_version": "1.7.0"
+}

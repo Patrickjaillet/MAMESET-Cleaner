@@ -1,0 +1,10 @@
+{
+  "id": "nes",
+  "name": "Nintendo Entertainment System / Famicom",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Nintendo",
+  "version": "1.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "cf2d6a45a4beaf113fc8d39beaebb60f3c25f44ff1b3b20afdfa1da6ddceb74d",
+  "min_app_version": "1.3.0"
+}

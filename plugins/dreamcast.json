@@ -1,0 +1,10 @@
+{
+  "id": "dreamcast",
+  "name": "Sega Dreamcast",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sega",
+  "version": "1.4.0",
+  "dat_format": "Redump",
+  "sha256": "5edd73fa5b7b87e9e71e21f693e23386cd650356fb93411b83e50069e85f69cc",
+  "min_app_version": "1.4.0"
+}

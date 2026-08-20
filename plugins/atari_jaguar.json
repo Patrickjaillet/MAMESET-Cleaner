@@ -1,0 +1,10 @@
+{
+  "id": "atari_jaguar",
+  "name": "Atari Jaguar",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Atari",
+  "version": "1.6.0",
+  "dat_format": "No-Intro",
+  "sha256": "c2ddb3ac38542ef1d081e8d6a9ea9d62cd3d50e577e22205cc888434a404ab20",
+  "min_app_version": "1.6.0"
+}

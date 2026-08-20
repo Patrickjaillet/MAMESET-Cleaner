@@ -1,0 +1,10 @@
+{
+  "id": "snes",
+  "name": "Super Nintendo Entertainment System / Super Famicom",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Nintendo",
+  "version": "1.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "96f764089750609106a6d90781b4f219271999d1592e9132ef9fa23e17b5b97a",
+  "min_app_version": "1.3.0"
+}

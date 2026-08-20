@@ -1,0 +1,10 @@
+{
+  "id": "saturn",
+  "name": "Sega Saturn",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sega",
+  "version": "1.4.0",
+  "dat_format": "Redump",
+  "sha256": "aa151a1f447a125066b7561e93e39cfb24085bcd50f63bdf31913b54b9059ac4",
+  "min_app_version": "1.4.0"
+}

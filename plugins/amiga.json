@@ -1,0 +1,10 @@
+{
+  "id": "amiga",
+  "name": "Commodore Amiga",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Commodore",
+  "version": "1.7.0",
+  "dat_format": "TOSEC",
+  "sha256": "2c18b92c746888d76baa469961ae8f40ecc869acaf4b2be5dea0afa3145a2569",
+  "min_app_version": "1.7.0"
+}

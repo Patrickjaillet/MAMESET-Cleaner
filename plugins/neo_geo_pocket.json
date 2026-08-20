@@ -1,0 +1,10 @@
+{
+  "id": "neo_geo_pocket",
+  "name": "Neo Geo Pocket / Pocket Color",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "SNK",
+  "version": "1.6.0",
+  "dat_format": "No-Intro",
+  "sha256": "4eff033406db2112ff6f6fed04d3682ae15186f6f4ee50237dca3ffcfb312a21",
+  "min_app_version": "1.6.0"
+}

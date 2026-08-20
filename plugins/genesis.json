@@ -1,0 +1,10 @@
+{
+  "id": "genesis",
+  "name": "Sega Mega Drive / Genesis",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sega",
+  "version": "1.4.0",
+  "dat_format": "No-Intro",
+  "sha256": "3c928e0e03caca73079cae3d82f1eb705825f15fb57364c4c567b56e1f69d523",
+  "min_app_version": "1.4.0"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "atari_lynx",
+  "name": "Atari Lynx",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Atari",
+  "version": "1.6.0",
+  "dat_format": "No-Intro",
+  "sha256": "67b9ac9be152308f0f857e6b1499871cf7432db9dd02b0bc59a0e7d9a8bc75c3",
+  "min_app_version": "1.6.0"
+}

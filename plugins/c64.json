@@ -1,0 +1,10 @@
+{
+  "id": "c64",
+  "name": "Commodore 64",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Commodore",
+  "version": "1.7.0",
+  "dat_format": "TOSEC",
+  "sha256": "f1cedb2bd84f842f65f8ba51455d58139418ce4ce892e22dbab81d38c59f5d12",
+  "min_app_version": "1.7.0"
+}

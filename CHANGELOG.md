@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.0.0
+- First stable release with multi-console support: 30 systems — every NES/Famicom through Commodore 64/Amiga/ZX Spectrum/Amstrad CPC/MSX plugin added since v1.3.0 — are now actually available for download from the "Plugins" section, alongside the built-in MAME support.
+- Fixed a bug where, after installing and using one console plugin, switching to a different one in the same session could fail to actually switch to it.
+
 ## v1.8.0
 - Strengthened the plugin system: a plugin can no longer claim another system's identity (including the built-in MAME system), and a plugin that encounters an internal error while reading a reference database now reports it cleanly instead of being able to affect the rest of the application.
 

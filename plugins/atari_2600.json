@@ -1,0 +1,10 @@
+{
+  "id": "atari_2600",
+  "name": "Atari 2600",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Atari",
+  "version": "1.6.0",
+  "dat_format": "No-Intro",
+  "sha256": "27eb084943786e388c989db08d2e3d2218d90daf78814462caf2029ec62ae488",
+  "min_app_version": "1.6.0"
+}

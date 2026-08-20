@@ -1,0 +1,10 @@
+{
+  "id": "n64",
+  "name": "Nintendo 64",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Nintendo",
+  "version": "1.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "14547ea8968308b8a040b9187e699b9b840d890ecebf5a173e96664174666387",
+  "min_app_version": "1.3.0"
+}

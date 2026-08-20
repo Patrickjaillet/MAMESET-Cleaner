@@ -1,0 +1,10 @@
+{
+  "id": "neo_geo",
+  "name": "Neo Geo AES / MVS",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "SNK",
+  "version": "1.6.0",
+  "dat_format": "No-Intro",
+  "sha256": "0ed8a37c455ccc915d9c31ce4802516f586b391d5af128d907ed1aec3ac04f2c",
+  "min_app_version": "1.6.0"
+}

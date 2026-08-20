@@ -1,0 +1,10 @@
+{
+  "id": "psx",
+  "name": "Sony PlayStation",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sony",
+  "version": "1.5.0",
+  "dat_format": "Redump",
+  "sha256": "aa64f43fa414564cc7e88a60d1bed23aeacb2cd8ff066493dd9d41e5f9e70898",
+  "min_app_version": "1.5.0"
+}

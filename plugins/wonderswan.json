@@ -1,0 +1,10 @@
+{
+  "id": "wonderswan",
+  "name": "WonderSwan / WonderSwan Color",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Bandai",
+  "version": "1.6.0",
+  "dat_format": "No-Intro",
+  "sha256": "14724049d17d0fc3444246ef4f4c8f563bfe3e0c86cab7a292acfd2e02b6df99",
+  "min_app_version": "1.6.0"
+}

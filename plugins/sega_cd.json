@@ -1,0 +1,10 @@
+{
+  "id": "sega_cd",
+  "name": "Sega CD / Mega-CD",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sega",
+  "version": "1.4.0",
+  "dat_format": "Redump",
+  "sha256": "de0f75669b059fef7412e9a8aa3ca2b845b11fa3ba279a7b7f2dd1270a8d422e",
+  "min_app_version": "1.4.0"
+}

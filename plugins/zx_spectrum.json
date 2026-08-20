@@ -1,0 +1,10 @@
+{
+  "id": "zx_spectrum",
+  "name": "ZX Spectrum",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sinclair",
+  "version": "1.7.0",
+  "dat_format": "TOSEC",
+  "sha256": "34a6e525ea9c629541dce4ecda3e3dab155aba4a7f11f546068a84e4be0e07eb",
+  "min_app_version": "1.7.0"
+}

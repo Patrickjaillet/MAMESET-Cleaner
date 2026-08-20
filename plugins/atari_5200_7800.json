@@ -1,0 +1,10 @@
+{
+  "id": "atari_5200_7800",
+  "name": "Atari 5200 / 7800",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Atari",
+  "version": "1.6.0",
+  "dat_format": "No-Intro",
+  "sha256": "2eb4124a405470805a36e3caf02b784f465056fab12d883c1de9a951eee375c9",
+  "min_app_version": "1.6.0"
+}

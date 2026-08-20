@@ -98,3 +98,56 @@ fn accepts_a_plugin_whose_declared_id_matches_the_expected_one() {
     let result = load_plugin_from_file_expecting_id(&plugin_path, "fake");
     assert!(result.is_ok());
 }
+
+fn ensure_panicking_plugin_is_built(profile: &str) {
+    let mut args = vec!["build", "-p", "panicking_plugin_fixture"];
+    if profile == "release" {
+        args.push("--release");
+    }
+    let status = Command::new(env!("CARGO"))
+        .args(&args)
+        .current_dir(env!("CARGO_MANIFEST_DIR"))
+        .status()
+        .expect("échec du lancement de cargo build pour panicking_plugin_fixture");
+    assert!(
+        status.success(),
+        "cargo build -p panicking_plugin_fixture a échoué"
+    );
+}
+
+fn panicking_plugin_path() -> PathBuf {
+    let profile = if cfg!(debug_assertions) { "debug" } else { "release" };
+    ensure_panicking_plugin_is_built(profile);
+    let file_name = format!("panicking_plugin_fixture{}", std::env::consts::DLL_SUFFIX);
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("target")
+        .join(profile)
+        .join(file_name)
+}
+
+/// Regression test for a bug found while building `examples/publish_plugins.rs`:
+/// `abi_stable`'s `RootModule::load_from_file` caches the loaded module in a
+/// `static` keyed by the module *type*, so loading a second, different
+/// plugin sharing the same `RomSystemPlugin_Ref` type in the same process
+/// used to silently return the *first* plugin ever loaded — a real
+/// cross-plugin data-integrity bug, not just a theoretical one, since a
+/// single running instance of the application is exactly this scenario
+/// once a user switches between two different console systems. Loading two
+/// genuinely different plugins in the same process and getting back their
+/// own distinct manifests proves the fix (`loader::load_plugin_from_file`
+/// bypassing that per-type cache) actually works.
+#[test]
+fn loading_two_different_plugins_in_the_same_process_keeps_their_identities_distinct() {
+    let fake = load_plugin_from_file(&fake_plugin_path()).expect("le plugin factice doit se charger");
+    let panicking = load_plugin_from_file(&panicking_plugin_path())
+        .expect("le plugin panicking doit se charger");
+
+    assert_eq!(fake.manifest().id, "fake");
+    assert_eq!(panicking.manifest().id, "panicking");
+
+    // Loading `fake` again, after `panicking`, must still yield `fake` — not
+    // whichever plugin happened to be loaded first in this process.
+    let fake_again =
+        load_plugin_from_file(&fake_plugin_path()).expect("le plugin factice doit se recharger");
+    assert_eq!(fake_again.manifest().id, "fake");
+}

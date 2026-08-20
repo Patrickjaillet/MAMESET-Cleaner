@@ -1,0 +1,10 @@
+{
+  "id": "sms",
+  "name": "Sega Master System",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sega",
+  "version": "1.4.0",
+  "dat_format": "No-Intro",
+  "sha256": "be8578b6d91c7958919db29712234311aa5af2c88c4d0f228afd0caef63ab862",
+  "min_app_version": "1.4.0"
+}

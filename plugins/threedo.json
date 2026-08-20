@@ -1,0 +1,10 @@
+{
+  "id": "threedo",
+  "name": "3DO",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "3DO",
+  "version": "1.6.0",
+  "dat_format": "Redump",
+  "sha256": "50c04b255cf6bc7f2e6847302d6bb54193a892b2af82a87ce6a516e38c14b7e4",
+  "min_app_version": "1.6.0"
+}

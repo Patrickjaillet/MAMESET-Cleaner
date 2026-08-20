@@ -1,0 +1,10 @@
+{
+  "id": "psp",
+  "name": "Sony PSP",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sony",
+  "version": "1.5.0",
+  "dat_format": "Redump",
+  "sha256": "e0ca2c0829b55344ac6487604e5f4af77fd0b1ef870b25558d4e7bce2fa7cbf2",
+  "min_app_version": "1.5.0"
+}

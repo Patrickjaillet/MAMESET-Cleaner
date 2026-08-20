@@ -1,0 +1,10 @@
+{
+  "id": "msx",
+  "name": "MSX / MSX2",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Microsoft/ASCII",
+  "version": "1.7.0",
+  "dat_format": "TOSEC",
+  "sha256": "e2cdf76dca111e01dcf4aee3cfc867229b2927d4a32f4d3716343675999cca6d",
+  "min_app_version": "1.7.0"
+}

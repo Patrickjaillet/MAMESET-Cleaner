@@ -13,7 +13,7 @@ MAMESET Cleaner is a Windows desktop application that helps clean and organize a
 - **Detailed report** for every cleanup operation (JSON and CSV)
 - **Automatic integrity check** of the set after a cleanup
 - **French and English** interface, **light and dark** theme
-- **Multi-console plugin system**: beyond its native MAME support, the application can load a plugin to clean ROM sets for other consoles. Support for several Nintendo and Sega systems is in active development and will become available for download from the in-app "Plugins" section as each one is published
+- **Multi-console plugin system**: beyond its native MAME support, the application can load a plugin to clean ROM sets for other consoles. As of v2.0.0, 30 systems are available for download directly from the in-app "Plugins" section: NES/Famicom, SNES/Super Famicom, Nintendo 64, Game Boy/Game Boy Color, Game Boy Advance, Nintendo DS, GameCube/Wii, Master System, Mega Drive/Genesis, Game Gear, Sega CD, Saturn, Dreamcast, PlayStation, PlayStation 2, PSP, Neo Geo AES/MVS, Neo Geo Pocket, Atari 2600/5200/7800/Lynx/Jaguar, TurboGrafx-16/PC Engine, WonderSwan, 3DO, Commodore 64, Amiga, ZX Spectrum, Amstrad CPC and MSX/MSX2
 
 ![MAMESET Cleaner Results view](docs/screenshots/results_view.png)
 

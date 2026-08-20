@@ -1,0 +1,10 @@
+{
+  "id": "turbografx16",
+  "name": "TurboGrafx-16 / PC Engine",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "NEC",
+  "version": "1.6.0",
+  "dat_format": "No-Intro",
+  "sha256": "8614e07e0605ee743b073654f3b0eb93d92df94c69fa6b968ac8d2691db392aa",
+  "min_app_version": "1.6.0"
+}

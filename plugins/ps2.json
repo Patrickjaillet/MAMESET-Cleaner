@@ -1,0 +1,10 @@
+{
+  "id": "ps2",
+  "name": "Sony PlayStation 2",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sony",
+  "version": "1.5.0",
+  "dat_format": "Redump",
+  "sha256": "d157457c669cca803a28cab86343705e170612f774634f157ad7d371a4812505",
+  "min_app_version": "1.5.0"
+}

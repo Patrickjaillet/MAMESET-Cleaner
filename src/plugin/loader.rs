@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::fmt;
 use std::path::Path;
 
-use abi_stable::library::RootModule;
+use abi_stable::library::{lib_header_from_raw_library, RawLibrary, RootModule};
+use abi_stable::utils::leak_value;
 
 use plugin_interface::{PluginManifest, PluginRomEntry, RomSystemPlugin_Ref, PLUGIN_ABI_VERSION};
 
@@ -56,9 +57,38 @@ pub struct LoadedPlugin {
 /// ABI version before returning it. A plugin that fails either the
 /// structural `abi_stable` layout check or the explicit ABI version check
 /// is rejected cleanly (an `Err` is returned, the host never crashes).
+///
+/// # Why this does not use `RomSystemPlugin_Ref::load_from_file`
+///
+/// `abi_stable`'s `RootModule::load_from_file` caches the loaded module in a
+/// `static` keyed by the *module type*, not by path: "once the root module
+/// is loaded, this will return the already loaded root module" regardless
+/// of which path is passed on later calls. Since every plugin in this
+/// workspace shares the same `RomSystemPlugin_Ref` type, calling it a
+/// second time with a *different* plugin's path would silently keep
+/// returning the *first* plugin ever loaded in this process — discovered
+/// directly while building the tool that publishes all shipped plugins at
+/// once (`examples/publish_plugins.rs`), which loads dozens of different
+/// `.dll`s in a single process. This function instead replicates
+/// `load_from_file`'s own steps manually (see `abi_stable::library`'s
+/// module docs) without going through that per-type cache, so every call
+/// genuinely loads the library at `path`.
 pub fn load_plugin_from_file(path: &Path) -> Result<LoadedPlugin, PluginLoadError> {
-    let module =
-        RomSystemPlugin_Ref::load_from_file(path).map_err(|err| PluginLoadError::Library(err.to_string()))?;
+    let raw_library =
+        RawLibrary::load_at(path).map_err(|err| PluginLoadError::Library(err.to_string()))?;
+    // Leaking is deliberate and matches `abi_stable`'s own loading code: the
+    // root module loader may do anything incompatible with sound library
+    // unloading, so the library is never unloaded for the process's lifetime.
+    let raw_library: &'static RawLibrary = leak_value(raw_library);
+
+    let header = unsafe { lib_header_from_raw_library(raw_library) }
+        .map_err(|err| PluginLoadError::Library(err.to_string()))?;
+    header
+        .ensure_layout::<RomSystemPlugin_Ref>()
+        .map_err(|err| PluginLoadError::Library(err.to_string()))?;
+    let module: RomSystemPlugin_Ref = unsafe { header.init_root_module_with_unchecked_layout() }
+        .and_then(RootModule::initialization)
+        .map_err(|err| PluginLoadError::Library(err.to_string()))?;
 
     let found_version = (module.plugin_abi_version())();
     check_abi_version(found_version)?;
