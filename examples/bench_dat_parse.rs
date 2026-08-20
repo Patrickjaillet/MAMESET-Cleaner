@@ -10,4 +10,14 @@ fn main() {
         entries.len(),
         started.elapsed().as_secs_f64()
     );
+
+    // Simulates what an in-session cache hit costs: no re-parse, just an
+    // owned clone of the already-parsed data (see ROADMAP5.md v4.3.0).
+    let clone_started = Instant::now();
+    let cloned = entries.clone();
+    println!(
+        "cloned {} machines (simulated cache hit) in {:.3}s",
+        cloned.len(),
+        clone_started.elapsed().as_secs_f64()
+    );
 }

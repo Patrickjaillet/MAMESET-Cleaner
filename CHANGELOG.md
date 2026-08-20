@@ -1,5 +1,9 @@
 # Changelog
 
+## v5.0.0
+- Scanning is now dramatically faster on repeat runs: the DAT file (and catver.ini/languages.ini) is no longer re-read and re-parsed from scratch every time you click "Lancer le scan" — if the files haven't changed, MAMESET Cleaner reuses what it already loaded, cutting repeat scans down to a fraction of a second instead of several seconds. This also now works across app restarts: the first scan after reopening the app skips the full re-parse too, as long as your DAT file hasn't changed since last time.
+- The scan progress display now updates more smoothly on very large ROM sets instead of refreshing on every single file.
+
 ## v4.2.0
 - Reduced unnecessary memory allocation during ROM-set scanning by removing data that was being copied but never actually used. This is the first step of an ongoing effort to make loading and scanning large ROM sets faster — bigger improvements (avoiding re-reading the DAT file on every scan) are coming in upcoming releases.
 

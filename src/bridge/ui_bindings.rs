@@ -1,16 +1,18 @@
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
+use std::time::Instant;
 
 use slint::{Model, ModelRc, VecModel, Weak};
 
 use crate::core::cleanup_engine::{CleanupOptions, CleanupTarget};
 use crate::core::config_manager::{AppConfig, AppLanguage};
 use crate::core::i18n::Translator;
+use crate::core::file_cache::FileCache;
 use crate::core::{
     catver_parser, cleanup_engine, dat_parser, dedup_engine, filter_engine, languages_parser,
-    profile_manager, report_generator, rom_scanner,
+    persistent_dat_cache, profile_manager, report_generator, rom_scanner,
 };
 use crate::models::filter_profile::FilterProfile;
 use crate::models::rom_entry::{DriverStatus, RomEntry};
@@ -42,6 +44,9 @@ struct AppState {
     scan_cancel_flag: Arc<AtomicBool>,
     plugins_dir: PathBuf,
     remote_plugins: HashMap<String, RemotePlugin>,
+    reference_db_cache: FileCache<HashMap<String, RomEntry>>,
+    catver_cache: FileCache<HashMap<String, String>>,
+    languages_cache: FileCache<HashMap<String, Vec<String>>>,
 }
 
 impl AppState {
@@ -58,6 +63,9 @@ impl AppState {
             scan_cancel_flag: Arc::new(AtomicBool::new(false)),
             plugins_dir: registry::default_plugins_dir(),
             remote_plugins: HashMap::new(),
+            reference_db_cache: FileCache::default(),
+            catver_cache: FileCache::default(),
+            languages_cache: FileCache::default(),
         }
     }
 }
@@ -271,6 +279,7 @@ fn setup_start_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
             let weak_shared = Arc::new(Mutex::new(weak_for_thread.clone()));
 
             let result = run_scan_pipeline(
+                &state_for_thread,
                 ScanPipelineInput {
                     rom_set_path: &rom_set_path,
                     dat_file_path: &dat_file_path,
@@ -351,7 +360,7 @@ type ScanPipelineResult = Result<(HashMap<String, RomEntry>, RomSet, HashSet<Str
 /// own `parse_reference_database`, converted into the shared [`RomEntry`]
 /// model so the rest of the pipeline (scanner, dedup, filters) stays
 /// system-agnostic.
-fn load_reference_database(
+fn load_reference_database_uncached(
     selected_system: &str,
     plugins_dir: &Path,
     dat_file_path: &Path,
@@ -372,6 +381,67 @@ fn load_reference_database(
     Ok(plugin::plugin_entries_to_rom_entries(plugin_entries))
 }
 
+/// Same as [`load_reference_database_uncached`], but skips the actual parse
+/// (which for a full MAME `-listxml` is the single most expensive step in
+/// scanning) when the same DAT file, for the same system, was already
+/// parsed earlier in this session and hasn't changed on disk since.
+fn load_reference_database_cached(
+    state: &Arc<Mutex<AppState>>,
+    selected_system: &str,
+    plugins_dir: &Path,
+    dat_file_path: &Path,
+) -> Result<HashMap<String, RomEntry>, String> {
+    let mut guard = state.lock().unwrap();
+    guard.reference_db_cache.get_or_parse(
+        dat_file_path,
+        selected_system,
+        |path| {
+            if let Some(entries) = persistent_dat_cache::load_if_matching(path, selected_system) {
+                return Ok(entries);
+            }
+            let entries = load_reference_database_uncached(selected_system, plugins_dir, path)?;
+            persistent_dat_cache::save(path, selected_system, &entries);
+            Ok(entries)
+        },
+        |err| err.to_string(),
+    )
+}
+
+fn load_categories_cached(state: &Arc<Mutex<AppState>>, path: &str) -> HashMap<String, String> {
+    if path.is_empty() {
+        return HashMap::new();
+    }
+    let mut guard = state.lock().unwrap();
+    guard
+        .catver_cache
+        .get_or_parse(
+            Path::new(path),
+            "",
+            catver_parser::parse_catver_file,
+            catver_parser::CatverError::Io,
+        )
+        .unwrap_or_default()
+}
+
+fn load_languages_cached(
+    state: &Arc<Mutex<AppState>>,
+    path: &str,
+) -> HashMap<String, Vec<String>> {
+    if path.is_empty() {
+        return HashMap::new();
+    }
+    let mut guard = state.lock().unwrap();
+    guard
+        .languages_cache
+        .get_or_parse(
+            Path::new(path),
+            "",
+            languages_parser::parse_languages_file,
+            languages_parser::LanguagesError::Io,
+        )
+        .unwrap_or_default()
+}
+
 struct ScanPipelineInput<'a> {
     rom_set_path: &'a str,
     dat_file_path: &'a str,
@@ -382,35 +452,55 @@ struct ScanPipelineInput<'a> {
 }
 
 fn run_scan_pipeline(
+    state: &Arc<Mutex<AppState>>,
     input: ScanPipelineInput,
     cancel_flag: &AtomicBool,
     weak_shared: Arc<Mutex<Weak<AppWindow>>>,
 ) -> ScanPipelineResult {
-    let mut dat_entries = load_reference_database(
+    let mut dat_entries = load_reference_database_cached(
+        state,
         input.selected_system,
         input.plugins_dir,
         Path::new(input.dat_file_path),
     )?;
 
-    let categories = input
-        .catver_ini_path
-        .filter(|p| !p.is_empty())
-        .and_then(|p| catver_parser::parse_catver_file(Path::new(p)).ok())
-        .unwrap_or_default();
-
-    let languages = input
-        .languages_ini_path
-        .filter(|p| !p.is_empty())
-        .and_then(|p| languages_parser::parse_languages_file(Path::new(p)).ok())
-        .unwrap_or_default();
+    let categories = load_categories_cached(state, input.catver_ini_path.unwrap_or(""));
+    let languages = load_languages_cached(state, input.languages_ini_path.unwrap_or(""));
 
     dat_parser::merge_metadata(&mut dat_entries, &categories, &languages);
+
+    // Scanning a full set can process tens of thousands of files, and
+    // `on_progress` fires from multiple rayon worker threads concurrently.
+    // Updating the UI on every single file means tens of thousands of
+    // cross-thread event-loop hops for no visible benefit — a human can't
+    // perceive updates faster than this anyway. Throttle to a fixed rate,
+    // but always let the final (100%) update through so the progress bar
+    // and status text don't visibly stall just short of completion.
+    const PROGRESS_THROTTLE_MS: u64 = 100;
+    let scan_started = Instant::now();
+    let last_update_ms = AtomicU64::new(0);
 
     let rom_set = rom_scanner::scan_rom_directory(
         Path::new(input.rom_set_path),
         &dat_entries,
         cancel_flag,
         move |progress: rom_scanner::ScanProgress| {
+            let is_final = progress.processed >= progress.total;
+            if !is_final {
+                let now_ms = scan_started.elapsed().as_millis() as u64;
+                let last = last_update_ms.load(Ordering::Relaxed);
+                if now_ms.saturating_sub(last) < PROGRESS_THROTTLE_MS {
+                    return;
+                }
+                if last_update_ms
+                    .compare_exchange(last, now_ms, Ordering::Relaxed, Ordering::Relaxed)
+                    .is_err()
+                {
+                    // Another thread just claimed this update slot.
+                    return;
+                }
+            }
+
             let ratio = if progress.total == 0 {
                 1.0
             } else {
@@ -1038,7 +1128,7 @@ fn refresh_available_systems(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
 /// Guards against a saved (or just-changed) `selected_system` pointing at a
 /// plugin that is not actually installed on disk — e.g. a `config.json`
 /// left over from a plugin that was later removed, or removed by hand
-/// outside the app. Without this, `load_reference_database` would fail with
+/// outside the app. Without this, `load_reference_database_cached` would fail with
 /// a low-level, unhelpful OS error (`LoadLibraryExW failed`) on every scan
 /// attempt, and the user would have no way to recover except manually
 /// reselecting a system in Settings. If the selected system is missing,

@@ -6,7 +6,7 @@ MAMESET Cleaner is a Windows desktop application that helps clean and organize a
 
 ## Features
 
-- **Scan** the ROM folder (`.zip`, `.7z` files and uncompressed folders), detecting ROMs that are correct, missing, corrupted, or unreferenced
+- **Scan** the ROM folder (`.zip`, `.7z` files and uncompressed folders), detecting ROMs that are correct, missing, corrupted, or unreferenced — the reference database (DAT file, `catver.ini`, `languages.ini`) is cached both within a session and across app restarts, so repeat scans skip re-parsing large files and complete dramatically faster
 - **Duplicate detection** (1G1R logic: 1 game = 1 ROM) based on a customizable region priority (e.g. World > USA > Europe > Japan), working status and the most recent revision
 - **Filtering** by genre, language, region, working status, manufacturer, year and content type (BIOS, mechanical, adult), picked from real values found in your loaded ROM set, with reusable saved filter profiles
 - **Cleanup** of duplicate ROMs: moved to the Windows Recycle Bin by default (or permanently deleted), with an optional backup beforehand and mandatory confirmation before any deletion
