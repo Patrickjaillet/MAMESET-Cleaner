@@ -11,11 +11,17 @@ members = [
     "crates/gba_plugin",
     "crates/nds_plugin",
     "crates/gc_wii_plugin",
+    "crates/sms_plugin",
+    "crates/genesis_plugin",
+    "crates/game_gear_plugin",
+    "crates/sega_cd_plugin",
+    "crates/saturn_plugin",
+    "crates/dreamcast_plugin",
 ]
 
 [package]
 name = "mameset_cleaner"
-version = "1.3.0"
+version = "1.4.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -96,6 +102,30 @@ path = "test/nds_plugin_test.rs"
 [[test]]
 name = "gc_wii_plugin_test"
 path = "test/gc_wii_plugin_test.rs"
+
+[[test]]
+name = "sms_plugin_test"
+path = "test/sms_plugin_test.rs"
+
+[[test]]
+name = "genesis_plugin_test"
+path = "test/genesis_plugin_test.rs"
+
+[[test]]
+name = "game_gear_plugin_test"
+path = "test/game_gear_plugin_test.rs"
+
+[[test]]
+name = "sega_cd_plugin_test"
+path = "test/sega_cd_plugin_test.rs"
+
+[[test]]
+name = "saturn_plugin_test"
+path = "test/saturn_plugin_test.rs"
+
+[[test]]
+name = "dreamcast_plugin_test"
+path = "test/dreamcast_plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

@@ -1379,6 +1379,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
 
 [[package]]
+name = "dreamcast_plugin"
+version = "1.4.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
+]
+
+[[package]]
 name = "drm"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1860,6 +1869,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "game_gear_plugin"
+version = "1.4.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
+]
+
+[[package]]
 name = "gb_plugin"
 version = "1.3.0"
 dependencies = [
@@ -1925,6 +1943,15 @@ checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
  "version_check",
+]
+
+[[package]]
+name = "genesis_plugin"
+version = "1.4.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
 ]
 
 [[package]]
@@ -3182,7 +3209,7 @@ dependencies = [
 
 [[package]]
 name = "mameset_cleaner"
-version = "1.3.0"
+version = "1.4.0"
 dependencies = [
  "abi_stable",
  "configparser",
@@ -4802,6 +4829,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "saturn_plugin"
+version = "1.4.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
+]
+
+[[package]]
 name = "scoped-tls"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4830,6 +4866,15 @@ dependencies = [
  "memmap2",
  "smithay-client-toolkit 0.19.2",
  "tiny-skia 0.11.4",
+]
+
+[[package]]
+name = "sega_cd_plugin"
+version = "1.4.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
 ]
 
 [[package]]
@@ -5212,6 +5257,15 @@ checksum = "4aaa7368fcf4852a4c2dd92df0cace6a71f2091ca0a23391ce7f3a31833f1523"
 dependencies = [
  "borsh",
  "serde_core",
+]
+
+[[package]]
+name = "sms_plugin"
+version = "1.4.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
 ]
 
 [[package]]
