@@ -3,6 +3,7 @@ members = [
     ".",
     "crates/plugin_interface",
     "crates/fake_plugin_fixture",
+    "crates/panicking_plugin_fixture",
     "crates/dat_common",
     "crates/nes_plugin",
     "crates/snes_plugin",
@@ -38,7 +39,7 @@ members = [
 
 [package]
 name = "mameset_cleaner"
-version = "1.7.0"
+version = "1.8.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -87,6 +88,10 @@ path = "test/cleanup_test.rs"
 [[test]]
 name = "plugin_test"
 path = "test/plugin_test.rs"
+
+[[test]]
+name = "plugin_panic_isolation_test"
+path = "test/plugin_panic_isolation_test.rs"
 
 [[test]]
 name = "plugin_download_test"

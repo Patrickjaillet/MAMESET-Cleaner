@@ -2,7 +2,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use mameset_cleaner::plugin::loader::load_plugin_from_file;
+use mameset_cleaner::plugin::loader::{load_plugin_from_file, load_plugin_from_file_expecting_id, PluginLoadError};
 use mameset_cleaner::plugin::RomSystem;
 
 /// `cargo test` compiles library crates as rlibs for the test harness; it
@@ -81,4 +81,20 @@ fn loads_a_real_plugin_dynamic_library_and_uses_it() {
 fn loading_a_plugin_from_a_missing_path_fails_without_crashing() {
     let result = load_plugin_from_file(Path::new("this-plugin-does-not-exist.dll"));
     assert!(result.is_err());
+}
+
+#[test]
+fn rejects_a_plugin_whose_declared_id_does_not_match_the_expected_one() {
+    let plugin_path = fake_plugin_path();
+
+    let result = load_plugin_from_file_expecting_id(&plugin_path, "not-the-fake-id");
+    assert!(matches!(result, Err(PluginLoadError::IdMismatch { .. })));
+}
+
+#[test]
+fn accepts_a_plugin_whose_declared_id_matches_the_expected_one() {
+    let plugin_path = fake_plugin_path();
+
+    let result = load_plugin_from_file_expecting_id(&plugin_path, "fake");
+    assert!(result.is_ok());
 }

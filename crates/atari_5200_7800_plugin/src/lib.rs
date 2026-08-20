@@ -1,7 +1,7 @@
 use std::fs;
 
 use abi_stable::{export_root_module, prefix_type::PrefixTypeTrait, std_types::*};
-use dat_common::parse_logiqx_dat;
+use dat_common::parse_logiqx_dat_panic_safe;
 use plugin_interface::{
     PluginManifest, PluginRomEntry, PluginRomFile, RomSystemPlugin_Ref, RomSystemPluginMod,
     PLUGIN_ABI_VERSION,
@@ -30,7 +30,7 @@ extern "C" fn parse_reference_database(path: RString) -> RResult<RVec<PluginRomE
         Err(err) => return RErr(err.to_string().into()),
     };
 
-    match parse_logiqx_dat(&content) {
+    match parse_logiqx_dat_panic_safe(&content) {
         Ok(games) => ROk(RVec::from(
             games.iter().map(to_plugin_entry).collect::<Vec<_>>(),
         )),

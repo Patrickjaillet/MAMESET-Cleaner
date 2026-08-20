@@ -30,6 +30,11 @@ pub enum PluginStatus {
     UpdateAvailable,
 }
 
+/// The id of the built-in, always-available MAME system. No plugin may
+/// claim this id, since that would let it silently shadow or conflict with
+/// the native support in the system selector.
+pub const RESERVED_SYSTEM_ID: &str = "mame";
+
 pub fn default_plugins_dir() -> PathBuf {
     config_dir().join("plugins")
 }
@@ -86,6 +91,10 @@ pub fn install_plugin_from_bytes(
     bytes: &[u8],
     manifest: &StoredManifest,
 ) -> Result<(), GitHubClientError> {
+    if manifest.id == RESERVED_SYSTEM_ID {
+        return Err(GitHubClientError::ReservedSystemId(manifest.id.clone()));
+    }
+
     fs::create_dir_all(dir)?;
     let dll_path = plugin_dll_path(dir, &manifest.id);
     fs::write(&dll_path, bytes)?;
@@ -117,6 +126,10 @@ pub fn install_plugin_from_url_with_progress(
     manifest: &StoredManifest,
     on_progress: impl FnMut(u64, Option<u64>),
 ) -> Result<(), GitHubClientError> {
+    if manifest.id == RESERVED_SYSTEM_ID {
+        return Err(GitHubClientError::ReservedSystemId(manifest.id.clone()));
+    }
+
     fs::create_dir_all(dir)?;
     let dll_path = plugin_dll_path(dir, &manifest.id);
     github_client::download_file_with_progress(download_url, &dll_path, on_progress)?;
@@ -202,6 +215,24 @@ mod tests {
         assert!(!plugin_dll_path(&dir, "nes").exists());
 
         fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn installing_a_plugin_with_the_reserved_mame_id_is_rejected() {
+        let dir = temp_dir("install_reserved_id");
+        let _ = fs::remove_dir_all(&dir);
+
+        let bytes = b"fake dll content";
+        let hash = github_client::compute_sha256_hex_bytes(bytes);
+        let manifest = sample_manifest(RESERVED_SYSTEM_ID, "1.0.0", &hash);
+
+        let result = install_plugin_from_bytes(&dir, bytes, &manifest);
+        assert!(matches!(
+            result,
+            Err(GitHubClientError::ReservedSystemId(_))
+        ));
+        assert!(list_installed(&dir).is_empty());
+        assert!(!plugin_dll_path(&dir, RESERVED_SYSTEM_ID).exists());
     }
 
     #[test]

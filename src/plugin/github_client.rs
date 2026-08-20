@@ -14,6 +14,7 @@ pub enum GitHubClientError {
     Json(String),
     Io(std::io::Error),
     HashMismatch { expected: String, actual: String },
+    ReservedSystemId(String),
 }
 
 impl fmt::Display for GitHubClientError {
@@ -25,6 +26,10 @@ impl fmt::Display for GitHubClientError {
             GitHubClientError::HashMismatch { expected, actual } => write!(
                 f,
                 "empreinte SHA-256 invalide (attendue {expected}, obtenue {actual}) — fichier rejeté"
+            ),
+            GitHubClientError::ReservedSystemId(id) => write!(
+                f,
+                "l'identifiant « {id} » est réservé au système MAME intégré — plugin rejeté"
             ),
         }
     }

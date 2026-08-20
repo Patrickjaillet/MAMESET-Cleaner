@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.8.0
+- Strengthened the plugin system: a plugin can no longer claim another system's identity (including the built-in MAME system), and a plugin that encounters an internal error while reading a reference database now reports it cleanly instead of being able to affect the rest of the application.
+
 ## v1.7.0
 - Added support for five classic computers — Commodore 64, Commodore Amiga, ZX Spectrum, Amstrad CPC and MSX/MSX2 — each installable from the "Plugins" section once published to the repository.
 

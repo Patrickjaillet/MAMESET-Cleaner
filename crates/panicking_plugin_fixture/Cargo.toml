@@ -1,0 +1,12 @@
+[package]
+name = "panicking_plugin_fixture"
+version = "1.8.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+plugin_interface = { path = "../plugin_interface" }
+abi_stable = "0.11.3"

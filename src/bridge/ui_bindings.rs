@@ -348,8 +348,8 @@ fn load_reference_database(
     }
 
     let dll_path = registry::plugin_dll_path(plugins_dir, selected_system);
-    let loaded_plugin = loader::load_plugin_from_file(&dll_path)
-        .map_err(|err| format!("impossible de charger le plugin « {selected_system} » : {err:?}"))?;
+    let loaded_plugin = loader::load_plugin_from_file_expecting_id(&dll_path, selected_system)
+        .map_err(|err| format!("impossible de charger le plugin « {selected_system} » : {err}"))?;
     let plugin_entries = loaded_plugin.parse_reference_database(dat_file_path)?;
     Ok(plugin::plugin_entries_to_rom_entries(plugin_entries))
 }

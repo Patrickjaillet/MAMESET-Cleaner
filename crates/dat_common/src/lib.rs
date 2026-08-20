@@ -25,6 +25,7 @@ pub struct LogiqxGame {
 pub enum LogiqxDatError {
     Xml(quick_xml::Error),
     NoGamesFound,
+    Panicked,
 }
 
 impl fmt::Display for LogiqxDatError {
@@ -33,6 +34,9 @@ impl fmt::Display for LogiqxDatError {
             LogiqxDatError::Xml(err) => write!(f, "XML parsing error in the DAT file: {err}"),
             LogiqxDatError::NoGamesFound => {
                 write!(f, "the DAT file is readable but contains no recognized game")
+            }
+            LogiqxDatError::Panicked => {
+                write!(f, "an internal error (panic) occurred while parsing the DAT file")
             }
         }
     }
@@ -44,6 +48,29 @@ impl From<quick_xml::Error> for LogiqxDatError {
     fn from(err: quick_xml::Error) -> Self {
         LogiqxDatError::Xml(err)
     }
+}
+
+/// Same as [`parse_logiqx_dat`], but additionally catches a panic raised
+/// while parsing and turns it into a plain error message instead of letting
+/// it propagate.
+///
+/// This exists because every console plugin in this workspace is a dynamic
+/// library exposing `extern "C"` functions: a panic that unwinds across an
+/// `extern "C"` FFI boundary without being caught first is undefined
+/// behavior, and in practice aborts the whole host process rather than
+/// being observable as an error (`thread caused non-unwinding panic.
+/// aborting.`) — confirmed directly while building the panic-isolation test
+/// for v1.8.0. Catching the panic here, entirely on the plugin's own side
+/// of the boundary and before any FFI-safe value is returned, is what
+/// actually keeps a misbehaving reference database from crashing the host;
+/// a `catch_unwind` added on the host side after the call cannot help,
+/// since the abort already happens while unwinding through the plugin's own
+/// `extern "C"` frame. Every plugin shipped in this workspace calls this
+/// function rather than [`parse_logiqx_dat`] directly for that reason.
+pub fn parse_logiqx_dat_panic_safe(xml: &str) -> Result<Vec<LogiqxGame>, String> {
+    std::panic::catch_unwind(|| parse_logiqx_dat(xml))
+        .unwrap_or(Err(LogiqxDatError::Panicked))
+        .map_err(|err| err.to_string())
 }
 
 /// Parses a Logiqx-style DAT (`<datafile><game name=".." cloneof="..">
@@ -204,5 +231,17 @@ mod tests {
     fn valid_xml_without_any_game_is_reported_clearly() {
         let result = parse_logiqx_dat(r#"<?xml version="1.0"?><datafile><header/></datafile>"#);
         assert!(matches!(result, Err(LogiqxDatError::NoGamesFound)));
+    }
+
+    #[test]
+    fn panic_safe_variant_behaves_like_the_regular_parser_on_valid_input() {
+        let games = parse_logiqx_dat_panic_safe(SAMPLE_NO_INTRO_DAT).unwrap();
+        assert_eq!(games.len(), 2);
+    }
+
+    #[test]
+    fn panic_safe_variant_reports_errors_without_panicking() {
+        let result = parse_logiqx_dat_panic_safe("not xml at all");
+        assert!(result.is_err());
     }
 }

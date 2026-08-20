@@ -3272,7 +3272,7 @@ dependencies = [
 
 [[package]]
 name = "mameset_cleaner"
-version = "1.7.0"
+version = "1.8.0"
 dependencies = [
  "abi_stable",
  "configparser",
@@ -4046,6 +4046,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36820e9051aca1014ddc75770aab4d68bc1e9e632f0f5627c4086bc216fb583b"
 dependencies = [
  "ttf-parser",
+]
+
+[[package]]
+name = "panicking_plugin_fixture"
+version = "1.8.0"
+dependencies = [
+ "abi_stable",
+ "plugin_interface",
 ]
 
 [[package]]

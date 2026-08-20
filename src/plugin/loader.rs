@@ -12,6 +12,7 @@ use super::RomSystem;
 pub enum PluginLoadError {
     Library(String),
     IncompatibleAbiVersion { found: u32, expected: u32 },
+    IdMismatch { expected: String, found: String },
 }
 
 impl fmt::Display for PluginLoadError {
@@ -21,6 +22,10 @@ impl fmt::Display for PluginLoadError {
             PluginLoadError::IncompatibleAbiVersion { found, expected } => write!(
                 f,
                 "version d'interface de plugin incompatible (trouvée {found}, attendue {expected})"
+            ),
+            PluginLoadError::IdMismatch { expected, found } => write!(
+                f,
+                "le plugin déclare l'identifiant « {found} » alors que « {expected} » était attendu — fichier rejeté pour éviter tout conflit entre systèmes"
             ),
         }
     }
@@ -61,6 +66,47 @@ pub fn load_plugin_from_file(path: &Path) -> Result<LoadedPlugin, PluginLoadErro
     Ok(LoadedPlugin { module })
 }
 
+/// Same as [`load_plugin_from_file`], but additionally checks that the
+/// plugin's own declared [`PluginManifest::id`] matches `expected_id` (the
+/// id its file was located by, e.g. from the local plugin registry). This
+/// rejects a plugin that would otherwise silently impersonate another
+/// system's identity, which would let two different plugins conflict over
+/// the same `system_id`.
+pub fn load_plugin_from_file_expecting_id(
+    path: &Path,
+    expected_id: &str,
+) -> Result<LoadedPlugin, PluginLoadError> {
+    let plugin = load_plugin_from_file(path)?;
+    let declared_id = plugin.manifest().id.to_string();
+    if declared_id != expected_id {
+        return Err(PluginLoadError::IdMismatch {
+            expected: expected_id.to_string(),
+            found: declared_id,
+        });
+    }
+    Ok(plugin)
+}
+
+/// # Panic safety across the FFI boundary
+///
+/// Unlike an ordinary Rust function call, a panic that unwinds across an
+/// `extern "C"` boundary without being caught first is undefined behavior:
+/// in practice, on this toolchain, it aborts the whole host process
+/// (`thread caused non-unwinding panic. aborting.`) rather than being
+/// observable here as an error. A `catch_unwind` added on the host side,
+/// after calling into the plugin, cannot help — by the time control would
+/// return here, the process has already aborted while unwinding through the
+/// plugin's own `extern "C"` frame. This was confirmed directly while
+/// building the v1.8.0 panic-isolation test.
+///
+/// This means panic containment has to happen on the *plugin's* side of the
+/// boundary, before it returns an FFI-safe value. Every plugin shipped in
+/// this workspace follows that contract: reference-database parsing goes
+/// through `dat_common::parse_logiqx_dat_panic_safe`, which wraps the actual
+/// parsing in `catch_unwind` entirely within the plugin's own stack frame.
+/// A third-party plugin that does not follow this contract can still crash
+/// the host — full protection against that would require process-level
+/// sandboxing (a separate plugin host process), which is out of scope here.
 impl RomSystem for LoadedPlugin {
     fn manifest(&self) -> PluginManifest {
         (self.module.get_manifest())()
