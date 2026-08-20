@@ -1,0 +1,10 @@
+{
+  "id": "colecovision",
+  "name": "ColecoVision",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Coleco",
+  "version": "2.2.0",
+  "dat_format": "No-Intro",
+  "sha256": "ef7652e435dd8787d094f520eb2b788a5a0280d6a24cd079f34eabde3969d0b9",
+  "min_app_version": "2.2.0"
+}

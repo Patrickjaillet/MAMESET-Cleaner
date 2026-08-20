@@ -1,0 +1,10 @@
+{
+  "id": "pv1000",
+  "name": "Casio PV-1000",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Casio",
+  "version": "2.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "ac6d14ad32428215612c5ecce6b0bd7d39193bc15d2baa3a296904ee6af5fc14",
+  "min_app_version": "2.3.0"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "odyssey2",
+  "name": "Magnavox Odyssey 2 / Videopac",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Magnavox",
+  "version": "2.2.0",
+  "dat_format": "No-Intro",
+  "sha256": "a74b65a9a50ac71d5bf982cb876d6de528aa3ed0d17f25b23ea350cd57f20d84",
+  "min_app_version": "2.2.0"
+}

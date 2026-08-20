@@ -1,0 +1,10 @@
+{
+  "id": "astrocade",
+  "name": "Bally Astrocade",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Bally",
+  "version": "2.2.0",
+  "dat_format": "No-Intro",
+  "sha256": "2a2f55315bd651e8544528fd68991b2ce2611a236cb47b2427affb135d4a9902",
+  "min_app_version": "2.2.0"
+}

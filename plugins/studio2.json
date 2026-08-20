@@ -1,0 +1,10 @@
+{
+  "id": "studio2",
+  "name": "RCA Studio II",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "RCA",
+  "version": "2.2.0",
+  "dat_format": "No-Intro",
+  "sha256": "07c9934900de1350dbffe0fd2e347bfd23b5e090ba2bdb8121e1e55b69e4bd89",
+  "min_app_version": "2.2.0"
+}

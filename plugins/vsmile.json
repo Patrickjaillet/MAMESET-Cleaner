@@ -1,0 +1,10 @@
+{
+  "id": "vsmile",
+  "name": "VTech V.Smile",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "VTech",
+  "version": "2.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "224fff6ba1e8da6920e718f26587d0dd6f4167dc8565be03b3b2234322375eb6",
+  "min_app_version": "2.3.0"
+}

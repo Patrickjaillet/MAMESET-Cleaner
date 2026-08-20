@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.3.0
+- Added support for 18 more systems — ColecoVision, Mattel Intellivision, GCE Vectrex, Magnavox Odyssey²/Videopac, Fairchild Channel F, Bally Astrocade, Emerson Arcadia 2001, Interton VC 4000, RCA Studio II, Watara Supervision, Tiger Game.com, Nokia N-Gage, Tapwave Zodiac, VTech CreatiVision, VTech V.Smile, APF MP1000, Casio PV-1000 and Casio Loopy — available for download from the "Plugins" section.
+
 ## v2.1.0
 - Added support for four more systems — Virtual Boy, Pokémon Mini, SG-1000 and Sega Pico — available for download from the "Plugins" section.
 

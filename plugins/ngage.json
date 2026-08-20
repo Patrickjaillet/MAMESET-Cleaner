@@ -1,0 +1,10 @@
+{
+  "id": "ngage",
+  "name": "Nokia N-Gage",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Nokia",
+  "version": "2.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "28b9f6d6dd5320e707a0566b73193988704623eb59295a44bbe5c8fb7e6844b6",
+  "min_app_version": "2.3.0"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "loopy",
+  "name": "Casio Loopy",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Casio",
+  "version": "2.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "2fc809ecade3cb6f902871cb2f0140ea095f6af6a6677442f00736a7a02869fe",
+  "min_app_version": "2.3.0"
+}

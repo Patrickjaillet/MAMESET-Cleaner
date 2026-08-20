@@ -1,0 +1,10 @@
+{
+  "id": "arcadia_2001",
+  "name": "Emerson Arcadia 2001",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Emerson",
+  "version": "2.2.0",
+  "dat_format": "No-Intro",
+  "sha256": "985cc654074fd046ecb6256491bb23d94aacd98d3e4a519a67ba47ee48792f09",
+  "min_app_version": "2.2.0"
+}

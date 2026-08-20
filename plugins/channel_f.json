@@ -1,0 +1,10 @@
+{
+  "id": "channel_f",
+  "name": "Fairchild Channel F",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Fairchild",
+  "version": "2.2.0",
+  "dat_format": "No-Intro",
+  "sha256": "9b35c4cc1cf0bc78357677868fcad14a9d2534336c80ef087034b6706f6f207c",
+  "min_app_version": "2.2.0"
+}

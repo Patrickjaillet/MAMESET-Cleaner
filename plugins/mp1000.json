@@ -1,0 +1,10 @@
+{
+  "id": "mp1000",
+  "name": "APF MP1000",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "APF",
+  "version": "2.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "853fa7e4614d643de3599edb16a5136fe3d57042baa2bdb4e0d65baab75ce964",
+  "min_app_version": "2.3.0"
+}

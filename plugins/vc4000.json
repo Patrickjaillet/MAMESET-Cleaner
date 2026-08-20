@@ -1,0 +1,10 @@
+{
+  "id": "vc4000",
+  "name": "Interton VC 4000",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Interton",
+  "version": "2.2.0",
+  "dat_format": "No-Intro",
+  "sha256": "794226e95b3a72ebd67d270f6ef5278e4adc60af3d008fc9ff496a4bd8abdfd3",
+  "min_app_version": "2.2.0"
+}

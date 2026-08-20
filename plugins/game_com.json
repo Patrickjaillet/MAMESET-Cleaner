@@ -1,0 +1,10 @@
+{
+  "id": "game_com",
+  "name": "Tiger Game.com",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Tiger",
+  "version": "2.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "a17d71b291a3a615d6d87adeaf683f55b2f5baed4acd3c0f54593b267c703fb3",
+  "min_app_version": "2.3.0"
+}

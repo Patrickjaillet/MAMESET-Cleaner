@@ -39,11 +39,29 @@ members = [
     "crates/pokemon_mini_plugin",
     "crates/sg1000_plugin",
     "crates/sega_pico_plugin",
+    "crates/colecovision_plugin",
+    "crates/intellivision_plugin",
+    "crates/vectrex_plugin",
+    "crates/odyssey2_plugin",
+    "crates/channel_f_plugin",
+    "crates/astrocade_plugin",
+    "crates/arcadia_2001_plugin",
+    "crates/vc4000_plugin",
+    "crates/studio2_plugin",
+    "crates/supervision_plugin",
+    "crates/game_com_plugin",
+    "crates/ngage_plugin",
+    "crates/zodiac_plugin",
+    "crates/creativision_plugin",
+    "crates/vsmile_plugin",
+    "crates/mp1000_plugin",
+    "crates/pv1000_plugin",
+    "crates/loopy_plugin",
 ]
 
 [package]
 name = "mameset_cleaner"
-version = "2.1.0"
+version = "2.3.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -236,6 +254,78 @@ path = "test/sg1000_plugin_test.rs"
 [[test]]
 name = "sega_pico_plugin_test"
 path = "test/sega_pico_plugin_test.rs"
+
+[[test]]
+name = "colecovision_plugin_test"
+path = "test/colecovision_plugin_test.rs"
+
+[[test]]
+name = "intellivision_plugin_test"
+path = "test/intellivision_plugin_test.rs"
+
+[[test]]
+name = "vectrex_plugin_test"
+path = "test/vectrex_plugin_test.rs"
+
+[[test]]
+name = "odyssey2_plugin_test"
+path = "test/odyssey2_plugin_test.rs"
+
+[[test]]
+name = "channel_f_plugin_test"
+path = "test/channel_f_plugin_test.rs"
+
+[[test]]
+name = "astrocade_plugin_test"
+path = "test/astrocade_plugin_test.rs"
+
+[[test]]
+name = "arcadia_2001_plugin_test"
+path = "test/arcadia_2001_plugin_test.rs"
+
+[[test]]
+name = "vc4000_plugin_test"
+path = "test/vc4000_plugin_test.rs"
+
+[[test]]
+name = "studio2_plugin_test"
+path = "test/studio2_plugin_test.rs"
+
+[[test]]
+name = "supervision_plugin_test"
+path = "test/supervision_plugin_test.rs"
+
+[[test]]
+name = "game_com_plugin_test"
+path = "test/game_com_plugin_test.rs"
+
+[[test]]
+name = "ngage_plugin_test"
+path = "test/ngage_plugin_test.rs"
+
+[[test]]
+name = "zodiac_plugin_test"
+path = "test/zodiac_plugin_test.rs"
+
+[[test]]
+name = "creativision_plugin_test"
+path = "test/creativision_plugin_test.rs"
+
+[[test]]
+name = "vsmile_plugin_test"
+path = "test/vsmile_plugin_test.rs"
+
+[[test]]
+name = "mp1000_plugin_test"
+path = "test/mp1000_plugin_test.rs"
+
+[[test]]
+name = "pv1000_plugin_test"
+path = "test/pv1000_plugin_test.rs"
+
+[[test]]
+name = "loopy_plugin_test"
+path = "test/loopy_plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

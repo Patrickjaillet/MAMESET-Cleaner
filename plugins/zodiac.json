@@ -1,0 +1,10 @@
+{
+  "id": "zodiac",
+  "name": "Tapwave Zodiac",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Tapwave",
+  "version": "2.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "335f9d01f8386d59cb48da0f870770af776f5ee16d13eb63079c53e2a7ba8508",
+  "min_app_version": "2.3.0"
+}

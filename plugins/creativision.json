@@ -1,0 +1,10 @@
+{
+  "id": "creativision",
+  "name": "VTech CreatiVision",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "VTech",
+  "version": "2.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "edeaf02d248c0d449ecc4c0bea4f26d36fff12de60a91edff6d69dc7437ee61f",
+  "min_app_version": "2.3.0"
+}

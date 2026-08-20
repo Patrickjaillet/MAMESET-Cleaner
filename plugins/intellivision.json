@@ -1,0 +1,10 @@
+{
+  "id": "intellivision",
+  "name": "Mattel Intellivision",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Mattel",
+  "version": "2.2.0",
+  "dat_format": "No-Intro",
+  "sha256": "4417979194ddb8fb20e2152142b820e468399af4c38fdb0bebd72983e466c5ee",
+  "min_app_version": "2.2.0"
+}

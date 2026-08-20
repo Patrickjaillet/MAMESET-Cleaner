@@ -1,0 +1,10 @@
+{
+  "id": "supervision",
+  "name": "Watara Supervision",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Watara",
+  "version": "2.3.0",
+  "dat_format": "No-Intro",
+  "sha256": "3140ada91ce2ef39b2f0a2e90b03666f0e4cd35f4a86047a2a3815a0b31857a1",
+  "min_app_version": "2.3.0"
+}
