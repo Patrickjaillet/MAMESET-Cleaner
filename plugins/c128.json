@@ -1,0 +1,10 @@
+{
+  "id": "c128",
+  "name": "Commodore 128",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Commodore",
+  "version": "2.6.0",
+  "dat_format": "TOSEC",
+  "sha256": "89377de28e5af87d432805343889610090f11c672dabf95c4a46a466a5da11dc",
+  "min_app_version": "2.6.0"
+}

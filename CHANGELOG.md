@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.6.0
+- Added support for 20 more systems — Neo Geo CD, PC-FX, TurboGrafx-CD/PC Engine CD, CD-i, Amiga CD32, CDTV, Jaguar CD, FM Towns, Playdia, Pippin, PlayStation 3, Xbox, Xbox 360, Wii U, Atari 8-bit, Commodore VIC-20, Commodore 128, Commodore Plus/4, Sinclair QL and Sord M5 — available for download from the "Plugins" section.
+
 ## v2.3.0
 - Added support for 18 more systems — ColecoVision, Mattel Intellivision, GCE Vectrex, Magnavox Odyssey²/Videopac, Fairchild Channel F, Bally Astrocade, Emerson Arcadia 2001, Interton VC 4000, RCA Studio II, Watara Supervision, Tiger Game.com, Nokia N-Gage, Tapwave Zodiac, VTech CreatiVision, VTech V.Smile, APF MP1000, Casio PV-1000 and Casio Loopy — available for download from the "Plugins" section.
 

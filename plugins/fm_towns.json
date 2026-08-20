@@ -1,0 +1,10 @@
+{
+  "id": "fm_towns",
+  "name": "Fujitsu FM Towns",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Fujitsu",
+  "version": "2.4.0",
+  "dat_format": "Redump",
+  "sha256": "b37f9e2ce277c96034f207c80eebcec50f0ba92d964c8a533ea85b6548ff3087",
+  "min_app_version": "2.4.0"
+}

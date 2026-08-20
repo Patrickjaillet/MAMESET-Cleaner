@@ -1,0 +1,10 @@
+{
+  "id": "atari_8bit",
+  "name": "Atari 8-bit (400/800/XL/XE)",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Atari",
+  "version": "2.6.0",
+  "dat_format": "TOSEC",
+  "sha256": "3cbcfc2ba32f823c16713123a1fbd25a6e0e93ad8cb6426ef420e8d4cda42dca",
+  "min_app_version": "2.6.0"
+}

@@ -57,11 +57,31 @@ members = [
     "crates/mp1000_plugin",
     "crates/pv1000_plugin",
     "crates/loopy_plugin",
+    "crates/neo_geo_cd_plugin",
+    "crates/pcfx_plugin",
+    "crates/turbografx_cd_plugin",
+    "crates/cdi_plugin",
+    "crates/cd32_plugin",
+    "crates/cdtv_plugin",
+    "crates/jaguar_cd_plugin",
+    "crates/fm_towns_plugin",
+    "crates/playdia_plugin",
+    "crates/pippin_plugin",
+    "crates/ps3_plugin",
+    "crates/xbox_plugin",
+    "crates/xbox360_plugin",
+    "crates/wiiu_plugin",
+    "crates/atari_8bit_plugin",
+    "crates/vic20_plugin",
+    "crates/c128_plugin",
+    "crates/plus4_plugin",
+    "crates/sinclair_ql_plugin",
+    "crates/sord_m5_plugin",
 ]
 
 [package]
 name = "mameset_cleaner"
-version = "2.3.0"
+version = "2.6.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -326,6 +346,86 @@ path = "test/pv1000_plugin_test.rs"
 [[test]]
 name = "loopy_plugin_test"
 path = "test/loopy_plugin_test.rs"
+
+[[test]]
+name = "neo_geo_cd_plugin_test"
+path = "test/neo_geo_cd_plugin_test.rs"
+
+[[test]]
+name = "pcfx_plugin_test"
+path = "test/pcfx_plugin_test.rs"
+
+[[test]]
+name = "turbografx_cd_plugin_test"
+path = "test/turbografx_cd_plugin_test.rs"
+
+[[test]]
+name = "cdi_plugin_test"
+path = "test/cdi_plugin_test.rs"
+
+[[test]]
+name = "cd32_plugin_test"
+path = "test/cd32_plugin_test.rs"
+
+[[test]]
+name = "cdtv_plugin_test"
+path = "test/cdtv_plugin_test.rs"
+
+[[test]]
+name = "jaguar_cd_plugin_test"
+path = "test/jaguar_cd_plugin_test.rs"
+
+[[test]]
+name = "fm_towns_plugin_test"
+path = "test/fm_towns_plugin_test.rs"
+
+[[test]]
+name = "playdia_plugin_test"
+path = "test/playdia_plugin_test.rs"
+
+[[test]]
+name = "pippin_plugin_test"
+path = "test/pippin_plugin_test.rs"
+
+[[test]]
+name = "ps3_plugin_test"
+path = "test/ps3_plugin_test.rs"
+
+[[test]]
+name = "xbox_plugin_test"
+path = "test/xbox_plugin_test.rs"
+
+[[test]]
+name = "xbox360_plugin_test"
+path = "test/xbox360_plugin_test.rs"
+
+[[test]]
+name = "wiiu_plugin_test"
+path = "test/wiiu_plugin_test.rs"
+
+[[test]]
+name = "atari_8bit_plugin_test"
+path = "test/atari_8bit_plugin_test.rs"
+
+[[test]]
+name = "vic20_plugin_test"
+path = "test/vic20_plugin_test.rs"
+
+[[test]]
+name = "c128_plugin_test"
+path = "test/c128_plugin_test.rs"
+
+[[test]]
+name = "plus4_plugin_test"
+path = "test/plus4_plugin_test.rs"
+
+[[test]]
+name = "sinclair_ql_plugin_test"
+path = "test/sinclair_ql_plugin_test.rs"
+
+[[test]]
+name = "sord_m5_plugin_test"
+path = "test/sord_m5_plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

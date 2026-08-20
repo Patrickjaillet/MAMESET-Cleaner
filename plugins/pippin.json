@@ -1,0 +1,10 @@
+{
+  "id": "pippin",
+  "name": "Apple/Bandai Pippin",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Apple/Bandai",
+  "version": "2.4.0",
+  "dat_format": "Redump",
+  "sha256": "e5756f924ca5350f437dc4919a3fe7e3a0e92293543690e563deae2bb1280267",
+  "min_app_version": "2.4.0"
+}

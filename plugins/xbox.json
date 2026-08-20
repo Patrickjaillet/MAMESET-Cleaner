@@ -1,0 +1,10 @@
+{
+  "id": "xbox",
+  "name": "Microsoft Xbox",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Microsoft",
+  "version": "2.5.0",
+  "dat_format": "Redump",
+  "sha256": "9d0251a41a50bfafccce34da2d73c39a196dd658164e4fd84f380c61b6c8406f",
+  "min_app_version": "2.5.0"
+}

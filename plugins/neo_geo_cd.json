@@ -1,0 +1,10 @@
+{
+  "id": "neo_geo_cd",
+  "name": "SNK Neo Geo CD",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "SNK",
+  "version": "2.4.0",
+  "dat_format": "Redump",
+  "sha256": "2bef8a3a5a48cb8007476f1b7f61420eb86f89b588ba53062916232d3b429c6b",
+  "min_app_version": "2.4.0"
+}

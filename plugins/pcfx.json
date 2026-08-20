@@ -1,0 +1,10 @@
+{
+  "id": "pcfx",
+  "name": "NEC PC-FX",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "NEC",
+  "version": "2.4.0",
+  "dat_format": "Redump",
+  "sha256": "c2a9e3378a1304ed6ec458c96b89151c07d58c2895da2c62175ec35b479803ee",
+  "min_app_version": "2.4.0"
+}

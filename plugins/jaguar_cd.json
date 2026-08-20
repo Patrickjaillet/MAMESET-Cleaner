@@ -1,0 +1,10 @@
+{
+  "id": "jaguar_cd",
+  "name": "Atari Jaguar CD",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Atari",
+  "version": "2.4.0",
+  "dat_format": "Redump",
+  "sha256": "796fb40aff0a1d5214ce3097a1f2726be15d5be9da4e8bd70e1cf61ef4c4f4b0",
+  "min_app_version": "2.4.0"
+}

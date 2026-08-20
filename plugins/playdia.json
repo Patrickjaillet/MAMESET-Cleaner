@@ -1,0 +1,10 @@
+{
+  "id": "playdia",
+  "name": "Bandai Playdia",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Bandai",
+  "version": "2.4.0",
+  "dat_format": "Redump",
+  "sha256": "1923c876735f53bb1c841773caa5ae39b04a677963df622eea390b3eaa1432c4",
+  "min_app_version": "2.4.0"
+}

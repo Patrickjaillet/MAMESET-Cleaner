@@ -1,0 +1,10 @@
+{
+  "id": "cdi",
+  "name": "Philips CD-i",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Philips",
+  "version": "2.4.0",
+  "dat_format": "Redump",
+  "sha256": "20fb8338376682b55cc1d544af0234a42caa468de54de9ea49c1ee3f538db9c7",
+  "min_app_version": "2.4.0"
+}

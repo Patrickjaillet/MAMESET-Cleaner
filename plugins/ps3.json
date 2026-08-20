@@ -1,0 +1,10 @@
+{
+  "id": "ps3",
+  "name": "Sony PlayStation 3",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sony",
+  "version": "2.5.0",
+  "dat_format": "Redump",
+  "sha256": "10bc187c4587dc981ef7520fe509143155bb302f598f7f21e72702549a4a8588",
+  "min_app_version": "2.5.0"
+}

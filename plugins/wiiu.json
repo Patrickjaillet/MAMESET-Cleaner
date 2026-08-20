@@ -1,0 +1,10 @@
+{
+  "id": "wiiu",
+  "name": "Nintendo Wii U",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Nintendo",
+  "version": "2.5.0",
+  "dat_format": "Redump",
+  "sha256": "c33257044d334ea786da9eba728beb7469371c14dd1bc42d8c0e06eae5b6c868",
+  "min_app_version": "2.5.0"
+}

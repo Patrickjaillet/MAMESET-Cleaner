@@ -1,0 +1,10 @@
+{
+  "id": "cd32",
+  "name": "Commodore Amiga CD32",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Commodore",
+  "version": "2.4.0",
+  "dat_format": "Redump",
+  "sha256": "f7bfbe3a4823cc784169c150bc27bfe025da43feba68572f0f6c16ed7882a924",
+  "min_app_version": "2.4.0"
+}

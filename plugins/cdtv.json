@@ -1,0 +1,10 @@
+{
+  "id": "cdtv",
+  "name": "Commodore CDTV",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Commodore",
+  "version": "2.4.0",
+  "dat_format": "Redump",
+  "sha256": "3922043cf09f280af1a89b30c85dda1638ce9e31c164957c00e38358d0081e7b",
+  "min_app_version": "2.4.0"
+}

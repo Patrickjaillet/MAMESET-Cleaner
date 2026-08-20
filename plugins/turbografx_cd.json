@@ -1,0 +1,10 @@
+{
+  "id": "turbografx_cd",
+  "name": "TurboGrafx-CD / PC Engine CD",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "NEC",
+  "version": "2.4.0",
+  "dat_format": "Redump",
+  "sha256": "6e6c5bba3dcd796f6cbf730e86df0d228e9e5981bfdf92ccd6915244fce9e581",
+  "min_app_version": "2.4.0"
+}

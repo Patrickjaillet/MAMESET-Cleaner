@@ -1,0 +1,10 @@
+{
+  "id": "sinclair_ql",
+  "name": "Sinclair QL",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sinclair",
+  "version": "2.6.0",
+  "dat_format": "TOSEC",
+  "sha256": "5b594ccc0e55e10cb30887057113154b458df1022ad110c0973c67c15c336c07",
+  "min_app_version": "2.6.0"
+}

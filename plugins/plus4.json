@@ -1,0 +1,10 @@
+{
+  "id": "plus4",
+  "name": "Commodore Plus/4",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Commodore",
+  "version": "2.6.0",
+  "dat_format": "TOSEC",
+  "sha256": "d0e0efea2811ad7db8e779e05fd1c995723d9744f6e95e72c6f19e70833a28f3",
+  "min_app_version": "2.6.0"
+}

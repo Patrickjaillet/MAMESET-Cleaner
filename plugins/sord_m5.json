@@ -1,0 +1,10 @@
+{
+  "id": "sord_m5",
+  "name": "Sord M5",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sord",
+  "version": "2.6.0",
+  "dat_format": "TOSEC",
+  "sha256": "80fb2603537c8bb11d4eef0b43d4b75d98ab360a52172923000aefd85809c61c",
+  "min_app_version": "2.6.0"
+}

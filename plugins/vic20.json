@@ -1,0 +1,10 @@
+{
+  "id": "vic20",
+  "name": "Commodore VIC-20",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Commodore",
+  "version": "2.6.0",
+  "dat_format": "TOSEC",
+  "sha256": "59f6fc990c3641a6d401f155cc5e6f9cb2e3ca95389df4d21ca8a7bb94bc249b",
+  "min_app_version": "2.6.0"
+}
