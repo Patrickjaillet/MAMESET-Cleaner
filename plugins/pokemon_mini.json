@@ -1,0 +1,10 @@
+{
+  "id": "pokemon_mini",
+  "name": "Pokémon Mini",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Nintendo",
+  "version": "2.1.0",
+  "dat_format": "No-Intro",
+  "sha256": "8b349e1a7cd3b922656a689d540ff8f0809052a8cd6cc3118c461bdecbbaf02f",
+  "min_app_version": "2.1.0"
+}

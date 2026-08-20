@@ -3272,7 +3272,7 @@ dependencies = [
 
 [[package]]
 name = "mameset_cleaner"
-version = "1.8.0"
+version = "2.1.0"
 dependencies = [
  "abi_stable",
  "configparser",
@@ -4283,6 +4283,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "pokemon_mini_plugin"
+version = "2.1.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
+]
+
+[[package]]
 name = "polling"
 version = "3.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5003,6 +5012,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "sega_pico_plugin"
+version = "2.1.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
+]
+
+[[package]]
 name = "semver"
 version = "1.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5086,6 +5104,15 @@ dependencies = [
  "nt-time",
  "sha2",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "sg1000_plugin"
+version = "2.1.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
 ]
 
 [[package]]
@@ -6233,6 +6260,15 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+
+[[package]]
+name = "virtual_boy_plugin"
+version = "2.1.0"
+dependencies = [
+ "abi_stable",
+ "dat_common",
+ "plugin_interface",
+]
 
 [[package]]
 name = "vtable"

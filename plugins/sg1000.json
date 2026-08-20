@@ -1,0 +1,10 @@
+{
+  "id": "sg1000",
+  "name": "Sega SG-1000",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sega",
+  "version": "2.1.0",
+  "dat_format": "No-Intro",
+  "sha256": "9de2ef19033d9e70e287405215e6e46c3235ff20704b4e62b5eaea03b2921253",
+  "min_app_version": "2.1.0"
+}

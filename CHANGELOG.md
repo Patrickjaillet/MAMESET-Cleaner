@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.0
+- Added support for four more systems — Virtual Boy, Pokémon Mini, SG-1000 and Sega Pico — available for download from the "Plugins" section.
+
 ## v2.0.0
 - First stable release with multi-console support: 30 systems — every NES/Famicom through Commodore 64/Amiga/ZX Spectrum/Amstrad CPC/MSX plugin added since v1.3.0 — are now actually available for download from the "Plugins" section, alongside the built-in MAME support.
 - Fixed a bug where, after installing and using one console plugin, switching to a different one in the same session could fail to actually switch to it.

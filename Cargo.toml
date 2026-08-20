@@ -35,11 +35,15 @@ members = [
     "crates/zx_spectrum_plugin",
     "crates/amstrad_cpc_plugin",
     "crates/msx_plugin",
+    "crates/virtual_boy_plugin",
+    "crates/pokemon_mini_plugin",
+    "crates/sg1000_plugin",
+    "crates/sega_pico_plugin",
 ]
 
 [package]
 name = "mameset_cleaner"
-version = "2.0.0"
+version = "2.1.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -216,6 +220,22 @@ path = "test/amstrad_cpc_plugin_test.rs"
 [[test]]
 name = "msx_plugin_test"
 path = "test/msx_plugin_test.rs"
+
+[[test]]
+name = "virtual_boy_plugin_test"
+path = "test/virtual_boy_plugin_test.rs"
+
+[[test]]
+name = "pokemon_mini_plugin_test"
+path = "test/pokemon_mini_plugin_test.rs"
+
+[[test]]
+name = "sg1000_plugin_test"
+path = "test/sg1000_plugin_test.rs"
+
+[[test]]
+name = "sega_pico_plugin_test"
+path = "test/sega_pico_plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

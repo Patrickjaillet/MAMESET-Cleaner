@@ -1,0 +1,10 @@
+{
+  "id": "virtual_boy",
+  "name": "Nintendo Virtual Boy",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Nintendo",
+  "version": "2.1.0",
+  "dat_format": "No-Intro",
+  "sha256": "56c99e738191813817d9fe8dce6aeaa0d805c54382a4c85b941de3a9e1e6813a",
+  "min_app_version": "2.1.0"
+}
