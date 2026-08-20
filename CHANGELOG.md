@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.5.0
+- The Filters view's genre, language, region and manufacturer fields are no longer free-text boxes you have to type exact values into — they're now checklists populated with the actual values found in your loaded ROM set, so you can just pick what you want.
+
+## v3.4.0
+- Redesigned the About screen: it now shows the app icon, clickable links to the project website, GitHub releases, and contact email, plus a short credits section for the open cataloging projects the app relies on (No-Intro, TOSEC, Redump, MAME).
+
 ## v3.3.0
 - The sidebar now shows a smoothly animated accent indicator that slides to the active section, and a subtle divider separates the core workflow (Scan, Filters, Results, Settings) from Plugins and About.
 - Fixed the Results table so its columns resize to fit the window instead of overflowing off the edge when the window is small.

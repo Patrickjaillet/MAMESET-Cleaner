@@ -6,6 +6,7 @@ import { SettingsView } from "views/settings_view.slint";
 import { PluginsView } from "views/plugins_view.slint";
 import { AboutView } from "views/about_view.slint";
 import { ResultRow, PluginRow, SystemOption } from "common.slint";
+import { FilterOption } from "components/multi_select_picker.slint";
 import { Theme } from "theme.slint";
 
 export component AppWindow inherits Window {
@@ -35,10 +36,14 @@ export component AppWindow inherits Window {
     in property <string> scan-status-text;
     in property <string> scan-counts-text;
 
-    in-out property <string> filter-categories-text;
-    in-out property <string> filter-languages-text;
-    in-out property <string> filter-regions-text;
-    in-out property <string> filter-manufacturers-text;
+    in property <[FilterOption]> category-options;
+    in property <[FilterOption]> language-options;
+    in property <[FilterOption]> region-options;
+    in property <[FilterOption]> manufacturer-options;
+    in property <int> category-selected-count;
+    in property <int> language-selected-count;
+    in property <int> region-selected-count;
+    in property <int> manufacturer-selected-count;
     in-out property <string> filter-year-min-text;
     in-out property <string> filter-year-max-text;
     in-out property <bool> filter-status-good: true;
@@ -85,6 +90,11 @@ export component AppWindow inherits Window {
     callback search-plugins();
     callback install-plugin(string);
     callback remove-plugin(string);
+    callback open-url(string);
+    callback toggle-category(string);
+    callback toggle-language(string);
+    callback toggle-region(string);
+    callback toggle-manufacturer(string);
 
     HorizontalLayout {
         Sidebar {
@@ -113,10 +123,18 @@ export component AppWindow inherits Window {
                 cancel-scan => { root.cancel-scan(); }
             }
             if current-view == 1: FilterView {
-                filter-categories-text <=> root.filter-categories-text;
-                filter-languages-text <=> root.filter-languages-text;
-                filter-regions-text <=> root.filter-regions-text;
-                filter-manufacturers-text <=> root.filter-manufacturers-text;
+                category-options: root.category-options;
+                language-options: root.language-options;
+                region-options: root.region-options;
+                manufacturer-options: root.manufacturer-options;
+                category-selected-count: root.category-selected-count;
+                language-selected-count: root.language-selected-count;
+                region-selected-count: root.region-selected-count;
+                manufacturer-selected-count: root.manufacturer-selected-count;
+                toggle-category(value) => { root.toggle-category(value); }
+                toggle-language(value) => { root.toggle-language(value); }
+                toggle-region(value) => { root.toggle-region(value); }
+                toggle-manufacturer(value) => { root.toggle-manufacturer(value); }
                 filter-year-min-text <=> root.filter-year-min-text;
                 filter-year-max-text <=> root.filter-year-max-text;
                 filter-status-good <=> root.filter-status-good;
@@ -175,7 +193,10 @@ export component AppWindow inherits Window {
                 install-plugin(id) => { root.install-plugin(id); }
                 remove-plugin(id) => { root.remove-plugin(id); }
             }
-            if current-view == 5: AboutView { app-version: root.app-version; }
+            if current-view == 5: AboutView {
+                app-version: root.app-version;
+                open-url(url) => { root.open-url(url); }
+            }
         }
     }
 }

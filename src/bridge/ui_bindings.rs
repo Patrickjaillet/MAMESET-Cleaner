@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
-use slint::{ModelRc, VecModel, Weak};
+use slint::{Model, ModelRc, VecModel, Weak};
 
 use crate::core::cleanup_engine::{CleanupOptions, CleanupTarget};
 use crate::core::config_manager::{AppConfig, AppLanguage};
@@ -91,10 +91,14 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     refresh_available_systems(&window, &state);
     reset_selected_system_if_uninstalled(&window, &state);
 
+    refresh_filter_options(&window, &state);
+
     setup_browse_callbacks(&window);
+    setup_open_url(&window);
     setup_save_settings(&window, &state);
     setup_start_scan(&window, &state);
     setup_cancel_scan(&window, &state);
+    setup_filter_option_toggles(&window);
     setup_apply_filters(&window, &state);
     setup_search(&window, &state);
     setup_sort(&window, &state);
@@ -106,6 +110,14 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     tracing::info!("fenêtre principale initialisée");
 
     window.run()
+}
+
+fn setup_open_url(window: &AppWindow) {
+    window.on_open_url(|url| {
+        let _ = std::process::Command::new("cmd")
+            .args(["/C", "start", "", url.as_str()])
+            .spawn();
+    });
 }
 
 fn setup_browse_callbacks(window: &AppWindow) {
@@ -290,6 +302,7 @@ fn setup_start_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
                             window.set_scan_progress(1.0);
                             window.set_scan_status_text(status_text.into());
                             window.set_scan_counts_text(counts_text.into());
+                            refresh_filter_options(&window, &state_after);
                             refresh_results(&window, &state_after);
                         }
                     });
@@ -440,10 +453,10 @@ fn setup_apply_filters(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
 
         let profile = FilterProfile {
             name: "Courant".to_string(),
-            categories: split_csv(&window.get_filter_categories_text()),
-            languages: split_csv(&window.get_filter_languages_text()),
-            regions: split_csv(&window.get_filter_regions_text()),
-            manufacturers: split_csv(&window.get_filter_manufacturers_text()),
+            categories: selected_values(&window.get_category_options()),
+            languages: selected_values(&window.get_language_options()),
+            regions: selected_values(&window.get_region_options()),
+            manufacturers: selected_values(&window.get_manufacturer_options()),
             year_min: parse_year(&window.get_filter_year_min_text()),
             year_max: parse_year(&window.get_filter_year_max_text()),
             driver_statuses: collect_statuses(&window),
@@ -1174,11 +1187,127 @@ fn collect_statuses(window: &AppWindow) -> Vec<DriverStatus> {
     statuses
 }
 
-fn split_csv(text: &str) -> Vec<String> {
-    text.split(',')
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
+fn selected_values(options: &ModelRc<FilterOption>) -> Vec<String> {
+    options
+        .iter()
+        .filter(|opt| opt.selected)
+        .map(|opt| opt.value.to_string())
         .collect()
+}
+
+fn build_filter_options(
+    dat_entries: &HashMap<String, RomEntry>,
+    currently_selected: &[String],
+    extract: impl Fn(&RomEntry) -> Vec<String>,
+) -> ModelRc<FilterOption> {
+    let mut distinct: Vec<String> = dat_entries
+        .values()
+        .flat_map(&extract)
+        .filter(|value| !value.is_empty())
+        .collect();
+    distinct.sort();
+    distinct.dedup();
+
+    let options: Vec<FilterOption> = distinct
+        .into_iter()
+        .map(|value| {
+            let selected = currently_selected
+                .iter()
+                .any(|selected| selected.eq_ignore_ascii_case(&value));
+            FilterOption {
+                value: value.into(),
+                selected,
+            }
+        })
+        .collect();
+
+    ModelRc::new(VecModel::from(options))
+}
+
+fn refresh_filter_options(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let guard = state.lock().unwrap();
+    let profile = &guard.filter_profile;
+
+    let category_options = build_filter_options(&guard.dat_entries, &profile.categories, |entry| {
+        entry.category.clone().into_iter().collect()
+    });
+    let language_options = build_filter_options(&guard.dat_entries, &profile.languages, |entry| {
+        entry.languages.clone()
+    });
+    let region_options = build_filter_options(&guard.dat_entries, &profile.regions, |entry| {
+        dedup_engine::extract_region(&entry.description)
+            .into_iter()
+            .collect()
+    });
+    let manufacturer_options =
+        build_filter_options(&guard.dat_entries, &profile.manufacturers, |entry| {
+            vec![entry.manufacturer.clone()]
+        });
+
+    drop(guard);
+
+    window.set_category_selected_count(category_options.iter().filter(|o| o.selected).count() as i32);
+    window.set_language_selected_count(language_options.iter().filter(|o| o.selected).count() as i32);
+    window.set_region_selected_count(region_options.iter().filter(|o| o.selected).count() as i32);
+    window
+        .set_manufacturer_selected_count(manufacturer_options.iter().filter(|o| o.selected).count() as i32);
+
+    window.set_category_options(category_options);
+    window.set_language_options(language_options);
+    window.set_region_options(region_options);
+    window.set_manufacturer_options(manufacturer_options);
+}
+
+fn toggle_filter_option(options: &ModelRc<FilterOption>, value: &str) -> (ModelRc<FilterOption>, i32) {
+    let items: Vec<FilterOption> = options
+        .iter()
+        .map(|mut opt| {
+            if opt.value == value {
+                opt.selected = !opt.selected;
+            }
+            opt
+        })
+        .collect();
+    let selected_count = items.iter().filter(|opt| opt.selected).count() as i32;
+    (ModelRc::new(VecModel::from(items)), selected_count)
+}
+
+fn setup_filter_option_toggles(window: &AppWindow) {
+    let weak = window.as_weak();
+    window.on_toggle_category(move |value| {
+        if let Some(window) = weak.upgrade() {
+            let (updated, count) = toggle_filter_option(&window.get_category_options(), &value);
+            window.set_category_options(updated);
+            window.set_category_selected_count(count);
+        }
+    });
+
+    let weak = window.as_weak();
+    window.on_toggle_language(move |value| {
+        if let Some(window) = weak.upgrade() {
+            let (updated, count) = toggle_filter_option(&window.get_language_options(), &value);
+            window.set_language_options(updated);
+            window.set_language_selected_count(count);
+        }
+    });
+
+    let weak = window.as_weak();
+    window.on_toggle_region(move |value| {
+        if let Some(window) = weak.upgrade() {
+            let (updated, count) = toggle_filter_option(&window.get_region_options(), &value);
+            window.set_region_options(updated);
+            window.set_region_selected_count(count);
+        }
+    });
+
+    let weak = window.as_weak();
+    window.on_toggle_manufacturer(move |value| {
+        if let Some(window) = weak.upgrade() {
+            let (updated, count) = toggle_filter_option(&window.get_manufacturer_options(), &value);
+            window.set_manufacturer_options(updated);
+            window.set_manufacturer_selected_count(count);
+        }
+    });
 }
 
 fn parse_year(text: &str) -> Option<u32> {

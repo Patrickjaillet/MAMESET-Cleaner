@@ -1,5 +1,46 @@
 import { Theme } from "../theme.slint";
 
+component LinkText inherits Rectangle {
+    in property <string> text;
+    callback activated();
+
+    width: label.preferred-width;
+    height: label.preferred-height;
+
+    label := Text {
+        text: root.text;
+        color: touch.has-hover ? Theme.color-accent-hover : Theme.color-accent;
+        font-size: Theme.font-size-body;
+    }
+
+    Rectangle {
+        y: label.height - 1px;
+        height: 1px;
+        width: label.width;
+        background: touch.has-hover ? Theme.color-accent-hover : Theme.color-accent;
+    }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.activated(); }
+    }
+}
+
+component SectionCard inherits Rectangle {
+    background: Theme.color-surface;
+    border-width: 1px;
+    border-color: Theme.color-border-subtle;
+    border-radius: Theme.radius-lg;
+
+    VerticalLayout {
+        padding: Theme.space-lg;
+        spacing: Theme.space-sm;
+        alignment: start;
+
+        @children
+    }
+}
+
 export component AboutView inherits Rectangle {
     opacity: 0;
     animate opacity { duration: Theme.duration-medium; easing: ease-out; }
@@ -10,23 +51,91 @@ export component AboutView inherits Rectangle {
     in property <string> copyright-text: "Copyright © 2026 Patrick JAILLET — Tous droits réservés";
     in property <string> contact-email: "sandefjord.development@proton.me";
     in property <string> website-url: "https://patrickjaillet.github.io/MAMESET-Cleaner";
+    in property <string> releases-url: "https://github.com/Patrickjaillet/MAMESET-Cleaner/releases";
     in property <string> license-name: "MIT";
+    callback open-url(string);
 
-    VerticalLayout {
-        padding: 24px;
-        spacing: 8px;
-        alignment: start;
+    Flickable {
+        VerticalLayout {
+            padding: 24px;
+            spacing: Theme.space-lg;
+            alignment: start;
 
-        Text {
-            text: title;
-            font-size: 20px;
-            font-weight: 700;
+            Text {
+                text: root.title;
+                font-size: Theme.font-size-title;
+                font-weight: 700;
+            }
+
+            SectionCard {
+                HorizontalLayout {
+                    spacing: Theme.space-lg;
+                    alignment: start;
+
+                    Image {
+                        source: @image-url("../../assets/icons/app.png");
+                        width: 64px;
+                        height: 64px;
+                    }
+
+                    VerticalLayout {
+                        spacing: Theme.space-xs;
+                        alignment: center;
+
+                        Text {
+                            text: "MAMESET Cleaner";
+                            font-size: Theme.font-size-heading;
+                            font-weight: 700;
+                        }
+                        Text {
+                            text: "Version " + root.app-version;
+                            color: Theme.color-text-secondary;
+                        }
+                        Text {
+                            text: root.copyright-text;
+                            color: Theme.color-text-secondary;
+                            font-size: Theme.font-size-caption;
+                            wrap: word-wrap;
+                        }
+                    }
+                }
+            }
+
+            SectionCard {
+                Text { text: "Liens"; font-weight: 600; font-size: Theme.font-size-heading; }
+
+                HorizontalLayout {
+                    spacing: Theme.space-xs;
+                    Text { text: "Site du projet :"; color: Theme.color-text-secondary; }
+                    LinkText { text: root.website-url; activated => { root.open-url(root.website-url); } }
+                }
+
+                HorizontalLayout {
+                    spacing: Theme.space-xs;
+                    Text { text: "Nouvelles versions :"; color: Theme.color-text-secondary; }
+                    LinkText { text: "Voir les releases sur GitHub"; activated => { root.open-url(root.releases-url); } }
+                }
+
+                HorizontalLayout {
+                    spacing: Theme.space-xs;
+                    Text { text: "Contact :"; color: Theme.color-text-secondary; }
+                    LinkText { text: root.contact-email; activated => { root.open-url("mailto:" + root.contact-email); } }
+                }
+            }
+
+            SectionCard {
+                Text { text: "Licence"; font-weight: 600; font-size: Theme.font-size-heading; }
+                Text { text: "MAMESET Cleaner est distribué sous licence " + root.license-name + "."; wrap: word-wrap; }
+            }
+
+            SectionCard {
+                Text { text: "Remerciements"; font-weight: 600; font-size: Theme.font-size-heading; }
+                Text {
+                    text: "Réalisé avec Rust et Slint. La reconnaissance des ROMs s'appuie sur le travail de catalogage des projets No-Intro, TOSEC, Redump et MAME — ce logiciel n'existerait pas sans leur travail.";
+                    color: Theme.color-text-secondary;
+                    wrap: word-wrap;
+                }
+            }
         }
-
-        Text { text: "MAMESET Cleaner v" + app-version; }
-        Text { text: copyright-text; }
-        Text { text: contact-email; }
-        Text { text: website-url; }
-        Text { text: "Licence : " + license-name; }
     }
 }

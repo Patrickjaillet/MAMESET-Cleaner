@@ -1,0 +1,94 @@
+import { Theme } from "../theme.slint";
+
+export struct FilterOption {
+    value: string,
+    selected: bool,
+}
+
+export component MultiSelectPicker inherits Rectangle {
+    in property <string> label;
+    in property <[FilterOption]> options;
+    in property <int> selected-count;
+    callback toggle(string);
+
+    border-width: 1px;
+    border-color: Theme.color-border-subtle;
+    border-radius: Theme.radius-md;
+    background: Theme.color-surface;
+
+    VerticalLayout {
+        padding: Theme.space-sm;
+        spacing: Theme.space-xs;
+
+        HorizontalLayout {
+            spacing: Theme.space-xs;
+
+            Text { text: root.label; font-weight: 600; }
+            Rectangle { horizontal-stretch: 1; }
+            Text {
+                text: root.selected-count == 0 ? "Tous" : root.selected-count + " sélectionné(s)";
+                color: Theme.color-text-secondary;
+                font-size: Theme.font-size-caption;
+            }
+        }
+
+        if root.options.length == 0: Text {
+            text: "Aucune valeur disponible (lancez un scan d'abord)";
+            color: Theme.color-placeholder;
+            font-size: Theme.font-size-caption;
+            wrap: word-wrap;
+        }
+
+        if root.options.length > 0: Flickable {
+            height: 160px;
+
+            VerticalLayout {
+                alignment: start;
+
+                for opt in root.options: Rectangle {
+                    height: 26px;
+                    background: row-touch.has-hover ? Theme.color-hover-tint : transparent;
+                    animate background { duration: Theme.duration-fast; easing: ease-out; }
+
+                    row-touch := TouchArea {
+                        clicked => { root.toggle(opt.value); }
+                    }
+
+                    HorizontalLayout {
+                        padding-left: Theme.space-xs;
+                        spacing: Theme.space-sm;
+                        alignment: start;
+
+                        box := Rectangle {
+                            width: 16px;
+                            height: 16px;
+                            border-radius: Theme.radius-sm;
+                            border-width: 1px;
+                            border-color: opt.selected ? Theme.color-accent : #888888;
+                            background: opt.selected ? Theme.color-accent : Theme.color-surface;
+                            animate border-color, background { duration: Theme.duration-fast; easing: ease-out; }
+
+                            Text {
+                                text: "✓";
+                                color: Theme.color-text-on-accent;
+                                font-size: 10px;
+                                opacity: opt.selected ? 1 : 0;
+                                animate opacity { duration: Theme.duration-fast; easing: ease-out; }
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                            }
+                        }
+
+                        Text {
+                            text: opt.value;
+                            font-size: Theme.font-size-body;
+                            color: Theme.color-text;
+                            vertical-alignment: center;
+                            overflow: elide;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
