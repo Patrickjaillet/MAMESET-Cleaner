@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAMESET Cleaner</title>
-<meta name="description" content="MAMESET Cleaner — Windows software to clean and organize a MAME ROM set (duplicates, filters, reports).">
+<meta name="description" content="MAMESET Cleaner — Windows software to clean and organize a MAME ROM set, plus 30 other console systems via plugins (duplicates, filters, reports).">
 <style>
   :root {
     --accent: #0078d4;
@@ -119,6 +119,31 @@
   .req-list {
     color: var(--muted);
   }
+  .system-groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .system-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .system-group h3 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    color: var(--accent-dark);
+  }
+  .system-group ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .system-group li {
+    margin-bottom: 4px;
+  }
   footer {
     text-align: center;
     padding: 32px 24px;
@@ -139,7 +164,7 @@
 
 <header>
   <h1>MAMESET Cleaner</h1>
-  <p class="tagline">Clean and organize your MAME ROM set: duplicates, filters and detailed reports, safely.</p>
+  <p class="tagline">Clean and organize your MAME ROM set — and 30 other console systems — with duplicate detection, filters and detailed reports, safely.</p>
   <div class="buttons">
     <a class="btn btn-primary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner/releases">Download (Windows)</a>
     <a class="btn btn-secondary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner">View source code</a>
@@ -183,6 +208,71 @@
       <div class="feature">
         <h3>Clean interface</h3>
         <p>French and English, light or dark theme, built entirely in native Rust to stay fast on very large sets.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Multi-console plugins</h2>
+    <p>
+      Beyond its native MAME support, MAMESET Cleaner can install a plugin for another console system directly
+      from its "Plugins" section. 30 systems are available today:
+    </p>
+    <div class="system-groups">
+      <div class="system-group">
+        <h3>Nintendo</h3>
+        <ul>
+          <li>NES / Famicom</li>
+          <li>SNES / Super Famicom</li>
+          <li>Nintendo 64</li>
+          <li>Game Boy / Game Boy Color</li>
+          <li>Game Boy Advance</li>
+          <li>Nintendo DS</li>
+          <li>GameCube / Wii</li>
+        </ul>
+      </div>
+      <div class="system-group">
+        <h3>Sega</h3>
+        <ul>
+          <li>Master System</li>
+          <li>Mega Drive / Genesis</li>
+          <li>Game Gear</li>
+          <li>Sega CD / Mega-CD</li>
+          <li>Sega Saturn</li>
+          <li>Dreamcast</li>
+        </ul>
+      </div>
+      <div class="system-group">
+        <h3>Sony</h3>
+        <ul>
+          <li>PlayStation</li>
+          <li>PlayStation 2</li>
+          <li>PSP</li>
+        </ul>
+      </div>
+      <div class="system-group">
+        <h3>SNK, Atari &amp; others</h3>
+        <ul>
+          <li>Neo Geo AES / MVS</li>
+          <li>Neo Geo Pocket / Pocket Color</li>
+          <li>Atari 2600</li>
+          <li>Atari 5200 / 7800</li>
+          <li>Atari Lynx</li>
+          <li>Atari Jaguar</li>
+          <li>TurboGrafx-16 / PC Engine</li>
+          <li>WonderSwan / WonderSwan Color</li>
+          <li>3DO</li>
+        </ul>
+      </div>
+      <div class="system-group">
+        <h3>8/16-bit computers</h3>
+        <ul>
+          <li>Commodore 64</li>
+          <li>Commodore Amiga</li>
+          <li>ZX Spectrum</li>
+          <li>Amstrad CPC</li>
+          <li>MSX / MSX2</li>
+        </ul>
       </div>
     </div>
   </section>
