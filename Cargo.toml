@@ -20,11 +20,20 @@ members = [
     "crates/psx_plugin",
     "crates/ps2_plugin",
     "crates/psp_plugin",
+    "crates/neo_geo_plugin",
+    "crates/neo_geo_pocket_plugin",
+    "crates/atari_2600_plugin",
+    "crates/atari_5200_7800_plugin",
+    "crates/atari_lynx_plugin",
+    "crates/atari_jaguar_plugin",
+    "crates/turbografx16_plugin",
+    "crates/wonderswan_plugin",
+    "crates/threedo_plugin",
 ]
 
 [package]
 name = "mameset_cleaner"
-version = "1.5.0"
+version = "1.6.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -141,6 +150,42 @@ path = "test/ps2_plugin_test.rs"
 [[test]]
 name = "psp_plugin_test"
 path = "test/psp_plugin_test.rs"
+
+[[test]]
+name = "neo_geo_plugin_test"
+path = "test/neo_geo_plugin_test.rs"
+
+[[test]]
+name = "neo_geo_pocket_plugin_test"
+path = "test/neo_geo_pocket_plugin_test.rs"
+
+[[test]]
+name = "atari_2600_plugin_test"
+path = "test/atari_2600_plugin_test.rs"
+
+[[test]]
+name = "atari_5200_7800_plugin_test"
+path = "test/atari_5200_7800_plugin_test.rs"
+
+[[test]]
+name = "atari_lynx_plugin_test"
+path = "test/atari_lynx_plugin_test.rs"
+
+[[test]]
+name = "atari_jaguar_plugin_test"
+path = "test/atari_jaguar_plugin_test.rs"
+
+[[test]]
+name = "turbografx16_plugin_test"
+path = "test/turbografx16_plugin_test.rs"
+
+[[test]]
+name = "wonderswan_plugin_test"
+path = "test/wonderswan_plugin_test.rs"
+
+[[test]]
+name = "threedo_plugin_test"
+path = "test/threedo_plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

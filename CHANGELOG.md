@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.6.0
+- Added support for nine more systems — Neo Geo AES/MVS, Neo Geo Pocket/Pocket Color, Atari 2600, Atari 5200/7800, Atari Lynx, Atari Jaguar, TurboGrafx-16/PC Engine, WonderSwan/WonderSwan Color and 3DO — each installable from the "Plugins" section once published to the repository.
+
 ## v1.5.0
 - Added support for three Sony systems — PlayStation, PlayStation 2 and PSP — each installable from the "Plugins" section once published to the repository.
 
