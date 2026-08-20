@@ -1,64 +1,64 @@
-# Compilation de MAMESET Cleaner
+# Building MAMESET Cleaner
 
-Ce document explique comment compiler MAMESET Cleaner depuis les sources, sur Windows 10/11 (x64).
+This document explains how to build MAMESET Cleaner from source, on Windows 10/11 (x64).
 
-## Prérequis
+## Prerequisites
 
-- **Rust** (édition 2021) via [rustup](https://rustup.rs), avec la cible `x86_64-pc-windows-msvc`
-- **Visual Studio Build Tools** (composant "Outils de génération C++") — requis par la chaîne de compilation `msvc` de Rust sur Windows
-- **Inno Setup 7** — uniquement nécessaire pour générer l'installateur (`installer/inno_setup_script.iss`), pas pour compiler le logiciel lui-même
+- **Rust** (2021 edition) via [rustup](https://rustup.rs), with the `x86_64-pc-windows-msvc` target
+- **Visual Studio Build Tools** ("C++ build tools" workload) — required by Rust's `msvc` toolchain on Windows
+- **Inno Setup 7** — only needed to build the installer (`installer/inno_setup_script.iss`), not to build the software itself
 
-Vérifier l'installation :
+Check your installation:
 
 ```powershell
 rustc --version
 cargo --version
 ```
 
-## Compilation en mode développement
+## Development build
 
 ```powershell
 cargo build
 ```
 
-Le binaire est généré dans `target\debug\mameset_cleaner.exe`. En mode développement, les journaux (`tracing`) restent visibles dans le terminal.
+The binary is generated in `target\debug\mameset_cleaner.exe`. In development mode, logs (`tracing`) remain visible in the terminal.
 
-## Compilation en mode release (optimisé)
+## Release build (optimized)
 
 ```powershell
 cargo build --release
 ```
 
-Le binaire final est généré dans `target\release\mameset_cleaner.exe`. Ce mode :
-- active les optimisations complètes (`opt-level = 3`, LTO, un seul codegen-unit) ;
-- retire les symboles de débogage (`strip`) pour réduire la taille du fichier ;
-- masque la fenêtre de console au démarrage (aucune console ne s'affiche au double-clic) ;
-- intègre l'icône de l'application (`assets/icons/app.ico`) dans l'exécutable.
+The final binary is generated in `target\release\mameset_cleaner.exe`. This mode:
+- enables full optimizations (`opt-level = 3`, LTO, a single codegen unit);
+- strips debug symbols (`strip`) to reduce the file size;
+- hides the console window at startup (no console appears on double-click);
+- embeds the application icon (`assets/icons/app.ico`) into the executable.
 
-## Lancer les tests
+## Running the tests
 
 ```powershell
 cargo test
 ```
 
-Inclut les tests unitaires (dans chaque module de `src/`) et les tests d'intégration (`test/*.rs`), soit plus de 60 tests couvrant le parsing, le scan, le dédoublonnage, le filtrage et le nettoyage.
+Includes unit tests (in each module under `src/`) and integration tests (`test/*.rs`), for a total of more than 60 tests covering parsing, scanning, deduplication, filtering and cleanup.
 
-## Génération de l'installateur Windows
+## Building the Windows installer
 
-1. Compiler le binaire en mode release (`cargo build --release`).
-2. Ouvrir `installer/inno_setup_script.iss` avec Inno Setup 7 (ou lancer `ISCC.exe installer\inno_setup_script.iss` en ligne de commande).
-3. L'installateur généré (`MAMESET-Cleaner-Setup-vX.Y.Z.exe`) est déposé dans `installer/output/`.
+1. Build the binary in release mode (`cargo build --release`).
+2. Open `installer/inno_setup_script.iss` with Inno Setup 7 (or run `ISCC.exe installer\inno_setup_script.iss` from the command line).
+3. The generated installer (`MAMESET-Cleaner-Setup-vX.Y.Z.exe`) is placed in `installer/output/`.
 
-L'installateur cible Windows 10 et Windows 11 (x64), utilise l'icône de l'application, et propose une installation ainsi qu'une désinstallation silencieuses (`/VERYSILENT`).
+The installer targets Windows 10 and Windows 11 (x64), uses the application icon, and supports silent installation and uninstallation (`/VERYSILENT`).
 
-## Structure du projet
+## Project structure
 
 ```
 MAMESET-Cleaner/
-├── src/            Code source Rust (cœur métier + interface)
-├── ui/             Interface utilisateur Slint (.slint)
-├── assets/         Icônes et fichiers de traduction (i18n)
-├── test/           Tests d'intégration
-├── installer/      Script Inno Setup 7
-└── docs/           Documentation (dont ce fichier)
+├── src/            Rust source code (core logic + interface)
+├── ui/             Slint user interface (.slint)
+├── assets/         Icons and translation files (i18n)
+├── test/           Integration tests
+├── installer/      Inno Setup 7 script
+└── docs/           Documentation (including this file)
 ```

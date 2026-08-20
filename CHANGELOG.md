@@ -1,59 +1,59 @@
-# Journal des modifications
+# Changelog
 
 ## v1.0.0
-- Première version stable de MAMESET Cleaner.
-- Le logiciel a été entièrement testé (plus de 60 vérifications automatiques) et relu pour ne laisser aucun problème connu.
-- Documentation complète pour les utilisateurs (guide d'installation, présentation des fonctionnalités, captures d'écran) et pour les développeurs souhaitant compiler le logiciel eux-mêmes.
+- First stable release of MAMESET Cleaner.
+- The software has been fully tested (more than 60 automated checks) and reviewed to leave no known issues.
+- Complete documentation for users (installation guide, feature overview, screenshots) and for developers who want to build the software themselves.
 
 ## v0.9.0
-- Ajout d'une icône pour le logiciel et pour son installateur.
-- Correction d'un bug important : une fenêtre noire de console s'affichait au lancement du logiciel en plus de la fenêtre principale ; ce n'est plus le cas.
-- Préparation de l'installateur Windows (à finaliser lors de la prochaine étape avec Inno Setup installé).
-- Ajout d'un guide de compilation pour les développeurs (`docs/COMPILATION.md`).
+- Added an icon for the application and its installer.
+- Fixed an important bug: a black console window used to appear at startup alongside the main window; this no longer happens.
+- Prepared the Windows installer (finalized once Inno Setup was available).
+- Added a build guide for developers (`docs/COMPILATION.md`).
 
 ## v0.8.0
-- Le scan détecte maintenant les archives réellement corrompues (et pas seulement les ROMs différentes de celles attendues), en relisant entièrement chaque fichier au lieu de se fier à une simple étiquette.
-- Un fichier de référence MAME illisible ou vide affiche désormais un message d'erreur clair au lieu de produire un résultat trompeur.
-- Ajout d'un bouton Annuler pendant un scan en cours.
-- Après un nettoyage, le logiciel revérifie automatiquement que toutes les ROMs conservées sont bien présentes et intactes, et affiche le résultat de cette vérification.
+- The scan now detects archives that are actually corrupted (not just ROMs that differ from what was expected), by fully re-reading each file instead of trusting a simple label.
+- An unreadable or empty MAME reference file now shows a clear error message instead of producing a misleading result.
+- Added a Cancel button during an ongoing scan.
+- After a cleanup, the software automatically re-checks that all kept ROMs are still present and intact, and displays the result of this check.
 
 ## v0.7.0
-- Ajout du nettoyage réel des ROMs en double détectées : elles sont déplacées vers la corbeille Windows par défaut, ou supprimées définitivement si l'utilisateur le choisit.
-- Ajout d'une option de sauvegarde : les ROMs peuvent être copiées dans un dossier de sécurité avant tout nettoyage.
-- Une confirmation est désormais toujours demandée avant de nettoyer, avec le nombre de ROMs concernées.
-- Chaque nettoyage génère un rapport détaillé (JSON et CSV) listant les ROMs supprimées et conservées avec leur motif, enregistré automatiquement sur l'ordinateur.
+- Added real cleanup of detected duplicate ROMs: they are moved to the Windows Recycle Bin by default, or permanently deleted if the user chooses to.
+- Added a backup option: ROMs can be copied to a safety folder before any cleanup.
+- A confirmation is now always required before cleaning up, showing the number of ROMs affected.
+- Every cleanup generates a detailed report (JSON and CSV) listing deleted and kept ROMs with their reason, automatically saved on the computer.
 
 ## v0.6.0
-- Le logiciel dispose maintenant d'une interface graphique complète avec 5 sections : Scan, Filtres, Résultats, Paramètres et À propos.
-- La sélection des dossiers et fichiers (ROMs, DAT, catver.ini, languages.ini) se fait désormais par une fenêtre de sélection classique de Windows, depuis les Paramètres.
-- Le scan affiche une barre de progression en temps réel et reste utilisable pendant l'analyse.
-- Les critères de filtrage peuvent être réglés visuellement et appliqués en un clic.
-- Les résultats s'affichent dans un tableau avec recherche et tri par nom ou par année, indiquant pour chaque jeu s'il est à garder ou à supprimer.
-- Ajout d'un thème clair et d'un thème sombre, activable dans les Paramètres.
+- The software now has a complete graphical interface with 5 sections: Scan, Filters, Results, Settings and About.
+- Selecting folders and files (ROMs, DAT, catver.ini, languages.ini) is now done through a standard Windows file picker, from Settings.
+- The scan shows a real-time progress bar and remains usable during the analysis.
+- Filter criteria can be set visually and applied with one click.
+- Results are shown in a table with search and sorting by name or year, indicating for each game whether it should be kept or removed.
+- Added a light theme and a dark theme, selectable in Settings.
 
 ## v0.5.0
-- Ajout du filtrage des jeux par genre, langue, région, statut de fonctionnement, fabricant, année et type (BIOS, mécanique, adulte).
-- Plusieurs critères peuvent être combinés en même temps (par exemple : un genre précis ET une langue précise).
-- Ajout de la sauvegarde et du chargement de profils de filtrage personnalisés, pour retrouver facilement ses réglages préférés.
+- Added filtering of games by genre, language, region, working status, manufacturer, year and type (BIOS, mechanical, adult).
+- Several criteria can be combined at the same time (for example: a specific genre AND a specific language).
+- Added saving and loading of custom filter profiles, to easily retrieve your preferred settings.
 
 ## v0.4.0
-- Ajout de la détection des jeux en double (un jeu principal et ses variantes).
-- Pour chaque groupe de doublons, le logiciel choisit automatiquement le meilleur exemplaire à conserver selon la région préférée (par exemple Monde puis USA puis Europe puis Japon), l'état de fonctionnement du jeu, puis sa version la plus récente.
-- La région préférée pourra être personnalisée par l'utilisateur.
-- Cette étape prépare seulement la liste des jeux à garder et à retirer : aucune suppression de fichier n'a lieu à ce stade.
+- Added detection of duplicate games (a main game and its variants).
+- For each group of duplicates, the software automatically picks the best copy to keep based on the preferred region (for example World, then USA, then Europe, then Japan), the game's working status, then its most recent revision.
+- The preferred region can be customized by the user.
+- This step only prepares the list of games to keep and remove: no file is deleted at this stage.
 
 ## v0.3.0
-- Ajout de l'analyse du dossier de ROMs de l'utilisateur (fichiers `.zip`, `.7z` et dossiers non compressés), y compris dans les sous-dossiers.
-- Le logiciel compare désormais chaque ROM trouvée avec la liste de référence MAME et indique si elle est correcte, corrompue, manquante ou non reconnue.
-- L'analyse s'exécute en parallèle sur plusieurs cœurs du processeur pour rester rapide même sur de très gros sets de ROMs.
+- Added scanning of the user's ROM folder (`.zip`, `.7z` files and uncompressed folders), including subfolders.
+- The software now compares every ROM found against the MAME reference list and indicates whether it is correct, corrupted, missing, or unrecognized.
+- The scan runs in parallel across several processor cores to stay fast even on very large ROM sets.
 
 ## v0.2.0
-- Ajout de la lecture des fichiers de référence MAME : liste officielle des jeux (DAT), catégories de jeux et langues des jeux.
-- Le logiciel peut désormais reconnaître automatiquement le nom, la description, l'année, le fabricant, le statut (jeu principal ou variante), l'état de fonctionnement, le genre et la langue de chaque jeu.
-- Ajout de la vérification de la disponibilité d'une nouvelle version du fichier de référence MAME.
+- Added reading of MAME reference files: the official game list (DAT), game categories, and game languages.
+- The software can now automatically recognize the name, description, year, manufacturer, status (main game or variant), working status, genre and language of each game.
+- Added a check for the availability of a newer version of the MAME reference file.
 
 ## v0.1.0
-- Première mise en place du logiciel MAMESET Cleaner.
-- Ajout de la fenêtre principale avec un menu de navigation (Scan, Filtres, Résultats, Paramètres, À propos).
-- Ajout de la prise en charge du français et de l'anglais dans l'interface.
-- Ajout de l'enregistrement des préférences (chemins des ROMs, du fichier DAT, des fichiers de catégories et de langues).
+- First version of MAMESET Cleaner.
+- Added the main window with a navigation menu (Scan, Filters, Results, Settings, About).
+- Added support for French and English in the interface.
+- Added saving of preferences (ROM folder path, DAT file, category and language files).

@@ -1,20 +1,20 @@
-# Contribuer à MAMESET Cleaner
+# Contributing to MAMESET Cleaner
 
-Merci de l'intérêt porté à ce projet !
+Thanks for your interest in this project!
 
-## Signaler un problème
+## Reporting an issue
 
-Ouvrez une [issue](https://github.com/Patrickjaillet/MAMESET-Cleaner/issues) en décrivant :
-- le comportement observé et le comportement attendu,
-- les étapes pour reproduire le problème,
-- votre version de Windows et la version du logiciel utilisée.
+Open an [issue](https://github.com/Patrickjaillet/MAMESET-Cleaner/issues) describing:
+- the observed behavior and the expected behavior,
+- the steps to reproduce the problem,
+- your Windows version and the software version you are using.
 
-## Proposer une modification
+## Proposing a change
 
-1. Créez une branche dédiée à partir de `master`.
-2. Assurez-vous que `cargo test` passe entièrement et que `cargo clippy` ne remonte aucun avertissement.
-3. Ouvrez une pull request en décrivant clairement le changement apporté.
+1. Create a dedicated branch from `master`.
+2. Make sure `cargo test` passes entirely and `cargo clippy` reports no warnings.
+3. Open a pull request with a clear description of the change.
 
-## Compilation
+## Building the project
 
-Voir [docs/COMPILATION.md](docs/COMPILATION.md) pour la procédure complète.
+See [docs/COMPILATION.md](docs/COMPILATION.md) for the full procedure.

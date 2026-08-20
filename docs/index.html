@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAMESET Cleaner</title>
-<meta name="description" content="MAMESET Cleaner — logiciel Windows pour nettoyer et organiser un set de ROMs MAME (doublons, filtres, rapports).">
+<meta name="description" content="MAMESET Cleaner — Windows software to clean and organize a MAME ROM set (duplicates, filters, reports).">
 <style>
   :root {
     --accent: #0078d4;
@@ -139,64 +139,64 @@
 
 <header>
   <h1>MAMESET Cleaner</h1>
-  <p class="tagline">Nettoyez et organisez votre set de ROMs MAME : doublons, filtres et rapports détaillés, en toute sécurité.</p>
+  <p class="tagline">Clean and organize your MAME ROM set: duplicates, filters and detailed reports, safely.</p>
   <div class="buttons">
-    <a class="btn btn-primary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner/releases">Télécharger (Windows)</a>
-    <a class="btn btn-secondary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner">Voir le code source</a>
+    <a class="btn btn-primary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner/releases">Download (Windows)</a>
+    <a class="btn btn-secondary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner">View source code</a>
   </div>
 </header>
 
 <main>
   <section>
-    <h2>Présentation</h2>
+    <h2>Overview</h2>
     <p>
-      MAMESET Cleaner est un logiciel de bureau pour Windows qui aide à nettoyer et organiser un set de ROMs MAME.
-      Il détecte et supprime les doublons (clones/parents) selon la logique <strong>1G1R</strong> (1 jeu = 1 ROM),
-      filtre par genre, langue, région, statut de fonctionnement, fabricant et année, et s'appuie sur les fichiers
-      de référence officiels MAME (DAT, catver.ini, languages.ini) pour un résultat fiable.
+      MAMESET Cleaner is a Windows desktop application that helps clean and organize a MAME ROM set.
+      It detects and removes duplicates (clones/parents) using the <strong>1G1R</strong> logic (1 game = 1 ROM),
+      filters by genre, language, region, working status, manufacturer and year, and relies on the official
+      MAME reference files (DAT, catver.ini, languages.ini) for a reliable result.
     </p>
   </section>
 
   <section>
-    <h2>Fonctionnalités</h2>
+    <h2>Features</h2>
     <div class="features">
       <div class="feature">
-        <h3>Scan intelligent</h3>
-        <p>Analyse le dossier de ROMs (.zip, .7z, dossiers non compressés) et détecte les fichiers corrects, manquants, corrompus ou non référencés.</p>
+        <h3>Smart scan</h3>
+        <p>Analyzes the ROM folder (.zip, .7z, uncompressed folders) and detects files that are correct, missing, corrupted, or unreferenced.</p>
       </div>
       <div class="feature">
-        <h3>Détection des doublons</h3>
-        <p>Choisit automatiquement le meilleur exemplaire de chaque jeu selon une priorité régionale personnalisable et l'état de fonctionnement.</p>
+        <h3>Duplicate detection</h3>
+        <p>Automatically picks the best copy of each game based on a customizable region priority and working status.</p>
       </div>
       <div class="feature">
-        <h3>Filtres avancés</h3>
-        <p>Genre, langue, région, statut, fabricant, année, BIOS, mécanique, contenu adulte : combinez librement vos critères.</p>
+        <h3>Advanced filters</h3>
+        <p>Genre, language, region, status, manufacturer, year, BIOS, mechanical, adult content: combine your criteria freely.</p>
       </div>
       <div class="feature">
-        <h3>Nettoyage sécurisé</h3>
-        <p>Corbeille Windows par défaut, sauvegarde préalable optionnelle et confirmation obligatoire avant toute suppression.</p>
+        <h3>Safe cleanup</h3>
+        <p>Windows Recycle Bin by default, optional backup beforehand, and mandatory confirmation before any deletion.</p>
       </div>
       <div class="feature">
-        <h3>Rapports détaillés</h3>
-        <p>Chaque nettoyage génère un rapport JSON et CSV listant les ROMs supprimées et conservées, avec leur motif.</p>
+        <h3>Detailed reports</h3>
+        <p>Every cleanup generates a JSON and CSV report listing deleted and kept ROMs, with their reason.</p>
       </div>
       <div class="feature">
-        <h3>Interface claire</h3>
-        <p>Français et anglais, thème clair ou sombre, entièrement conçue en Rust natif pour rester rapide sur de très gros sets.</p>
+        <h3>Clean interface</h3>
+        <p>French and English, light or dark theme, built entirely in native Rust to stay fast on very large sets.</p>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>Captures d'écran</h2>
+    <h2>Screenshots</h2>
     <div class="screenshots">
       <figure>
-        <img src="screenshots/filters_view.png" alt="Vue Filtres de MAMESET Cleaner">
-        <figcaption>Configuration des filtres (genre, langue, région, statut, année, type de contenu)</figcaption>
+        <img src="screenshots/filters_view.png" alt="MAMESET Cleaner Filters view">
+        <figcaption>Filter configuration (genre, language, region, status, year, content type)</figcaption>
       </figure>
       <figure>
-        <img src="screenshots/results_view.png" alt="Vue Résultats de MAMESET Cleaner">
-        <figcaption>Résultats du scan avec statut et action (conserver / supprimer) pour chaque ROM</figcaption>
+        <img src="screenshots/results_view.png" alt="MAMESET Cleaner Results view">
+        <figcaption>Scan results with status and action (keep / remove) for each ROM</figcaption>
       </figure>
     </div>
   </section>
@@ -204,21 +204,21 @@
   <section>
     <h2>Installation</h2>
     <p>
-      Téléchargez le dernier installateur depuis la page
-      <a href="https://github.com/Patrickjaillet/MAMESET-Cleaner/releases">Releases</a>, puis lancez
+      Download the latest installer from the
+      <a href="https://github.com/Patrickjaillet/MAMESET-Cleaner/releases">Releases</a> page, then run
       <code>MAMESET-Cleaner-Setup-vX.Y.Z.exe</code>.
     </p>
-    <p class="req-list">Configuration requise : Windows 10 ou Windows 11 (64 bits).</p>
+    <p class="req-list">Requirements: Windows 10 or Windows 11 (64-bit).</p>
   </section>
 
   <section>
-    <h2>Licence</h2>
-    <p>MAMESET Cleaner est distribué sous licence <strong>MIT</strong>.</p>
+    <h2>License</h2>
+    <p>MAMESET Cleaner is distributed under the <strong>MIT</strong> license.</p>
   </section>
 </main>
 
 <footer>
-  <p>Copyright © 2026 Patrick JAILLET — Tous droits réservés</p>
+  <p>Copyright © 2026 Patrick JAILLET — All rights reserved</p>
   <p>
     <a href="mailto:sandefjord.development@proton.me">sandefjord.development@proton.me</a>
     · <a href="https://github.com/Patrickjaillet/MAMESET-Cleaner">GitHub</a>

@@ -1,36 +1,36 @@
 # MAMESET Cleaner
 
-MAMESET Cleaner est un logiciel de bureau pour Windows qui aide à nettoyer et organiser un set de ROMs MAME : détection et suppression des doublons (clones/parents), filtrage par genre, langue, région, statut de fonctionnement, fabricant et année, pour obtenir un set de ROMs propre, cohérent et minimal (1 jeu = 1 ROM).
+MAMESET Cleaner is a Windows desktop application that helps clean and organize a MAME ROM set: detecting and removing duplicates (clones/parents), filtering by genre, language, region, working status, manufacturer and year, to produce a clean, consistent, minimal ROM set (1 game = 1 ROM).
 
-![Vue Filtres de MAMESET Cleaner](docs/screenshots/filters_view.png)
+![MAMESET Cleaner Filters view](docs/screenshots/filters_view.png)
 
-## Fonctionnalités
+## Features
 
-- **Scan** du dossier de ROMs (fichiers `.zip`, `.7z` et dossiers non compressés), avec détection des ROMs correctes, manquantes, corrompues ou non référencées
-- **Détection des doublons** (logique 1G1R : 1 jeu = 1 ROM) selon une priorité régionale personnalisable (ex. Monde > USA > Europe > Japon), le statut de fonctionnement et la version la plus récente
-- **Filtrage** par genre, langue, région, statut de fonctionnement, fabricant, année et type de contenu (BIOS, mécanique, adulte)
-- **Nettoyage** des ROMs en double : déplacement vers la corbeille Windows par défaut (ou suppression définitive), avec sauvegarde préalable optionnelle et confirmation obligatoire avant toute suppression
-- **Rapport détaillé** de chaque nettoyage (JSON et CSV)
-- **Vérification automatique** de l'intégrité du set après un nettoyage
-- Interface en **français et en anglais**, thème **clair et sombre**
+- **Scan** the ROM folder (`.zip`, `.7z` files and uncompressed folders), detecting ROMs that are correct, missing, corrupted, or unreferenced
+- **Duplicate detection** (1G1R logic: 1 game = 1 ROM) based on a customizable region priority (e.g. World > USA > Europe > Japan), working status and the most recent revision
+- **Filtering** by genre, language, region, working status, manufacturer, year and content type (BIOS, mechanical, adult)
+- **Cleanup** of duplicate ROMs: moved to the Windows Recycle Bin by default (or permanently deleted), with an optional backup beforehand and mandatory confirmation before any deletion
+- **Detailed report** for every cleanup operation (JSON and CSV)
+- **Automatic integrity check** of the set after a cleanup
+- **French and English** interface, **light and dark** theme
 
-![Vue Résultats de MAMESET Cleaner](docs/screenshots/results_view.png)
+![MAMESET Cleaner Results view](docs/screenshots/results_view.png)
 
 ## Installation
 
-Un installateur Windows (Inno Setup) est fourni à partir de la version v1.0.0. Voir les [releases](https://github.com/Patrickjaillet/MAMESET-Cleaner/releases) du dépôt.
+A Windows installer (Inno Setup) is available from version v1.0.0 onward. See the [releases](https://github.com/Patrickjaillet/MAMESET-Cleaner/releases) of this repository.
 
-Le logiciel fonctionne sur Windows 10 et Windows 11 (64 bits).
+The application runs on Windows 10 and Windows 11 (64-bit).
 
-## Compilation depuis les sources
+## Building from source
 
-Voir [docs/COMPILATION.md](docs/COMPILATION.md).
+See [docs/COMPILATION.md](docs/COMPILATION.md).
 
-## Licence
+## License
 
-Ce logiciel est distribué sous licence **MIT**. Voir le fichier [LICENSE](LICENSE).
+This software is distributed under the **MIT** license. See the [LICENSE](LICENSE) file.
 
 ## Contact
 
-- E-mail : sandefjord.development@proton.me
-- Site web : https://patrickjaillet.github.io/MAMESET-Cleaner
+- Email: sandefjord.development@proton.me
+- Website: https://patrickjaillet.github.io/MAMESET-Cleaner
