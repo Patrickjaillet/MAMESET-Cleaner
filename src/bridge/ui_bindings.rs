@@ -15,8 +15,18 @@ use crate::core::{
 use crate::models::filter_profile::FilterProfile;
 use crate::models::rom_entry::{DriverStatus, RomEntry};
 use crate::models::rom_set::{RomSet, RomStatus};
+use crate::plugin::github_client::{self, GitHubClientError, RemoteFile};
+use crate::plugin::registry::{self, PluginStatus, StoredManifest};
 
 slint::include_modules!();
+
+const PLUGIN_REPO_CONTENTS_URL: &str =
+    "https://api.github.com/repos/Patrickjaillet/MAMESET-Cleaner/contents/plugins";
+
+struct RemotePlugin {
+    manifest: StoredManifest,
+    dll_download_url: String,
+}
 
 struct AppState {
     config: AppConfig,
@@ -28,6 +38,8 @@ struct AppState {
     sort_column: String,
     sort_ascending: bool,
     scan_cancel_flag: Arc<AtomicBool>,
+    plugins_dir: PathBuf,
+    remote_plugins: HashMap<String, RemotePlugin>,
 }
 
 impl AppState {
@@ -42,6 +54,8 @@ impl AppState {
             sort_column: "name".to_string(),
             sort_ascending: true,
             scan_cancel_flag: Arc::new(AtomicBool::new(false)),
+            plugins_dir: registry::default_plugins_dir(),
+            remote_plugins: HashMap::new(),
         }
     }
 }
@@ -66,6 +80,9 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     window.set_result_count_text(String::new().into());
     window.set_cleanup_status_text(String::new().into());
     window.set_integrity_status_text(String::new().into());
+    window.set_plugins_status_text(String::new().into());
+    window.set_plugin_install_status_text(String::new().into());
+    window.set_plugin_rows(ModelRc::new(VecModel::from(Vec::<PluginRow>::new())));
 
     let state = Arc::new(Mutex::new(AppState::new(config.clone())));
 
@@ -77,6 +94,9 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     setup_search(&window, &state);
     setup_sort(&window, &state);
     setup_cleanup(&window, &state);
+    setup_plugins(&window, &state);
+
+    refresh_plugin_rows(&window, &state);
 
     tracing::info!("fenêtre principale initialisée");
 
@@ -597,6 +617,255 @@ fn setup_cleanup(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
                 }
             });
         });
+    });
+}
+
+fn status_kind(status: PluginStatus) -> i32 {
+    match status {
+        PluginStatus::NotInstalled => 0,
+        PluginStatus::Installed => 1,
+        PluginStatus::UpdateAvailable => 2,
+    }
+}
+
+fn status_text(status: PluginStatus) -> &'static str {
+    match status {
+        PluginStatus::NotInstalled => "Non installé",
+        PluginStatus::Installed => "Installé",
+        PluginStatus::UpdateAvailable => "Mise à jour disponible",
+    }
+}
+
+/// Rebuilds the plugin list shown in the UI from the currently known remote
+/// plugins (last fetched from GitHub) combined with what is actually
+/// installed locally.
+fn refresh_plugin_rows(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let guard = state.lock().unwrap();
+    let installed = registry::list_installed(&guard.plugins_dir);
+    let installed_by_id: HashMap<&str, &StoredManifest> =
+        installed.iter().map(|m| (m.id.as_str(), m)).collect();
+
+    let mut rows: Vec<PluginRow> = guard
+        .remote_plugins
+        .values()
+        .map(|remote| {
+            let local = installed_by_id.get(remote.manifest.id.as_str()).copied();
+            let status = registry::compare_status(local, &remote.manifest.version);
+            PluginRow {
+                id: remote.manifest.id.clone().into(),
+                name: remote.manifest.name.clone().into(),
+                console_family: remote.manifest.console_family.clone().into(),
+                version: remote.manifest.version.clone().into(),
+                status_text: status_text(status).into(),
+                status_kind: status_kind(status),
+            }
+        })
+        .collect();
+
+    for local in &installed {
+        if !guard.remote_plugins.contains_key(&local.id) {
+            rows.push(PluginRow {
+                id: local.id.clone().into(),
+                name: local.name.clone().into(),
+                console_family: local.console_family.clone().into(),
+                version: local.version.clone().into(),
+                status_text: status_text(PluginStatus::Installed).into(),
+                status_kind: status_kind(PluginStatus::Installed),
+            });
+        }
+    }
+
+    rows.sort_by(|a, b| a.name.cmp(&b.name));
+    drop(guard);
+
+    window.set_plugin_rows(ModelRc::new(VecModel::from(rows)));
+}
+
+/// Fetches the list of plugin manifests published in the repository's
+/// `plugins` directory. Pairs each `<id>.json` manifest with its sibling
+/// `<id>.dll` download URL.
+fn fetch_remote_plugins(api_url: &str) -> Result<HashMap<String, RemotePlugin>, GitHubClientError> {
+    let files = github_client::fetch_repository_contents(api_url)?;
+    let dll_urls: HashMap<String, String> = files
+        .iter()
+        .filter(|f| f.kind == "file" && f.name.ends_with(".dll"))
+        .filter_map(|f| {
+            let stem = f.name.strip_suffix(".dll")?;
+            let url = f.download_url.clone()?;
+            Some((stem.to_string(), url))
+        })
+        .collect();
+
+    let mut remote_plugins = HashMap::new();
+    for file in files.iter().filter(|f: &&RemoteFile| f.name.ends_with(".json")) {
+        let Some(stem) = file.name.strip_suffix(".json") else {
+            continue;
+        };
+        let Some(json_url) = &file.download_url else {
+            continue;
+        };
+        let Some(dll_url) = dll_urls.get(stem) else {
+            continue;
+        };
+
+        let content = github_client::fetch_text(json_url)?;
+        let manifest: StoredManifest =
+            serde_json::from_str(&content).map_err(|err| GitHubClientError::Json(err.to_string()))?;
+
+        remote_plugins.insert(
+            manifest.id.clone(),
+            RemotePlugin {
+                manifest,
+                dll_download_url: dll_url.clone(),
+            },
+        );
+    }
+
+    Ok(remote_plugins)
+}
+
+fn setup_plugins(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let weak = window.as_weak();
+    let state_refresh = Arc::clone(state);
+    window.on_refresh_plugins(move || {
+        let Some(window) = weak.upgrade() else {
+            return;
+        };
+
+        window.set_plugins_loading(true);
+        window.set_plugins_status_text("Récupération de la liste des plugins...".into());
+
+        let weak_thread = weak.clone();
+        let state_thread = Arc::clone(&state_refresh);
+        std::thread::spawn(move || {
+            let result = fetch_remote_plugins(PLUGIN_REPO_CONTENTS_URL);
+            let _ = slint::invoke_from_event_loop(move || {
+                let Some(window) = weak_thread.upgrade() else {
+                    return;
+                };
+
+                window.set_plugins_loading(false);
+                match result {
+                    Ok(remote_plugins) => {
+                        let count = remote_plugins.len();
+                        {
+                            let mut guard = state_thread.lock().unwrap();
+                            guard.remote_plugins = remote_plugins;
+                        }
+                        window.set_plugins_status_text(
+                            if count == 0 {
+                                "Aucun plugin publié pour le moment.".to_string()
+                            } else {
+                                format!("{count} plugin(s) disponible(s).")
+                            }
+                            .into(),
+                        );
+                        refresh_plugin_rows(&window, &state_thread);
+                    }
+                    Err(err) => {
+                        window.set_plugins_status_text(
+                            format!("Impossible de récupérer la liste des plugins : {err}").into(),
+                        );
+                        refresh_plugin_rows(&window, &state_thread);
+                    }
+                }
+            });
+        });
+    });
+
+    let weak = window.as_weak();
+    let state_install = Arc::clone(state);
+    window.on_install_plugin(move |id| {
+        let Some(window) = weak.upgrade() else {
+            return;
+        };
+        let id = id.to_string();
+
+        let remote = {
+            let guard = state_install.lock().unwrap();
+            guard.remote_plugins.get(&id).map(|remote| {
+                (
+                    guard.plugins_dir.clone(),
+                    remote.manifest.clone(),
+                    remote.dll_download_url.clone(),
+                )
+            })
+        };
+
+        let Some((plugins_dir, manifest, dll_url)) = remote else {
+            return;
+        };
+
+        window.set_plugin_install_active(true);
+        window.set_plugin_install_progress(0.0);
+        window.set_plugin_install_status_text(format!("Téléchargement de {}...", manifest.name).into());
+
+        let weak_thread = weak.clone();
+        let state_thread = Arc::clone(&state_install);
+        std::thread::spawn(move || {
+            let weak_progress = weak_thread.clone();
+            let plugin_name = manifest.name.clone();
+            let result = registry::install_plugin_from_url_with_progress(
+                &plugins_dir,
+                &dll_url,
+                &manifest,
+                move |downloaded, total| {
+                    let ratio = total
+                        .filter(|&t| t > 0)
+                        .map(|t| downloaded as f32 / t as f32)
+                        .unwrap_or(0.0);
+                    let status = format!("Téléchargement de {plugin_name}... ({downloaded} octets)");
+                    let weak_inner = weak_progress.clone();
+                    let _ = slint::invoke_from_event_loop(move || {
+                        if let Some(window) = weak_inner.upgrade() {
+                            window.set_plugin_install_progress(ratio);
+                            window.set_plugin_install_status_text(status.into());
+                        }
+                    });
+                },
+            );
+
+            let _ = slint::invoke_from_event_loop(move || {
+                let Some(window) = weak_thread.upgrade() else {
+                    return;
+                };
+                window.set_plugin_install_active(false);
+                match result {
+                    Ok(()) => {
+                        window.set_plugin_install_status_text(
+                            format!("{} installé avec succès.", manifest.name).into(),
+                        );
+                    }
+                    Err(err) => {
+                        window.set_plugin_install_status_text(
+                            format!("Échec de l'installation : {err}").into(),
+                        );
+                    }
+                }
+                refresh_plugin_rows(&window, &state_thread);
+            });
+        });
+    });
+
+    let weak = window.as_weak();
+    let state_remove = Arc::clone(state);
+    window.on_remove_plugin(move |id| {
+        let Some(window) = weak.upgrade() else {
+            return;
+        };
+
+        let plugins_dir = state_remove.lock().unwrap().plugins_dir.clone();
+        match registry::remove_plugin(&plugins_dir, &id) {
+            Ok(()) => {
+                window.set_plugin_install_status_text(format!("{id} supprimé.").into());
+            }
+            Err(err) => {
+                window.set_plugin_install_status_text(
+                    format!("Échec de la suppression de {id} : {err}").into(),
+                );
+            }
+        }
+        refresh_plugin_rows(&window, &state_remove);
     });
 }
 

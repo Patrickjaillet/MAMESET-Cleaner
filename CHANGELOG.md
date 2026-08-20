@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.0
+- Added a new "Plugins" section to the interface, where support for other consoles can be browsed, installed, updated and removed directly from the project's GitHub repository.
+- Every downloaded plugin is verified against its expected checksum before being installed, so a corrupted or tampered download is automatically rejected.
+- Downloads show a real-time progress bar without freezing the interface.
+
+## v1.1.0
+- Laid the internal groundwork for supporting consoles beyond MAME through downloadable plugins. This release has no new visible feature on its own; the "Plugins" section introduced in v1.2.0 is what makes it usable.
+
 ## v1.0.0
 - First stable release of MAMESET Cleaner.
 - The software has been fully tested (more than 60 automated checks) and reviewed to leave no known issues.

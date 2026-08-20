@@ -3,8 +3,9 @@ import { ScanView } from "views/scan_view.slint";
 import { FilterView } from "views/filter_view.slint";
 import { ResultsView } from "views/results_view.slint";
 import { SettingsView } from "views/settings_view.slint";
+import { PluginsView } from "views/plugins_view.slint";
 import { AboutView } from "views/about_view.slint";
-import { ResultRow } from "common.slint";
+import { ResultRow, PluginRow } from "common.slint";
 
 export component AppWindow inherits Window {
     title: "MAMESET Cleaner";
@@ -56,6 +57,13 @@ export component AppWindow inherits Window {
     in property <string> cleanup-status-text;
     in property <string> integrity-status-text;
 
+    in property <bool> plugins-loading;
+    in property <string> plugins-status-text;
+    in property <[PluginRow]> plugin-rows;
+    in property <bool> plugin-install-active;
+    in property <float> plugin-install-progress;
+    in property <string> plugin-install-status-text;
+
     callback browse-rom-set-path();
     callback browse-dat-file-path();
     callback browse-catver-ini-path();
@@ -70,6 +78,9 @@ export component AppWindow inherits Window {
     callback request-cleanup();
     callback confirm-cleanup();
     callback cancel-cleanup();
+    callback refresh-plugins();
+    callback install-plugin(string);
+    callback remove-plugin(string);
 
     HorizontalLayout {
         Sidebar {
@@ -78,6 +89,7 @@ export component AppWindow inherits Window {
                 { label: "Filtres", icon: "🧰" },
                 { label: "Résultats", icon: "📋" },
                 { label: "Paramètres", icon: "⚙️" },
+                { label: "Plugins", icon: "🧩" },
                 { label: "À propos", icon: "ℹ️" },
             ];
             selected-index <=> current-view;
@@ -145,7 +157,18 @@ export component AppWindow inherits Window {
                 browse-backup-dir-path => { root.browse-backup-dir-path(); }
                 save-settings => { root.save-settings(); }
             }
-            if current-view == 4: AboutView { app-version: root.app-version; }
+            if current-view == 4: PluginsView {
+                plugins-loading: root.plugins-loading;
+                plugins-status-text: root.plugins-status-text;
+                plugin-rows: root.plugin-rows;
+                plugin-install-active: root.plugin-install-active;
+                plugin-install-progress: root.plugin-install-progress;
+                plugin-install-status-text: root.plugin-install-status-text;
+                refresh-plugins => { root.refresh-plugins(); }
+                install-plugin(id) => { root.install-plugin(id); }
+                remove-plugin(id) => { root.remove-plugin(id); }
+            }
+            if current-view == 5: AboutView { app-version: root.app-version; }
         }
     }
 }

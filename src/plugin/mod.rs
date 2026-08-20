@@ -1,5 +1,7 @@
+pub mod github_client;
 pub mod loader;
 pub mod mame_plugin;
+pub mod registry;
 
 use std::collections::HashMap;
 use std::path::Path;

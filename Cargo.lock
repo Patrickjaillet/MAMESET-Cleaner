@@ -3161,6 +3161,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sevenz-rust",
+ "sha2",
  "slint",
  "slint-build",
  "tracing",

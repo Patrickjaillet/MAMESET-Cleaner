@@ -1,0 +1,113 @@
+import { AppButton } from "../components/app_button.slint";
+import { PluginRow } from "../common.slint";
+
+export component PluginsView inherits Rectangle {
+    in property <bool> plugins-loading;
+    in property <string> plugins-status-text;
+    in property <[PluginRow]> plugin-rows;
+    in property <bool> plugin-install-active;
+    in property <float> plugin-install-progress;
+    in property <string> plugin-install-status-text;
+    callback refresh-plugins();
+    callback install-plugin(string);
+    callback remove-plugin(string);
+
+    Flickable {
+        VerticalLayout {
+            padding: 24px;
+            spacing: 14px;
+            alignment: start;
+
+            Text {
+                text: "Plugins";
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+            Text {
+                text: "Ajoutez la prise en charge d'autres consoles en installant des plugins depuis le dépôt GitHub du projet.";
+                wrap: word-wrap;
+            }
+
+            HorizontalLayout {
+                spacing: 8px;
+                AppButton {
+                    width: 240px;
+                    text: plugins-loading ? "Actualisation..." : "Actualiser depuis GitHub";
+                    primary: true;
+                    enabled: !plugins-loading;
+                    clicked => { root.refresh-plugins(); }
+                }
+            }
+
+            Text {
+                text: plugins-status-text;
+                wrap: word-wrap;
+            }
+
+            if plugin-install-active: VerticalLayout {
+                spacing: 6px;
+
+                Rectangle {
+                    height: 10px;
+                    border-radius: 5px;
+                    background: #e0e0e0;
+                    clip: true;
+
+                    Rectangle {
+                        width: parent.width * (plugin-install-progress < 0.0 ? 0.0 : (plugin-install-progress > 1.0 ? 1.0 : plugin-install-progress));
+                        height: parent.height;
+                        background: #0078d4;
+                    }
+                }
+
+                Text { text: plugin-install-status-text; }
+            }
+
+            for row[i] in plugin-rows: Rectangle {
+                height: 64px;
+                border-width: 1px;
+                border-color: #d0d0d0;
+                border-radius: 6px;
+
+                HorizontalLayout {
+                    padding: 10px;
+                    spacing: 10px;
+
+                    VerticalLayout {
+                        alignment: center;
+
+                        Text { text: row.name; font-weight: 600; }
+                        Text {
+                            text: row.console-family + " — v" + row.version + " — " + row.status-text;
+                            font-size: 12px;
+                        }
+                    }
+
+                    Rectangle { horizontal-stretch: 1; }
+
+                    HorizontalLayout {
+                        spacing: 8px;
+                        alignment: end;
+
+                        AppButton {
+                            width: 130px;
+                            text: row.status-kind == 2 ? "Mettre à jour" : "Installer";
+                            visible: row.status-kind != 1;
+                            enabled: !plugin-install-active;
+                            primary: true;
+                            clicked => { root.install-plugin(row.id); }
+                        }
+                        AppButton {
+                            width: 110px;
+                            text: "Supprimer";
+                            visible: row.status-kind != 0;
+                            enabled: !plugin-install-active;
+                            clicked => { root.remove-plugin(row.id); }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
