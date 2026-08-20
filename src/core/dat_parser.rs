@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fs;
 use std::path::Path;
+use std::time::Instant;
 
 use quick_xml::events::Event;
 use quick_xml::Reader;
@@ -50,9 +51,26 @@ impl From<quick_xml::Error> for DatError {
 const MACHINE_TAGS: [&[u8]; 2] = [b"machine", b"game"];
 const ROOT_TAGS: [&[u8]; 2] = [b"mame", b"datafile"];
 
+// Note: intentionally reads the whole file into memory via
+// `fs::read_to_string` and parses it with `Reader::from_str`, rather than
+// streaming from a `BufReader`. Measured both against the real 56 MB MAME
+// `-listxml` (37 123 machines): `from_str` (zero-copy borrowing directly
+// from the in-memory string) took ~1.6s, while a `Reader::from_reader`
+// streaming variant using `read_event_into` took ~2.2s — quick_xml's
+// `Read`-based API has to copy each chunk into a scratch buffer per event,
+// which is slower here than paying for one upfront read + UTF-8 validation.
+// See ROADMAP5.md v4.1.0 notes.
 pub fn parse_dat_file(path: &Path) -> Result<HashMap<String, RomEntry>, DatError> {
+    let started = Instant::now();
     let content = fs::read_to_string(path)?;
-    parse_dat_str(&content)
+    let entries = parse_dat_str(&content)?;
+    tracing::info!(
+        duration_ms = started.elapsed().as_millis() as u64,
+        machine_count = entries.len(),
+        path = %path.display(),
+        "DAT file parsed"
+    );
+    Ok(entries)
 }
 
 pub fn parse_dat_str(xml: &str) -> Result<HashMap<String, RomEntry>, DatError> {

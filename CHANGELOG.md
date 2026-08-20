@@ -1,5 +1,8 @@
 # Changelog
 
+## v4.2.0
+- Reduced unnecessary memory allocation during ROM-set scanning by removing data that was being copied but never actually used. This is the first step of an ongoing effort to make loading and scanning large ROM sets faster — bigger improvements (avoiding re-reading the DAT file on every scan) are coming in upcoming releases.
+
 ## v4.0.0
 - This release completes a full redesign of the interface (started in v3.1.0): a single polished theme, smooth animations throughout, a modernized About screen, and completely reworked filters with real pickers, active-filter chips, a live match count, and saved filter profiles. No scanning, deduplication, or cleanup behavior changed — this release is about how the app looks and feels to use.
 

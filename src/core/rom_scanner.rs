@@ -85,6 +85,7 @@ pub fn scan_rom_directory<F>(
 where
     F: Fn(ScanProgress) + Sync,
 {
+    let started = std::time::Instant::now();
     let candidates = collect_candidates(directory)?;
     let total = candidates.len();
     let processed = AtomicUsize::new(0);
@@ -111,14 +112,13 @@ where
 
     for result in results {
         found_names.insert(result.name.clone());
-        let metadata = dat_entries.get(&result.name).cloned();
-        let status = classify_status(&result, metadata.as_ref());
+        let metadata = dat_entries.get(&result.name);
+        let status = classify_status(&result, metadata);
 
         rom_set.entries.insert(
             result.name.clone(),
             ScannedEntry {
                 name: result.name,
-                metadata,
                 file_path: Some(result.path),
                 status,
             },
@@ -126,13 +126,12 @@ where
     }
 
     if !cancel_flag.load(Ordering::Relaxed) {
-        for (name, entry) in dat_entries {
+        for name in dat_entries.keys() {
             if !found_names.contains(name) {
                 rom_set.entries.insert(
                     name.clone(),
                     ScannedEntry {
                         name: name.clone(),
-                        metadata: Some(entry.clone()),
                         file_path: None,
                         status: RomStatus::Missing,
                     },
@@ -140,6 +139,13 @@ where
             }
         }
     }
+
+    tracing::info!(
+        duration_ms = started.elapsed().as_millis() as u64,
+        candidate_count = total,
+        entry_count = rom_set.entries.len(),
+        "ROM directory scan completed"
+    );
 
     Ok(rom_set)
 }
@@ -512,7 +518,6 @@ mod tests {
             "gamea".to_string(),
             ScannedEntry {
                 name: "gamea".to_string(),
-                metadata: None,
                 file_path: Some(PathBuf::from("gamea.zip")),
                 status: RomStatus::Ok,
             },
@@ -521,7 +526,6 @@ mod tests {
             "gameb".to_string(),
             ScannedEntry {
                 name: "gameb".to_string(),
-                metadata: None,
                 file_path: None,
                 status: RomStatus::Missing,
             },

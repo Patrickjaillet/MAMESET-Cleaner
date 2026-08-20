@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use crate::models::rom_entry::RomEntry;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RomStatus {
     Ok,
@@ -14,7 +12,6 @@ pub enum RomStatus {
 #[derive(Debug, Clone)]
 pub struct ScannedEntry {
     pub name: String,
-    pub metadata: Option<RomEntry>,
     pub file_path: Option<PathBuf>,
     pub status: RomStatus,
 }
@@ -50,7 +47,6 @@ mod tests {
             "pacman".to_string(),
             ScannedEntry {
                 name: "pacman".to_string(),
-                metadata: None,
                 file_path: Some(PathBuf::from("pacman.zip")),
                 status: RomStatus::Ok,
             },
@@ -59,7 +55,6 @@ mod tests {
             "missing".to_string(),
             ScannedEntry {
                 name: "missing".to_string(),
-                metadata: None,
                 file_path: None,
                 status: RomStatus::Missing,
             },

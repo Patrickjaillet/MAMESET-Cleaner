@@ -34,9 +34,21 @@ impl From<std::io::Error> for CatverError {
     }
 }
 
+// Note: reads the whole file into memory via `fs::read_to_string` rather
+// than streaming, because the underlying `configparser::Ini::read` only
+// accepts an owned `String` — there's no streaming/`Read`-based API in that
+// crate to switch to (see ROADMAP5.md v4.1.0 notes).
 pub fn parse_catver_file(path: &Path) -> Result<HashMap<String, String>, CatverError> {
+    let started = std::time::Instant::now();
     let content = fs::read_to_string(path)?;
-    parse_catver_str(&content)
+    let categories = parse_catver_str(&content)?;
+    tracing::info!(
+        duration_ms = started.elapsed().as_millis() as u64,
+        category_count = categories.len(),
+        path = %path.display(),
+        "catver.ini parsed"
+    );
+    Ok(categories)
 }
 
 pub fn parse_catver_str(content: &str) -> Result<HashMap<String, String>, CatverError> {

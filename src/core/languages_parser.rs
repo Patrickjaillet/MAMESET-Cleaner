@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 use std::fmt;
-use std::fs;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 use std::path::Path;
+use std::time::Instant;
 
 #[derive(Debug)]
 pub enum LanguagesError {
@@ -27,8 +29,16 @@ impl From<std::io::Error> for LanguagesError {
 }
 
 pub fn parse_languages_file(path: &Path) -> Result<HashMap<String, Vec<String>>, LanguagesError> {
-    let content = fs::read_to_string(path)?;
-    Ok(parse_languages_str(&content))
+    let started = Instant::now();
+    let file = File::open(path)?;
+    let result = parse_languages_lines(BufReader::new(file).lines().map_while(Result::ok));
+    tracing::info!(
+        duration_ms = started.elapsed().as_millis() as u64,
+        rom_count = result.len(),
+        path = %path.display(),
+        "languages.ini parsed"
+    );
+    Ok(result)
 }
 
 /// `languages.ini` ne suit pas la syntaxe classique `clé=valeur` : chaque
@@ -36,10 +46,14 @@ pub fn parse_languages_file(path: &Path) -> Result<HashMap<String, Vec<String>>,
 /// appartiennent, un par ligne. Le résultat associe chaque nom de ROM à
 /// la (ou les) langue(s) sous lesquelles il apparaît.
 pub fn parse_languages_str(content: &str) -> HashMap<String, Vec<String>> {
+    parse_languages_lines(content.lines().map(|line| line.to_string()))
+}
+
+fn parse_languages_lines(lines: impl Iterator<Item = String>) -> HashMap<String, Vec<String>> {
     let mut result: HashMap<String, Vec<String>> = HashMap::new();
     let mut current_language: Option<String> = None;
 
-    for raw_line in content.lines() {
+    for raw_line in lines {
         let line = raw_line.trim();
 
         if line.is_empty() || line.starts_with(';') || line.starts_with('#') {
