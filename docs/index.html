@@ -5,135 +5,315 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAMESET Cleaner</title>
 <meta name="description" content="MAMESET Cleaner — Windows software to clean and organize a MAME ROM set, plus 87 other console systems via plugins (duplicates, filters, reports).">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%B9%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --accent: #0078d4;
-    --accent-dark: #005a9e;
-    --bg: #f3f3f3;
-    --surface: #ffffff;
-    --text: #202020;
-    --muted: #5f5f5f;
-    --border: #e0e0e0;
+    --bg: #0a0014;
+    --bg-deep: #05000c;
+    --surface: rgba(20, 8, 40, 0.55);
+    --surface-solid: #140828;
+    --border: rgba(255, 43, 214, 0.35);
+    --border-cyan: rgba(5, 217, 232, 0.35);
+    --text: #f2e9ff;
+    --muted: #b6a6d9;
+    --magenta: #ff2bd6;
+    --cyan: #05d9e8;
+    --purple: #a742ff;
+    --yellow: #ffd23f;
+    --orange: #ff8a3d;
+    --glow-magenta: 0 0 8px rgba(255, 43, 214, 0.85), 0 0 24px rgba(255, 43, 214, 0.45);
+    --glow-cyan: 0 0 8px rgba(5, 217, 232, 0.85), 0 0 24px rgba(5, 217, 232, 0.45);
   }
+
   * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
   body {
     margin: 0;
-    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+    font-family: "Rajdhani", "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.6;
+    line-height: 1.65;
+    font-size: 1.08rem;
+    position: relative;
+    overflow-x: hidden;
   }
+
+  h1, h2, h3, .logo, .btn, .marquee span {
+    font-family: "Orbitron", "Rajdhani", sans-serif;
+  }
+
+  /* ---------- three.js backdrop ---------- */
+  #bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 20%, #1a0b33 0%, var(--bg) 55%, var(--bg-deep) 100%);
+  }
+
+  /* CRT scanlines + vignette overlay, purely decorative */
+  #crt-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 0px,
+        rgba(0, 0, 0, 0) 2px,
+        rgba(0, 0, 0, 0.18) 3px,
+        rgba(0, 0, 0, 0) 4px
+      ),
+      radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 100%);
+    mix-blend-mode: normal;
+    opacity: 0.55;
+  }
+
+  ::selection { background: var(--magenta); color: #100015; }
+
+  a { color: var(--cyan); }
+
+  /* ---------- marquee ticker ---------- */
+  .marquee {
+    background: linear-gradient(90deg, #1c0736, #2a0a4d, #1c0736);
+    border-bottom: 1px solid var(--border-cyan);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 8px 0;
+  }
+  .marquee-track {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 26s linear infinite;
+  }
+  .marquee span {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    color: var(--yellow);
+    text-shadow: 0 0 6px rgba(255, 210, 63, 0.8);
+    margin: 0 2.5rem;
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* ---------- header / hero ---------- */
   header {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-    color: white;
-    padding: 64px 24px 56px;
+    position: relative;
+    padding: 96px 24px 120px;
     text-align: center;
+    overflow: hidden;
   }
-  header h1 {
-    margin: 0 0 12px;
-    font-size: 2.4rem;
+  .logo {
+    display: inline-block;
+    font-family: "Press Start 2P", "Orbitron", sans-serif;
+    font-size: clamp(1.4rem, 5vw, 2.6rem);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    margin: 0 0 22px;
+    color: #fff;
+    text-shadow:
+      0 0 6px #fff,
+      0 0 18px var(--magenta),
+      0 0 40px var(--magenta),
+      0 4px 0 var(--purple);
+    animation: flicker 4.5s ease-in-out infinite;
+  }
+  @keyframes flicker {
+    0%, 92%, 100% { opacity: 1; }
+    93% { opacity: 0.82; }
+    94% { opacity: 1; }
+    95% { opacity: 0.7; }
+    96% { opacity: 1; }
   }
   header p.tagline {
-    margin: 0 auto 28px;
-    max-width: 640px;
-    font-size: 1.1rem;
-    opacity: 0.95;
+    margin: 0 auto 40px;
+    max-width: 680px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--muted);
   }
+  .badge-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+  }
+  .badge {
+    font-family: "Orbitron", sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-cyan);
+    color: var(--cyan);
+    background: rgba(5, 217, 232, 0.08);
+  }
+
   .buttons {
     display: flex;
-    gap: 12px;
+    gap: 18px;
     justify-content: center;
     flex-wrap: wrap;
   }
   .btn {
     display: inline-block;
-    padding: 12px 28px;
-    border-radius: 6px;
+    padding: 15px 34px;
+    border-radius: 4px;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: transform 0.2s ease, box-shadow 0.25s ease, background 0.25s ease;
+    border: 2px solid transparent;
   }
   .btn-primary {
-    background: white;
-    color: var(--accent-dark);
+    background: linear-gradient(90deg, var(--magenta), var(--purple));
+    color: #fff;
+    box-shadow: var(--glow-magenta);
+  }
+  .btn-primary:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 14px rgba(255,43,214,1), 0 0 46px rgba(255,43,214,0.7);
   }
   .btn-secondary {
-    background: rgba(255,255,255,0.15);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.5);
+    background: transparent;
+    color: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: var(--glow-cyan);
   }
+  .btn-secondary:hover {
+    transform: translateY(-3px) scale(1.03);
+    background: rgba(5, 217, 232, 0.1);
+    box-shadow: 0 0 14px rgba(5,217,232,1), 0 0 46px rgba(5,217,232,0.7);
+  }
+
+  /* ---------- layout ---------- */
   main {
-    max-width: 960px;
+    max-width: 1040px;
     margin: 0 auto;
-    padding: 48px 24px;
+    padding: 20px 24px 48px;
+    position: relative;
   }
-  section { margin-bottom: 56px; }
+  section {
+    margin-bottom: 84px;
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
   h2 {
     font-size: 1.5rem;
-    margin-bottom: 20px;
-    border-left: 4px solid var(--accent);
-    padding-left: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin: 0 0 28px;
+    color: #fff;
+    text-transform: uppercase;
+    position: relative;
+    padding-left: 18px;
   }
+  h2::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 3px;
+    bottom: 3px;
+    width: 5px;
+    background: linear-gradient(180deg, var(--magenta), var(--cyan));
+    box-shadow: var(--glow-magenta);
+    border-radius: 3px;
+  }
+  section > p {
+    color: var(--muted);
+    font-size: 1.08rem;
+    max-width: 760px;
+  }
+
+  /* ---------- glass cards ---------- */
   .features {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
   }
-  .feature {
+  .feature, .system-group, .system-catalog details, .screenshots figure {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .feature { padding: 22px; }
+  .feature:hover, .system-group:hover {
+    transform: translateY(-4px);
+    border-color: var(--cyan);
+    box-shadow: 0 8px 28px rgba(5, 217, 232, 0.18), var(--glow-cyan);
   }
   .feature h3 {
-    margin: 0 0 8px;
-    font-size: 1.05rem;
-    color: var(--accent-dark);
+    margin: 0 0 10px;
+    font-size: 1rem;
+    letter-spacing: 0.03em;
+    color: var(--cyan);
+    text-shadow: 0 0 10px rgba(5, 217, 232, 0.5);
   }
   .feature p {
     margin: 0;
     color: var(--muted);
-    font-size: 0.95rem;
+    font-size: 0.96rem;
   }
+
   .screenshots {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 20px;
+    gap: 24px;
   }
   .screenshots figure {
     margin: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
     overflow: hidden;
+    padding: 0;
+  }
+  .screenshots figure:hover {
+    transform: translateY(-4px);
+    border-color: var(--magenta);
+    box-shadow: 0 8px 28px rgba(255, 43, 214, 0.2), var(--glow-magenta);
   }
   .screenshots img {
     width: 100%;
     display: block;
+    border-bottom: 1px solid var(--border);
   }
   .screenshots figcaption {
-    padding: 12px 16px;
+    padding: 14px 18px;
     font-size: 0.9rem;
     color: var(--muted);
   }
-  .req-list {
-    color: var(--muted);
-  }
+
+  .req-list { color: var(--muted); }
+
   .system-groups {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
   }
-  .system-group {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 18px 20px;
-  }
+  .system-group { padding: 20px 22px; }
   .system-group h3 {
     margin: 0 0 10px;
     font-size: 1rem;
-    color: var(--accent-dark);
+    color: var(--yellow);
   }
   .system-group ul {
     margin: 0;
@@ -141,60 +321,109 @@
     color: var(--muted);
     font-size: 0.92rem;
   }
-  .system-group li {
-    margin-bottom: 4px;
-  }
+  .system-group li { margin-bottom: 4px; }
+
   .system-catalog details {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
     margin-bottom: 12px;
-    padding: 14px 20px;
+    padding: 16px 22px;
   }
   .system-catalog summary {
     cursor: pointer;
     font-weight: 700;
-    color: var(--accent-dark);
-    font-size: 1.05rem;
+    color: var(--yellow);
+    font-size: 1.02rem;
+    text-shadow: 0 0 10px rgba(255, 210, 63, 0.35);
   }
+  .system-catalog summary:hover { color: #fff; }
   .system-catalog ul {
     columns: 2;
-    margin: 12px 0 0;
+    margin: 14px 0 0;
     padding-left: 18px;
     color: var(--muted);
     font-size: 0.92rem;
   }
   .system-catalog li {
-    margin-bottom: 4px;
+    margin-bottom: 5px;
     break-inside: avoid;
   }
   @media (max-width: 640px) {
     .system-catalog ul { columns: 1; }
   }
+
+  code {
+    background: rgba(5, 217, 232, 0.12);
+    border: 1px solid var(--border-cyan);
+    color: var(--cyan);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
   footer {
     text-align: center;
-    padding: 32px 24px;
+    padding: 40px 24px;
     color: var(--muted);
     font-size: 0.9rem;
     border-top: 1px solid var(--border);
+    position: relative;
   }
-  footer a { color: var(--accent-dark); }
-  code {
-    background: #eef1f4;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.9em;
+  footer a {
+    color: var(--cyan);
+    text-decoration: none;
+  }
+  footer a:hover { text-shadow: 0 0 8px var(--cyan); }
+  .insert-coin {
+    font-family: "Press Start 2P", monospace;
+    font-size: 0.7rem;
+    color: var(--magenta);
+    margin-bottom: 14px;
+    animation: blink 1.4s steps(1) infinite;
+  }
+  @keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0.15; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .marquee-track, .logo, .insert-coin { animation: none !important; }
+    section { transition: none; opacity: 1; transform: none; }
   }
 </style>
 </head>
 <body>
 
+<canvas id="bg-canvas"></canvas>
+<div id="crt-overlay"></div>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>★ 87 CONSOLE SYSTEMS SUPPORTED ★</span>
+    <span>★ TRUE 1G1R DEDUPLICATION ★</span>
+    <span>★ FREE &amp; OPEN SOURCE ★</span>
+    <span>★ BUILT IN NATIVE RUST ★</span>
+    <span>★ SAFE CLEANUP, ALWAYS CONFIRMED ★</span>
+    <span>★ HIGH SCORE: YOUR ROM SET ★</span>
+    <span>★ 87 CONSOLE SYSTEMS SUPPORTED ★</span>
+    <span>★ TRUE 1G1R DEDUPLICATION ★</span>
+    <span>★ FREE &amp; OPEN SOURCE ★</span>
+    <span>★ BUILT IN NATIVE RUST ★</span>
+    <span>★ SAFE CLEANUP, ALWAYS CONFIRMED ★</span>
+    <span>★ HIGH SCORE: YOUR ROM SET ★</span>
+  </div>
+</div>
+
 <header>
-  <h1>MAMESET Cleaner</h1>
+  <p class="logo">MAMESET<br>CLEANER</p>
   <p class="tagline">Clean and organize your MAME ROM set — and 87 other console systems — with duplicate detection, filters and detailed reports, safely.</p>
+  <div class="badge-row">
+    <span class="badge">WINDOWS 10/11</span>
+    <span class="badge">100% RUST</span>
+    <span class="badge">MIT LICENSE</span>
+  </div>
   <div class="buttons">
-    <a class="btn btn-primary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner/releases">Download (Windows)</a>
-    <a class="btn btn-secondary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner">View source code</a>
+    <a class="btn btn-primary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner/releases">▶ Download</a>
+    <a class="btn btn-secondary" href="https://github.com/Patrickjaillet/MAMESET-Cleaner">Source code</a>
   </div>
 </header>
 
@@ -366,11 +595,11 @@
     <h2>Screenshots</h2>
     <div class="screenshots">
       <figure>
-        <img src="screenshots/filters_view.png" alt="MAMESET Cleaner Filters view">
+        <img src="screenshots/filters_view.png" alt="MAMESET Cleaner Filters view" loading="lazy">
         <figcaption>Filter configuration (genre, language, region, status, year, content type)</figcaption>
       </figure>
       <figure>
-        <img src="screenshots/results_view.png" alt="MAMESET Cleaner Results view">
+        <img src="screenshots/results_view.png" alt="MAMESET Cleaner Results view" loading="lazy">
         <figcaption>Scan results with status and action (keep / remove) for each ROM</figcaption>
       </figure>
     </div>
@@ -393,12 +622,158 @@
 </main>
 
 <footer>
+  <p class="insert-coin">INSERT COIN TO CONTINUE</p>
   <p>Copyright © 2026 Patrick JAILLET — All rights reserved</p>
   <p>
     <a href="mailto:sandefjord.development@proton.me">sandefjord.development@proton.me</a>
     · <a href="https://github.com/Patrickjaillet/MAMESET-Cleaner">GitHub</a>
   </p>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------- scroll-reveal for sections ----------
+  var sections = document.querySelectorAll("main section");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    sections.forEach(function (s) { io.observe(s); });
+  } else {
+    sections.forEach(function (s) { s.classList.add("visible"); });
+  }
+
+  // ---------- three.js synthwave grid backdrop ----------
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var canvas = document.getElementById("bg-canvas");
+  if (!window.THREE || !canvas) return;
+
+  var scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0a0014, 0.055);
+
+  var camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
+  camera.position.set(0, 1.35, 4.2);
+  camera.rotation.x = -0.18;
+
+  var renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+  } catch (e) {
+    return; // no WebGL: keep the plain gradient background from CSS
+  }
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+  // Retro sun: radial gradient sprite with a few horizontal "cut" bands.
+  function makeSunTexture() {
+    var size = 512;
+    var c = document.createElement("canvas");
+    c.width = c.height = size;
+    var ctx = c.getContext("2d");
+    var grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    grad.addColorStop(0, "#fff6d8");
+    grad.addColorStop(0.25, "#ffd23f");
+    grad.addColorStop(0.55, "#ff8a3d");
+    grad.addColorStop(0.8, "#ff2bd6");
+    grad.addColorStop(1, "rgba(255,43,214,0)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = "destination-out";
+    var bands = 7;
+    for (var i = 0; i < bands; i++) {
+      var y = size * 0.52 + i * (size * 0.045);
+      var h = size * 0.014;
+      ctx.fillRect(0, y, size, h);
+    }
+    return new THREE.CanvasTexture(c);
+  }
+
+  var sunMaterial = new THREE.SpriteMaterial({
+    map: makeSunTexture(),
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+  var sun = new THREE.Sprite(sunMaterial);
+  sun.scale.set(9, 9, 1);
+  sun.position.set(0, 2.1, -30);
+  scene.add(sun);
+
+  // Two grids stacked so one can loop seamlessly behind the other.
+  var cell = 1;
+  var gridSize = 80;
+  var divisions = 80;
+  function makeGrid() {
+    var g = new THREE.GridHelper(gridSize, divisions, 0xff2bd6, 0x05d9e8);
+    g.material.transparent = true;
+    g.material.opacity = 0.55;
+    g.position.y = -0.4;
+    return g;
+  }
+  var gridA = makeGrid();
+  var gridB = makeGrid();
+  gridB.position.z = -gridSize;
+  scene.add(gridA, gridB);
+
+  var stars = (function () {
+    var starCount = 250;
+    var positions = new Float32Array(starCount * 3);
+    for (var i = 0; i < starCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 60;
+      positions[i * 3 + 1] = Math.random() * 20 + 1;
+      positions[i * 3 + 2] = -Math.random() * 80;
+    }
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    var mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.06, transparent: true, opacity: 0.7 });
+    return new THREE.Points(geo, mat);
+  })();
+  scene.add(stars);
+
+  function onResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+  window.addEventListener("resize", onResize);
+
+  var speed = reduceMotion ? 0 : 6; // grid units per second
+  var last = performance.now();
+  var visible = true;
+  document.addEventListener("visibilitychange", function () {
+    visible = document.visibilityState === "visible";
+  });
+
+  function animate(now) {
+    requestAnimationFrame(animate);
+    if (!visible) return;
+    var dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+
+    if (speed > 0) {
+      gridA.position.z += speed * dt;
+      gridB.position.z += speed * dt;
+      if (gridA.position.z >= gridSize) gridA.position.z -= gridSize * 2;
+      if (gridB.position.z >= gridSize) gridB.position.z -= gridSize * 2;
+      sun.material.rotation += dt * 0.02;
+    }
+
+    renderer.render(scene, camera);
+  }
+  last = performance.now();
+  requestAnimationFrame(animate);
+})();
+</script>
 
 </body>
 </html>
