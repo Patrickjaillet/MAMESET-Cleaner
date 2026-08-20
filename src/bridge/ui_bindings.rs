@@ -16,7 +16,9 @@ use crate::models::filter_profile::FilterProfile;
 use crate::models::rom_entry::{DriverStatus, RomEntry};
 use crate::models::rom_set::{RomSet, RomStatus};
 use crate::plugin::github_client::{self, GitHubClientError, RemoteFile};
+use crate::plugin::loader;
 use crate::plugin::registry::{self, PluginStatus, StoredManifest};
+use crate::plugin::{self, RomSystem};
 
 slint::include_modules!();
 
@@ -83,8 +85,11 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     window.set_plugins_status_text(String::new().into());
     window.set_plugin_install_status_text(String::new().into());
     window.set_plugin_rows(ModelRc::new(VecModel::from(Vec::<PluginRow>::new())));
+    window.set_selected_system_id(config.selected_system.clone().into());
 
     let state = Arc::new(Mutex::new(AppState::new(config.clone())));
+
+    refresh_available_systems(&window, &state);
 
     setup_browse_callbacks(&window);
     setup_save_settings(&window, &state);
@@ -188,6 +193,7 @@ fn setup_save_settings(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
             languages_ini_path: non_empty(window.get_languages_ini_path().to_string()),
             backup_dir_path: non_empty(window.get_backup_dir_path().to_string()),
             use_recycle_bin: window.get_use_recycle_bin(),
+            selected_system: window.get_selected_system_id().to_string(),
         };
 
         let status = match config.save() {
@@ -213,13 +219,15 @@ fn setup_start_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
             return;
         };
 
-        let (rom_set_path, dat_file_path, catver_ini_path, languages_ini_path) = {
+        let (rom_set_path, dat_file_path, catver_ini_path, languages_ini_path, selected_system, plugins_dir) = {
             let guard = state.lock().unwrap();
             (
                 guard.config.rom_set_path.clone(),
                 guard.config.dat_file_path.clone(),
                 guard.config.catver_ini_path.clone(),
                 guard.config.languages_ini_path.clone(),
+                guard.config.selected_system.clone(),
+                guard.plugins_dir.clone(),
             )
         };
 
@@ -252,10 +260,14 @@ fn setup_start_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
             let weak_shared = Arc::new(Mutex::new(weak_for_thread.clone()));
 
             let result = run_scan_pipeline(
-                &rom_set_path,
-                &dat_file_path,
-                catver_ini_path.as_deref(),
-                languages_ini_path.as_deref(),
+                ScanPipelineInput {
+                    rom_set_path: &rom_set_path,
+                    dat_file_path: &dat_file_path,
+                    catver_ini_path: catver_ini_path.as_deref(),
+                    languages_ini_path: languages_ini_path.as_deref(),
+                    selected_system: &selected_system,
+                    plugins_dir: &plugins_dir,
+                },
                 &cancel_flag,
                 Arc::clone(&weak_shared),
             );
@@ -320,23 +332,56 @@ fn setup_cancel_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
 
 type ScanPipelineResult = Result<(HashMap<String, RomEntry>, RomSet, HashSet<String>, HashSet<String>), String>;
 
+/// Loads the reference database for the currently selected system: MAME's
+/// own `-listxml` parser for the built-in `"mame"` system, or, for any other
+/// system, the corresponding plugin's `.dll` (dynamically loaded) and its
+/// own `parse_reference_database`, converted into the shared [`RomEntry`]
+/// model so the rest of the pipeline (scanner, dedup, filters) stays
+/// system-agnostic.
+fn load_reference_database(
+    selected_system: &str,
+    plugins_dir: &Path,
+    dat_file_path: &Path,
+) -> Result<HashMap<String, RomEntry>, String> {
+    if selected_system == "mame" {
+        return dat_parser::parse_dat_file(dat_file_path).map_err(|e| e.to_string());
+    }
+
+    let dll_path = registry::plugin_dll_path(plugins_dir, selected_system);
+    let loaded_plugin = loader::load_plugin_from_file(&dll_path)
+        .map_err(|err| format!("impossible de charger le plugin « {selected_system} » : {err:?}"))?;
+    let plugin_entries = loaded_plugin.parse_reference_database(dat_file_path)?;
+    Ok(plugin::plugin_entries_to_rom_entries(plugin_entries))
+}
+
+struct ScanPipelineInput<'a> {
+    rom_set_path: &'a str,
+    dat_file_path: &'a str,
+    catver_ini_path: Option<&'a str>,
+    languages_ini_path: Option<&'a str>,
+    selected_system: &'a str,
+    plugins_dir: &'a Path,
+}
+
 fn run_scan_pipeline(
-    rom_set_path: &str,
-    dat_file_path: &str,
-    catver_ini_path: Option<&str>,
-    languages_ini_path: Option<&str>,
+    input: ScanPipelineInput,
     cancel_flag: &AtomicBool,
     weak_shared: Arc<Mutex<Weak<AppWindow>>>,
 ) -> ScanPipelineResult {
-    let mut dat_entries =
-        dat_parser::parse_dat_file(Path::new(dat_file_path)).map_err(|e| e.to_string())?;
+    let mut dat_entries = load_reference_database(
+        input.selected_system,
+        input.plugins_dir,
+        Path::new(input.dat_file_path),
+    )?;
 
-    let categories = catver_ini_path
+    let categories = input
+        .catver_ini_path
         .filter(|p| !p.is_empty())
         .and_then(|p| catver_parser::parse_catver_file(Path::new(p)).ok())
         .unwrap_or_default();
 
-    let languages = languages_ini_path
+    let languages = input
+        .languages_ini_path
         .filter(|p| !p.is_empty())
         .and_then(|p| languages_parser::parse_languages_file(Path::new(p)).ok())
         .unwrap_or_default();
@@ -344,7 +389,7 @@ fn run_scan_pipeline(
     dat_parser::merge_metadata(&mut dat_entries, &categories, &languages);
 
     let rom_set = rom_scanner::scan_rom_directory(
-        Path::new(rom_set_path),
+        Path::new(input.rom_set_path),
         &dat_entries,
         cancel_flag,
         move |progress: rom_scanner::ScanProgress| {
@@ -679,6 +724,26 @@ fn refresh_plugin_rows(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
     drop(guard);
 
     window.set_plugin_rows(ModelRc::new(VecModel::from(rows)));
+    refresh_available_systems(window, state);
+}
+
+/// Rebuilds the "Système actif" selector shown in Settings: the built-in
+/// MAME support plus every plugin currently installed on disk.
+fn refresh_available_systems(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let plugins_dir = state.lock().unwrap().plugins_dir.clone();
+    let mut systems = vec![SystemOption {
+        id: "mame".into(),
+        name: "MAME".into(),
+    }];
+    systems.extend(
+        registry::list_installed(&plugins_dir)
+            .into_iter()
+            .map(|manifest| SystemOption {
+                id: manifest.id.into(),
+                name: manifest.name.into(),
+            }),
+    );
+    window.set_available_systems(ModelRc::new(VecModel::from(systems)));
 }
 
 /// Fetches the list of plugin manifests published in the repository's

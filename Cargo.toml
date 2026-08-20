@@ -1,9 +1,15 @@
 [workspace]
-members = [".", "crates/plugin_interface", "crates/fake_plugin_fixture"]
+members = [
+    ".",
+    "crates/plugin_interface",
+    "crates/fake_plugin_fixture",
+    "crates/dat_common",
+    "crates/nes_plugin",
+]
 
 [package]
 name = "mameset_cleaner"
-version = "1.2.0"
+version = "1.3.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -56,6 +62,10 @@ path = "test/plugin_test.rs"
 [[test]]
 name = "plugin_download_test"
 path = "test/plugin_download_test.rs"
+
+[[test]]
+name = "nes_plugin_test"
+path = "test/nes_plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

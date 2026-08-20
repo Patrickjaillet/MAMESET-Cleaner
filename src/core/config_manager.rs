@@ -19,6 +19,10 @@ fn default_use_recycle_bin() -> bool {
     true
 }
 
+fn default_selected_system() -> String {
+    "mame".to_string()
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub language: AppLanguage,
@@ -31,6 +35,8 @@ pub struct AppConfig {
     pub backup_dir_path: Option<String>,
     #[serde(default = "default_use_recycle_bin")]
     pub use_recycle_bin: bool,
+    #[serde(default = "default_selected_system")]
+    pub selected_system: String,
 }
 
 impl Default for AppConfig {
@@ -44,6 +50,7 @@ impl Default for AppConfig {
             languages_ini_path: None,
             backup_dir_path: None,
             use_recycle_bin: true,
+            selected_system: default_selected_system(),
         }
     }
 }
@@ -105,11 +112,18 @@ mod tests {
             languages_ini_path: None,
             backup_dir_path: None,
             use_recycle_bin: false,
+            selected_system: "nes".to_string(),
         };
         let json = serde_json::to_string(&config).unwrap();
         let restored: AppConfig = serde_json::from_str(&json).unwrap();
         assert_eq!(restored.language, AppLanguage::En);
         assert_eq!(restored.theme, AppTheme::Dark);
         assert_eq!(restored.rom_set_path.as_deref(), Some("C:/roms"));
+        assert_eq!(restored.selected_system, "nes");
+    }
+
+    #[test]
+    fn default_config_uses_the_built_in_mame_system() {
+        assert_eq!(AppConfig::default().selected_system, "mame");
     }
 }

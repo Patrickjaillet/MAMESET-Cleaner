@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.0
+- Added support for the Nintendo Entertainment System / Famicom, installable from the "Plugins" section once published to the repository.
+- Added a "Système actif" (active system) selector in Settings, to switch between MAME and any installed console plugin before scanning.
+
 ## v1.2.0
 - Added a new "Plugins" section to the interface, where support for other consoles can be browsed, installed, updated and removed directly from the project's GitHub repository.
 - Every downloaded plugin is verified against its expected checksum before being installed, so a corrupted or tampered download is automatically rejected.

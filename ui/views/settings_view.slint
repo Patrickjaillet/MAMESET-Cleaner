@@ -2,8 +2,11 @@ import { AppButton } from "../components/app_button.slint";
 import { TextField } from "../components/text_field.slint";
 import { SegmentedChoice } from "../components/segmented_choice.slint";
 import { ToggleOption } from "../components/toggle_option.slint";
+import { SystemOption } from "../common.slint";
 
 export component SettingsView inherits Rectangle {
+    in-out property <string> selected-system-id;
+    in property <[SystemOption]> available-systems;
     in-out property <string> rom-set-path;
     in-out property <string> dat-file-path;
     in-out property <string> catver-ini-path;
@@ -32,6 +35,17 @@ export component SettingsView inherits Rectangle {
                 font-weight: 700;
             }
 
+            Text { text: "Système actif"; font-weight: 600; }
+            HorizontalLayout {
+                spacing: 8px;
+                for system in root.available-systems: AppButton {
+                    width: 160px;
+                    text: system.name;
+                    primary: system.id == root.selected-system-id;
+                    clicked => { root.selected-system-id = system.id; }
+                }
+            }
+
             Text { text: "Dossier du set de ROMs"; }
             HorizontalLayout {
                 spacing: 8px;
@@ -39,7 +53,7 @@ export component SettingsView inherits Rectangle {
                 AppButton { width: 120px; text: "Parcourir"; clicked => { root.browse-rom-set-path(); } }
             }
 
-            Text { text: "Fichier DAT MAME"; }
+            Text { text: "Fichier DAT de référence (MAME ou système sélectionné)"; }
             HorizontalLayout {
                 spacing: 8px;
                 TextField { value <=> root.dat-file-path; placeholder: "Chemin du fichier DAT"; }

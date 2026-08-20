@@ -5,7 +5,7 @@ import { ResultsView } from "views/results_view.slint";
 import { SettingsView } from "views/settings_view.slint";
 import { PluginsView } from "views/plugins_view.slint";
 import { AboutView } from "views/about_view.slint";
-import { ResultRow, PluginRow } from "common.slint";
+import { ResultRow, PluginRow, SystemOption } from "common.slint";
 
 export component AppWindow inherits Window {
     title: "MAMESET Cleaner";
@@ -27,6 +27,8 @@ export component AppWindow inherits Window {
     in-out property <bool> language-is-english;
     in-out property <bool> dark-theme;
     in property <string> settings-status-text;
+    in-out property <string> selected-system-id: "mame";
+    in property <[SystemOption]> available-systems;
 
     in property <bool> scan-running;
     in property <float> scan-progress;
@@ -150,6 +152,8 @@ export component AppWindow inherits Window {
                 language-is-english <=> root.language-is-english;
                 dark-theme <=> root.dark-theme;
                 settings-status-text: root.settings-status-text;
+                selected-system-id <=> root.selected-system-id;
+                available-systems: root.available-systems;
                 browse-rom-set-path => { root.browse-rom-set-path(); }
                 browse-dat-file-path => { root.browse-dat-file-path(); }
                 browse-catver-ini-path => { root.browse-catver-ini-path(); }
