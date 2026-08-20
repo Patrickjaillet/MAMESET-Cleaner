@@ -1,8 +1,13 @@
 import { AppButton } from "../components/app_button.slint";
 import { TextField } from "../components/text_field.slint";
 import { ResultRow } from "../common.slint";
+import { Theme } from "../theme.slint";
 
 export component ResultsView inherits Rectangle {
+    opacity: 0;
+    animate opacity { duration: Theme.duration-medium; easing: ease-out; }
+    init => { self.opacity = 1; }
+
     in-out property <string> search-text;
     in property <[ResultRow]> result-rows;
     in property <string> result-count-text;
@@ -82,7 +87,15 @@ export component ResultsView inherits Rectangle {
                 for row in root.result-rows: Rectangle {
                     height: 30px;
                     border-width: 1px;
-                    border-color: #ececec;
+                    border-color: Theme.color-border-subtle;
+                    background: row-touch.has-hover ? Theme.color-hover-tint : transparent;
+                    animate background { duration: Theme.duration-fast; easing: ease-out; }
+
+                    row-touch := TouchArea {
+                        // Hover highlight only; a full drop-shadow per row was
+                        // considered but skipped for performance reasons on
+                        // sets with thousands of rows (see ROADMAP4 v3.2.0 notes).
+                    }
 
                     HorizontalLayout {
                         padding-left: 8px;
@@ -107,6 +120,9 @@ export component ResultsView inherits Rectangle {
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        animate opacity { duration: Theme.duration-fast; easing: ease-out; }
+        init => { self.opacity = 1; }
 
         TouchArea {}
 
@@ -115,10 +131,13 @@ export component ResultsView inherits Rectangle {
             y: (parent.height - self.height) / 2;
             width: 420px;
             height: 220px;
-            background: white;
-            border-radius: 8px;
+            background: Theme.color-surface;
+            border-radius: Theme.radius-lg;
             border-width: 1px;
-            border-color: #c8c8c8;
+            border-color: Theme.color-border;
+            drop-shadow-color: Theme.shadow-color-strong;
+            drop-shadow-blur: 24px;
+            drop-shadow-offset-y: 8px;
 
             VerticalLayout {
                 padding: 20px;

@@ -17,11 +17,13 @@ export component ToggleOption inherits Rectangle {
             border-width: 1px;
             border-color: root.checked ? Theme.color-accent : #888888;
             background: root.checked ? Theme.color-accent : Theme.color-surface;
+            animate border-color, background { duration: Theme.duration-fast; easing: ease-out; }
 
-            Text {
+            check-mark := Text {
                 text: "✓";
                 color: Theme.color-text-on-accent;
-                visible: root.checked;
+                opacity: root.checked ? 1 : 0;
+                animate opacity { duration: Theme.duration-fast; easing: ease-out; }
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }

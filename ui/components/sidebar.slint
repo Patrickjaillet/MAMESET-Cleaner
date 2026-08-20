@@ -24,6 +24,7 @@ export component Sidebar inherits Rectangle {
             background: index == selected-index
                 ? Theme.color-accent-soft
                 : (touch.has-hover ? Theme.color-hover-tint : transparent);
+            animate background { duration: Theme.duration-fast; easing: ease-out; }
 
             touch := TouchArea {
                 clicked => {

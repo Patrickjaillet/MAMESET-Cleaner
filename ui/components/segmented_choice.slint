@@ -14,6 +14,7 @@ export component SegmentedChoice inherits Rectangle {
     HorizontalLayout {
         Rectangle {
             background: !root.selected-b ? Theme.color-accent : Theme.color-bg;
+            animate background { duration: Theme.duration-fast; easing: ease-out; }
 
             TouchArea {
                 clicked => { root.selected-b = false; }
@@ -30,6 +31,7 @@ export component SegmentedChoice inherits Rectangle {
 
         Rectangle {
             background: root.selected-b ? Theme.color-accent : Theme.color-bg;
+            animate background { duration: Theme.duration-fast; easing: ease-out; }
 
             TouchArea {
                 clicked => { root.selected-b = true; }

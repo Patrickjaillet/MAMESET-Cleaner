@@ -17,6 +17,12 @@ export component AppButton inherits Rectangle {
             : (touch.has-hover
                 ? (primary ? Theme.color-accent-hover : Theme.color-surface-alt)
                 : (primary ? Theme.color-accent : Theme.color-surface-alt)));
+    animate background { duration: Theme.duration-fast; easing: ease-out; }
+
+    drop-shadow-color: root.primary && root.enabled ? Theme.shadow-color : transparent;
+    drop-shadow-blur: touch.pressed ? 2px : (touch.has-hover ? 8px : 4px);
+    drop-shadow-offset-y: touch.pressed ? 1px : 2px;
+    animate drop-shadow-blur, drop-shadow-offset-y { duration: Theme.duration-fast; easing: ease-out; }
 
     touch := TouchArea {
         enabled: root.enabled;

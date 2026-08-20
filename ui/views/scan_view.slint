@@ -1,6 +1,11 @@
 import { AppButton } from "../components/app_button.slint";
+import { Theme } from "../theme.slint";
 
 export component ScanView inherits Rectangle {
+    opacity: 0;
+    animate opacity { duration: Theme.duration-medium; easing: ease-out; }
+    init => { self.opacity = 1; }
+
     in property <string> rom-set-path;
     in property <string> dat-file-path;
     in property <bool> scan-running;
@@ -51,13 +56,14 @@ export component ScanView inherits Rectangle {
         Rectangle {
             height: 10px;
             border-radius: 5px;
-            background: #e0e0e0;
+            background: Theme.color-border-subtle;
             clip: true;
 
             Rectangle {
                 width: parent.width * (scan-progress < 0.0 ? 0.0 : (scan-progress > 1.0 ? 1.0 : scan-progress));
                 height: parent.height;
-                background: #0078d4;
+                background: Theme.color-accent;
+                animate width { duration: Theme.duration-medium; easing: ease-out; }
             }
         }
 

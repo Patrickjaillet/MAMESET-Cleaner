@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.2.0
+- Added smooth animations throughout the interface: buttons, sidebar items, toggles and choice controls now transition instead of snapping instantly; views fade in when switching between sections; progress bars (scanning, plugin downloads) animate smoothly instead of jumping; text fields highlight more clearly when focused; cards and dialogs now have subtle shadows for better visual depth.
+
 ## v3.1.1
 - Fixed a bug where scanning would fail with a confusing error if the active system (selected in Settings) pointed to a plugin that was no longer installed. The application now automatically falls back to MAME in that case and explains why, instead of getting stuck.
 

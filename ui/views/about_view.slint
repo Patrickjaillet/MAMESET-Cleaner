@@ -1,4 +1,10 @@
+import { Theme } from "../theme.slint";
+
 export component AboutView inherits Rectangle {
+    opacity: 0;
+    animate opacity { duration: Theme.duration-medium; easing: ease-out; }
+    init => { self.opacity = 1; }
+
     in property <string> title: "À propos";
     in property <string> app-version: "0.1.0";
     in property <string> copyright-text: "Copyright © 2026 Patrick JAILLET — Tous droits réservés";

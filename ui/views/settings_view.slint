@@ -6,6 +6,10 @@ import { SystemOption } from "../common.slint";
 import { Theme } from "../theme.slint";
 
 export component SettingsView inherits Rectangle {
+    opacity: 0;
+    animate opacity { duration: Theme.duration-medium; easing: ease-out; }
+    init => { self.opacity = 1; }
+
     in-out property <string> selected-system-id;
     in property <[SystemOption]> available-systems;
     in-out property <string> rom-set-path;

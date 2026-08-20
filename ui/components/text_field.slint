@@ -6,9 +6,10 @@ export component TextField inherits Rectangle {
 
     height: 34px;
     background: Theme.color-surface;
-    border-width: 1px;
+    border-width: input.has-focus ? 2px : 1px;
     border-radius: Theme.radius-sm;
     border-color: input.has-focus ? Theme.color-accent : Theme.color-border;
+    animate border-color, border-width { duration: Theme.duration-fast; easing: ease-out; }
 
     input := TextInput {
         x: 8px;

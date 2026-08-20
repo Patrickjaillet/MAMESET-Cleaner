@@ -1,8 +1,13 @@
 import { AppButton } from "../components/app_button.slint";
 import { TextField } from "../components/text_field.slint";
 import { ToggleOption } from "../components/toggle_option.slint";
+import { Theme } from "../theme.slint";
 
 export component FilterView inherits Rectangle {
+    opacity: 0;
+    animate opacity { duration: Theme.duration-medium; easing: ease-out; }
+    init => { self.opacity = 1; }
+
     in-out property <string> filter-categories-text;
     in-out property <string> filter-languages-text;
     in-out property <string> filter-regions-text;

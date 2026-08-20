@@ -1,8 +1,13 @@
 import { AppButton } from "../components/app_button.slint";
 import { TextField } from "../components/text_field.slint";
 import { PluginRow } from "../common.slint";
+import { Theme } from "../theme.slint";
 
 export component PluginsView inherits Rectangle {
+    opacity: 0;
+    animate opacity { duration: Theme.duration-medium; easing: ease-out; }
+    init => { self.opacity = 1; }
+
     in property <bool> plugins-loading;
     in property <string> plugins-status-text;
     in property <[PluginRow]> plugin-rows;
@@ -67,13 +72,14 @@ export component PluginsView inherits Rectangle {
                 Rectangle {
                     height: 10px;
                     border-radius: 5px;
-                    background: #e0e0e0;
+                    background: Theme.color-border-subtle;
                     clip: true;
 
                     Rectangle {
                         width: parent.width * (plugin-install-progress < 0.0 ? 0.0 : (plugin-install-progress > 1.0 ? 1.0 : plugin-install-progress));
                         height: parent.height;
-                        background: #0078d4;
+                        background: Theme.color-accent;
+                        animate width { duration: Theme.duration-medium; easing: ease-out; }
                     }
                 }
 
@@ -83,16 +89,25 @@ export component PluginsView inherits Rectangle {
             for row[i] in plugin-rows: VerticalLayout {
                 if row.is-header: Text {
                     text: row.console-family;
-                    font-size: 15px;
+                    font-size: Theme.font-size-heading;
                     font-weight: 700;
-                    color: #0078d4;
+                    color: Theme.color-accent;
                 }
 
                 if !row.is-header: Rectangle {
                     height: 64px;
+                    background: Theme.color-surface;
                     border-width: 1px;
-                    border-color: #d0d0d0;
-                    border-radius: 6px;
+                    border-color: Theme.color-border-subtle;
+                    border-radius: Theme.radius-md;
+                    drop-shadow-color: card-touch.has-hover ? Theme.shadow-color-strong : Theme.shadow-color;
+                    drop-shadow-blur: card-touch.has-hover ? 10px : 4px;
+                    drop-shadow-offset-y: card-touch.has-hover ? 3px : 1px;
+                    animate drop-shadow-blur, drop-shadow-offset-y { duration: Theme.duration-fast; easing: ease-out; }
+
+                    card-touch := TouchArea {
+                        // Purely for hover elevation; no click behavior of its own.
+                    }
 
                     HorizontalLayout {
                         padding: 10px;
