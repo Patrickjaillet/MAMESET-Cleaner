@@ -1,12 +1,16 @@
+[workspace]
+members = [".", "crates/plugin_interface", "crates/fake_plugin_fixture"]
+
 [package]
 name = "mameset_cleaner"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
 authors = ["Patrick JAILLET <sandefjord.development@proton.me>"]
 
 [dependencies]
+plugin_interface = { path = "crates/plugin_interface" }
 slint = "1.8"
 quick-xml = "0.36"
 configparser = "3.1"
@@ -21,6 +25,8 @@ sevenz-rust = "0.6"
 ureq = "2.10"
 rfd = "0.15"
 trash = "5.2"
+abi_stable = "0.11.3"
+libloading = "0.9.0"
 
 [lib]
 name = "mameset_cleaner"
@@ -41,6 +47,10 @@ path = "test/dat_parsing_test.rs"
 [[test]]
 name = "cleanup_test"
 path = "test/cleanup_test.rs"
+
+[[test]]
+name = "plugin_test"
+path = "test/plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"
