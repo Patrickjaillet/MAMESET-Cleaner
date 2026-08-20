@@ -5,6 +5,12 @@ members = [
     "crates/fake_plugin_fixture",
     "crates/dat_common",
     "crates/nes_plugin",
+    "crates/snes_plugin",
+    "crates/n64_plugin",
+    "crates/gb_plugin",
+    "crates/gba_plugin",
+    "crates/nds_plugin",
+    "crates/gc_wii_plugin",
 ]
 
 [package]
@@ -66,6 +72,30 @@ path = "test/plugin_download_test.rs"
 [[test]]
 name = "nes_plugin_test"
 path = "test/nes_plugin_test.rs"
+
+[[test]]
+name = "snes_plugin_test"
+path = "test/snes_plugin_test.rs"
+
+[[test]]
+name = "n64_plugin_test"
+path = "test/n64_plugin_test.rs"
+
+[[test]]
+name = "gb_plugin_test"
+path = "test/gb_plugin_test.rs"
+
+[[test]]
+name = "gba_plugin_test"
+path = "test/gba_plugin_test.rs"
+
+[[test]]
+name = "nds_plugin_test"
+path = "test/nds_plugin_test.rs"
+
+[[test]]
+name = "gc_wii_plugin_test"
+path = "test/gc_wii_plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

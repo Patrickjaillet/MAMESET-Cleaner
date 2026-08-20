@@ -1,7 +1,7 @@
 # Changelog
 
 ## v1.3.0
-- Added support for the Nintendo Entertainment System / Famicom, installable from the "Plugins" section once published to the repository.
+- Added support for seven Nintendo systems — NES/Famicom, SNES/Super Famicom, Nintendo 64, Game Boy/Game Boy Color, Game Boy Advance, Nintendo DS and GameCube/Wii — each installable from the "Plugins" section once published to the repository.
 - Added a "Système actif" (active system) selector in Settings, to switch between MAME and any installed console plugin before scanning.
 
 ## v1.2.0
