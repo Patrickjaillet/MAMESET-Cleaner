@@ -1,6 +1,6 @@
 # MAMESET Cleaner
 
-MAMESET Cleaner is a Windows desktop application that helps clean and organize a MAME ROM set: detecting and removing duplicates (clones/parents), filtering by genre, language, region, working status, manufacturer and year, to produce a clean, consistent, minimal ROM set (1 game = 1 ROM).
+MAMESET Cleaner is a Windows desktop application that helps clean and organize a MAME ROM set — and, through downloadable plugins, ROM sets for 30 other console systems: detecting and removing duplicates (clones/parents), filtering by genre, language, region, working status, manufacturer and year, to produce a clean, consistent, minimal ROM set (1 game = 1 ROM).
 
 ![MAMESET Cleaner Filters view](docs/screenshots/filters_view.png)
 
