@@ -1,4 +1,5 @@
 import { Theme } from "../theme.slint";
+import { SectionCard } from "../components/section_card.slint";
 
 component LinkText inherits Rectangle {
     in property <string> text;
@@ -23,21 +24,6 @@ component LinkText inherits Rectangle {
     touch := TouchArea {
         mouse-cursor: pointer;
         clicked => { root.activated(); }
-    }
-}
-
-component SectionCard inherits Rectangle {
-    background: Theme.color-surface;
-    border-width: 1px;
-    border-color: Theme.color-border-subtle;
-    border-radius: Theme.radius-lg;
-
-    VerticalLayout {
-        padding: Theme.space-lg;
-        spacing: Theme.space-sm;
-        alignment: start;
-
-        @children
     }
 }
 

@@ -1,0 +1,41 @@
+import { Theme } from "../theme.slint";
+
+export component Chip inherits Rectangle {
+    in property <string> text;
+    callback remove();
+
+    height: 26px;
+    border-radius: 13px;
+    background: Theme.color-accent-soft;
+    border-width: 1px;
+    border-color: Theme.color-accent;
+
+    HorizontalLayout {
+        padding-left: 10px;
+        padding-right: 6px;
+        spacing: 4px;
+        alignment: center;
+
+        Text {
+            text: root.text;
+            font-size: Theme.font-size-caption;
+            color: Theme.color-accent;
+            vertical-alignment: center;
+        }
+
+        TouchArea {
+            width: 16px;
+            height: 16px;
+            mouse-cursor: pointer;
+            clicked => { root.remove(); }
+
+            Text {
+                text: "✕";
+                font-size: 10px;
+                color: Theme.color-accent;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+        }
+    }
+}

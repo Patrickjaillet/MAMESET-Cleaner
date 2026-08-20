@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.0.0
+- This release completes a full redesign of the interface (started in v3.1.0): a single polished theme, smooth animations throughout, a modernized About screen, and completely reworked filters with real pickers, active-filter chips, a live match count, and saved filter profiles. No scanning, deduplication, or cleanup behavior changed — this release is about how the app looks and feels to use.
+
+## v3.6.0
+- The Filters view now shows your active selections as removable chips, a live count of how many ROMs currently match your criteria (updated as you adjust filters, before you even apply them), a "Clear all" button, and the ability to save your filter combinations as named profiles you can reload or delete later.
+
 ## v3.5.0
 - The Filters view's genre, language, region and manufacturer fields are no longer free-text boxes you have to type exact values into — they're now checklists populated with the actual values found in your loaded ROM set, so you can just pick what you want.
 

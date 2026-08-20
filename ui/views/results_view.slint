@@ -66,8 +66,8 @@ export component ResultsView inherits Rectangle {
 
         if root.has-content: Rectangle {
             border-width: 1px;
-            border-color: #d8d8d8;
-            background: #f6f6f6;
+            border-color: Theme.color-border-subtle;
+            background: Theme.color-surface-alt;
             height: 32px;
 
             HorizontalLayout {
@@ -132,7 +132,7 @@ export component ResultsView inherits Rectangle {
         y: 0px;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.45);
+        background: Theme.scrim-color;
         opacity: 0;
         animate opacity { duration: Theme.duration-fast; easing: ease-out; }
         init => { self.opacity = 1; }

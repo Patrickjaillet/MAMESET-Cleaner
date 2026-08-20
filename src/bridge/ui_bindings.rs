@@ -10,7 +10,7 @@ use crate::core::config_manager::{AppConfig, AppLanguage};
 use crate::core::i18n::Translator;
 use crate::core::{
     catver_parser, cleanup_engine, dat_parser, dedup_engine, filter_engine, languages_parser,
-    report_generator, rom_scanner,
+    profile_manager, report_generator, rom_scanner,
 };
 use crate::models::filter_profile::FilterProfile;
 use crate::models::rom_entry::{DriverStatus, RomEntry};
@@ -85,6 +85,8 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     window.set_plugin_install_status_text(String::new().into());
     window.set_plugin_rows(ModelRc::new(VecModel::from(Vec::<PluginRow>::new())));
     window.set_selected_system_id(config.selected_system.clone().into());
+    window.set_filter_live_count_text(String::new().into());
+    window.set_profile_status_text(String::new().into());
 
     let state = Arc::new(Mutex::new(AppState::new(config.clone())));
 
@@ -92,14 +94,18 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     reset_selected_system_if_uninstalled(&window, &state);
 
     refresh_filter_options(&window, &state);
+    refresh_profile_list(&window);
 
     setup_browse_callbacks(&window);
     setup_open_url(&window);
     setup_save_settings(&window, &state);
     setup_start_scan(&window, &state);
     setup_cancel_scan(&window, &state);
-    setup_filter_option_toggles(&window);
+    setup_filter_option_toggles(&window, &state);
     setup_apply_filters(&window, &state);
+    setup_filters_changed(&window, &state);
+    setup_clear_all_filters(&window, &state);
+    setup_profile_management(&window, &state);
     setup_search(&window, &state);
     setup_sort(&window, &state);
     setup_cleanup(&window, &state);
@@ -303,6 +309,7 @@ fn setup_start_scan(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
                             window.set_scan_status_text(status_text.into());
                             window.set_scan_counts_text(counts_text.into());
                             refresh_filter_options(&window, &state_after);
+                            recompute_live_filter_preview(&window, &state_after);
                             refresh_results(&window, &state_after);
                         }
                     });
@@ -442,6 +449,23 @@ fn format_scan_counts(rom_set: &RomSet) -> String {
     )
 }
 
+fn build_profile_from_window(window: &AppWindow, name: &str) -> FilterProfile {
+    FilterProfile {
+        name: name.to_string(),
+        categories: selected_values(&window.get_category_options()),
+        languages: selected_values(&window.get_language_options()),
+        regions: selected_values(&window.get_region_options()),
+        manufacturers: selected_values(&window.get_manufacturer_options()),
+        year_min: parse_year(&window.get_filter_year_min_text()),
+        year_max: parse_year(&window.get_filter_year_max_text()),
+        driver_statuses: collect_statuses(window),
+        include_bios: window.get_filter_include_bios(),
+        include_device: window.get_filter_include_device(),
+        include_mechanical: window.get_filter_include_mechanical(),
+        include_adult: window.get_filter_include_adult(),
+    }
+}
+
 fn setup_apply_filters(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
     let weak = window.as_weak();
     let state = Arc::clone(state);
@@ -451,20 +475,7 @@ fn setup_apply_filters(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
             return;
         };
 
-        let profile = FilterProfile {
-            name: "Courant".to_string(),
-            categories: selected_values(&window.get_category_options()),
-            languages: selected_values(&window.get_language_options()),
-            regions: selected_values(&window.get_region_options()),
-            manufacturers: selected_values(&window.get_manufacturer_options()),
-            year_min: parse_year(&window.get_filter_year_min_text()),
-            year_max: parse_year(&window.get_filter_year_max_text()),
-            driver_statuses: collect_statuses(&window),
-            include_bios: window.get_filter_include_bios(),
-            include_device: window.get_filter_include_device(),
-            include_mechanical: window.get_filter_include_mechanical(),
-            include_adult: window.get_filter_include_adult(),
-        };
+        let profile = build_profile_from_window(&window, "Courant");
 
         let (match_count, total) = {
             let mut guard = state.lock().unwrap();
@@ -479,6 +490,206 @@ fn setup_apply_filters(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
 
         refresh_results(&window, &state);
     });
+}
+
+fn recompute_live_filter_preview(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let guard = state.lock().unwrap();
+    if guard.dat_entries.is_empty() {
+        window.set_filter_live_count_text(String::new().into());
+        return;
+    }
+
+    let profile = build_profile_from_window(window, "Aperçu");
+    let match_count = filter_engine::apply_filter(&guard.dat_entries, &profile).len();
+    let total = guard.dat_entries.len();
+    drop(guard);
+
+    window.set_filter_live_count_text(
+        format!("{match_count} / {total} ROMs correspondront à ces critères").into(),
+    );
+}
+
+fn setup_filters_changed(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let weak = window.as_weak();
+    let state = Arc::clone(state);
+
+    window.on_filters_changed(move || {
+        if let Some(window) = weak.upgrade() {
+            recompute_live_filter_preview(&window, &state);
+        }
+    });
+}
+
+fn setup_clear_all_filters(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let weak = window.as_weak();
+    let state = Arc::clone(state);
+
+    window.on_clear_all_filters(move || {
+        let Some(window) = weak.upgrade() else {
+            return;
+        };
+
+        let clear = |options: ModelRc<FilterOption>| -> ModelRc<FilterOption> {
+            let cleared: Vec<FilterOption> = options
+                .iter()
+                .map(|mut opt| {
+                    opt.selected = false;
+                    opt
+                })
+                .collect();
+            ModelRc::new(VecModel::from(cleared))
+        };
+
+        window.set_category_options(clear(window.get_category_options()));
+        window.set_language_options(clear(window.get_language_options()));
+        window.set_region_options(clear(window.get_region_options()));
+        window.set_manufacturer_options(clear(window.get_manufacturer_options()));
+        window.set_category_selected_count(0);
+        window.set_language_selected_count(0);
+        window.set_region_selected_count(0);
+        window.set_manufacturer_selected_count(0);
+        window.set_filter_year_min_text(String::new().into());
+        window.set_filter_year_max_text(String::new().into());
+        window.set_filter_status_good(true);
+        window.set_filter_status_imperfect(true);
+        window.set_filter_status_preliminary(true);
+        window.set_filter_status_unknown(true);
+        window.set_filter_include_bios(true);
+        window.set_filter_include_device(true);
+        window.set_filter_include_mechanical(true);
+        window.set_filter_include_adult(true);
+
+        recompute_live_filter_preview(&window, &state);
+    });
+}
+
+fn refresh_profile_list(window: &AppWindow) {
+    let names = profile_manager::list_profiles().unwrap_or_default();
+    let items: Vec<slint::SharedString> = names.into_iter().map(Into::into).collect();
+    window.set_profile_names(ModelRc::new(VecModel::from(items)));
+}
+
+fn setup_profile_management(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
+    let weak = window.as_weak();
+    window.on_save_profile(move |name| {
+        let Some(window) = weak.upgrade() else {
+            return;
+        };
+        let trimmed = name.trim();
+        if trimmed.is_empty() {
+            window.set_profile_status_text("Veuillez saisir un nom de profil.".into());
+            return;
+        }
+
+        let profile = build_profile_from_window(&window, trimmed);
+        match profile_manager::save_profile(&profile) {
+            Ok(()) => {
+                refresh_profile_list(&window);
+                window.set_profile_status_text(format!("Profil « {trimmed} » enregistré.").into());
+            }
+            Err(err) => {
+                window.set_profile_status_text(format!("Erreur : {err}").into());
+            }
+        }
+    });
+
+    let weak = window.as_weak();
+    let state_load = Arc::clone(state);
+    window.on_load_profile(move |name| {
+        let Some(window) = weak.upgrade() else {
+            return;
+        };
+
+        match profile_manager::load_profile(&name) {
+            Ok(profile) => {
+                apply_loaded_profile(&window, &state_load, profile);
+                window.set_profile_status_text(format!("Profil « {name} » chargé et appliqué.").into());
+                refresh_results(&window, &state_load);
+            }
+            Err(err) => {
+                window.set_profile_status_text(format!("Erreur : {err}").into());
+            }
+        }
+    });
+
+    let weak = window.as_weak();
+    window.on_delete_profile(move |name| {
+        let Some(window) = weak.upgrade() else {
+            return;
+        };
+
+        match profile_manager::delete_profile(&name) {
+            Ok(()) => {
+                refresh_profile_list(&window);
+                window.set_profile_status_text(format!("Profil « {name} » supprimé.").into());
+            }
+            Err(err) => {
+                window.set_profile_status_text(format!("Erreur : {err}").into());
+            }
+        }
+    });
+}
+
+fn apply_loaded_profile(window: &AppWindow, state: &Arc<Mutex<AppState>>, profile: FilterProfile) {
+    let mut guard = state.lock().unwrap();
+    guard.filter_profile = profile.clone();
+
+    let category_options =
+        build_filter_options(&guard.dat_entries, &profile.categories, |entry| {
+            entry.category.clone().into_iter().collect()
+        });
+    let language_options = build_filter_options(&guard.dat_entries, &profile.languages, |entry| {
+        entry.languages.clone()
+    });
+    let region_options = build_filter_options(&guard.dat_entries, &profile.regions, |entry| {
+        dedup_engine::extract_region(&entry.description)
+            .into_iter()
+            .collect()
+    });
+    let manufacturer_options =
+        build_filter_options(&guard.dat_entries, &profile.manufacturers, |entry| {
+            vec![entry.manufacturer.clone()]
+        });
+
+    drop(guard);
+
+    window.set_category_selected_count(category_options.iter().filter(|o| o.selected).count() as i32);
+    window.set_language_selected_count(language_options.iter().filter(|o| o.selected).count() as i32);
+    window.set_region_selected_count(region_options.iter().filter(|o| o.selected).count() as i32);
+    window
+        .set_manufacturer_selected_count(manufacturer_options.iter().filter(|o| o.selected).count() as i32);
+
+    window.set_category_options(category_options);
+    window.set_language_options(language_options);
+    window.set_region_options(region_options);
+    window.set_manufacturer_options(manufacturer_options);
+
+    window.set_filter_year_min_text(
+        profile
+            .year_min
+            .map(|y| y.to_string())
+            .unwrap_or_default()
+            .into(),
+    );
+    window.set_filter_year_max_text(
+        profile
+            .year_max
+            .map(|y| y.to_string())
+            .unwrap_or_default()
+            .into(),
+    );
+
+    let statuses = &profile.driver_statuses;
+    let matches_all = statuses.is_empty();
+    window.set_filter_status_good(matches_all || statuses.contains(&DriverStatus::Good));
+    window.set_filter_status_imperfect(matches_all || statuses.contains(&DriverStatus::Imperfect));
+    window.set_filter_status_preliminary(matches_all || statuses.contains(&DriverStatus::Preliminary));
+    window.set_filter_status_unknown(matches_all || statuses.contains(&DriverStatus::Unknown));
+
+    window.set_filter_include_bios(profile.include_bios);
+    window.set_filter_include_device(profile.include_device);
+    window.set_filter_include_mechanical(profile.include_mechanical);
+    window.set_filter_include_adult(profile.include_adult);
 }
 
 fn setup_search(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
@@ -1272,40 +1483,48 @@ fn toggle_filter_option(options: &ModelRc<FilterOption>, value: &str) -> (ModelR
     (ModelRc::new(VecModel::from(items)), selected_count)
 }
 
-fn setup_filter_option_toggles(window: &AppWindow) {
+fn setup_filter_option_toggles(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
     let weak = window.as_weak();
+    let state_toggle = Arc::clone(state);
     window.on_toggle_category(move |value| {
         if let Some(window) = weak.upgrade() {
             let (updated, count) = toggle_filter_option(&window.get_category_options(), &value);
             window.set_category_options(updated);
             window.set_category_selected_count(count);
+            recompute_live_filter_preview(&window, &state_toggle);
         }
     });
 
     let weak = window.as_weak();
+    let state_toggle = Arc::clone(state);
     window.on_toggle_language(move |value| {
         if let Some(window) = weak.upgrade() {
             let (updated, count) = toggle_filter_option(&window.get_language_options(), &value);
             window.set_language_options(updated);
             window.set_language_selected_count(count);
+            recompute_live_filter_preview(&window, &state_toggle);
         }
     });
 
     let weak = window.as_weak();
+    let state_toggle = Arc::clone(state);
     window.on_toggle_region(move |value| {
         if let Some(window) = weak.upgrade() {
             let (updated, count) = toggle_filter_option(&window.get_region_options(), &value);
             window.set_region_options(updated);
             window.set_region_selected_count(count);
+            recompute_live_filter_preview(&window, &state_toggle);
         }
     });
 
     let weak = window.as_weak();
+    let state_toggle = Arc::clone(state);
     window.on_toggle_manufacturer(move |value| {
         if let Some(window) = weak.upgrade() {
             let (updated, count) = toggle_filter_option(&window.get_manufacturer_options(), &value);
             window.set_manufacturer_options(updated);
             window.set_manufacturer_selected_count(count);
+            recompute_live_filter_preview(&window, &state_toggle);
         }
     });
 }

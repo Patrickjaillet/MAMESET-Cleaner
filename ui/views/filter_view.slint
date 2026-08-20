@@ -2,6 +2,8 @@ import { AppButton } from "../components/app_button.slint";
 import { TextField } from "../components/text_field.slint";
 import { ToggleOption } from "../components/toggle_option.slint";
 import { MultiSelectPicker, FilterOption } from "../components/multi_select_picker.slint";
+import { SectionCard } from "../components/section_card.slint";
+import { Chip } from "../components/chip.slint";
 import { Theme } from "../theme.slint";
 
 export component FilterView inherits Rectangle {
@@ -32,12 +34,43 @@ export component FilterView inherits Rectangle {
     in-out property <bool> filter-include-mechanical;
     in-out property <bool> filter-include-adult;
     in property <string> filter-summary-text;
+    in property <string> filter-live-count-text;
     callback apply-filters();
+    callback clear-all-filters();
+    callback filters-changed();
+
+    in-out property <string> profile-name-text;
+    in property <[string]> profile-names;
+    in property <string> profile-status-text;
+    callback save-profile(string);
+    callback load-profile(string);
+    callback delete-profile(string);
+
+    // Any user-visible edit to a plain bound property (not routed through a
+    // dedicated toggle-* callback already handled in Rust) re-triggers the
+    // live match-count preview.
+    changed filter-year-min-text => { root.filters-changed(); }
+    changed filter-year-max-text => { root.filters-changed(); }
+    changed filter-status-good => { root.filters-changed(); }
+    changed filter-status-imperfect => { root.filters-changed(); }
+    changed filter-status-preliminary => { root.filters-changed(); }
+    changed filter-status-unknown => { root.filters-changed(); }
+    changed filter-include-bios => { root.filters-changed(); }
+    changed filter-include-device => { root.filters-changed(); }
+    changed filter-include-mechanical => { root.filters-changed(); }
+    changed filter-include-adult => { root.filters-changed(); }
+
+    property <bool> has-active-filters: root.category-selected-count > 0
+        || root.language-selected-count > 0
+        || root.region-selected-count > 0
+        || root.manufacturer-selected-count > 0
+        || root.filter-year-min-text != ""
+        || root.filter-year-max-text != "";
 
     Flickable {
         VerticalLayout {
             padding: 24px;
-            spacing: 12px;
+            spacing: Theme.space-md;
             alignment: start;
 
             Text {
@@ -46,76 +79,183 @@ export component FilterView inherits Rectangle {
                 font-weight: 700;
             }
 
-            HorizontalLayout {
-                spacing: 12px;
+            if root.has-active-filters: HorizontalLayout {
+                spacing: Theme.space-sm;
 
-                MultiSelectPicker {
+                Flickable {
                     horizontal-stretch: 1;
-                    label: "Genres";
-                    options: root.category-options;
-                    selected-count: root.category-selected-count;
-                    toggle(value) => { root.toggle-category(value); }
+                    height: 34px;
+
+                    HorizontalLayout {
+                        spacing: Theme.space-xs;
+                        alignment: start;
+
+                        for opt in root.category-options: HorizontalLayout {
+                            if opt.selected: Chip { text: opt.value; remove => { root.toggle-category(opt.value); } }
+                        }
+                        for opt in root.language-options: HorizontalLayout {
+                            if opt.selected: Chip { text: opt.value; remove => { root.toggle-language(opt.value); } }
+                        }
+                        for opt in root.region-options: HorizontalLayout {
+                            if opt.selected: Chip { text: opt.value; remove => { root.toggle-region(opt.value); } }
+                        }
+                        for opt in root.manufacturer-options: HorizontalLayout {
+                            if opt.selected: Chip { text: opt.value; remove => { root.toggle-manufacturer(opt.value); } }
+                        }
+                        if root.filter-year-min-text != "" || root.filter-year-max-text != "": Chip {
+                            text: "Année : " + root.filter-year-min-text + "–" + root.filter-year-max-text;
+                            remove => {
+                                root.filter-year-min-text = "";
+                                root.filter-year-max-text = "";
+                            }
+                        }
+                    }
                 }
 
-                MultiSelectPicker {
-                    horizontal-stretch: 1;
-                    label: "Langues";
-                    options: root.language-options;
-                    selected-count: root.language-selected-count;
-                    toggle(value) => { root.toggle-language(value); }
+                AppButton {
+                    width: 130px;
+                    text: "Tout effacer";
+                    clicked => { root.clear-all-filters(); }
                 }
             }
 
-            HorizontalLayout {
-                spacing: 12px;
+            Text {
+                text: root.filter-live-count-text;
+                color: Theme.color-text-secondary;
+                font-size: Theme.font-size-caption;
+            }
 
-                MultiSelectPicker {
-                    horizontal-stretch: 1;
-                    label: "Régions";
-                    options: root.region-options;
-                    selected-count: root.region-selected-count;
-                    toggle(value) => { root.toggle-region(value); }
+            SectionCard {
+                Text { text: "Contenu"; font-weight: 600; font-size: Theme.font-size-heading; }
+
+                HorizontalLayout {
+                    spacing: 12px;
+
+                    MultiSelectPicker {
+                        horizontal-stretch: 1;
+                        label: "Genres";
+                        options: root.category-options;
+                        selected-count: root.category-selected-count;
+                        toggle(value) => { root.toggle-category(value); }
+                    }
+
+                    MultiSelectPicker {
+                        horizontal-stretch: 1;
+                        label: "Langues";
+                        options: root.language-options;
+                        selected-count: root.language-selected-count;
+                        toggle(value) => { root.toggle-language(value); }
+                    }
                 }
 
-                MultiSelectPicker {
-                    horizontal-stretch: 1;
-                    label: "Fabricants";
-                    options: root.manufacturer-options;
-                    selected-count: root.manufacturer-selected-count;
-                    toggle(value) => { root.toggle-manufacturer(value); }
+                HorizontalLayout {
+                    spacing: 12px;
+
+                    MultiSelectPicker {
+                        horizontal-stretch: 1;
+                        label: "Régions";
+                        options: root.region-options;
+                        selected-count: root.region-selected-count;
+                        toggle(value) => { root.toggle-region(value); }
+                    }
+
+                    MultiSelectPicker {
+                        horizontal-stretch: 1;
+                        label: "Fabricants";
+                        options: root.manufacturer-options;
+                        selected-count: root.manufacturer-selected-count;
+                        toggle(value) => { root.toggle-manufacturer(value); }
+                    }
                 }
             }
 
-            HorizontalLayout {
-                spacing: 12px;
-                VerticalLayout {
-                    spacing: 4px;
-                    Text { text: "Année minimum"; }
-                    TextField { placeholder: "ex: 1980"; value <=> root.filter-year-min-text; }
+            SectionCard {
+                Text { text: "Période et statut"; font-weight: 600; font-size: Theme.font-size-heading; }
+
+                HorizontalLayout {
+                    spacing: 12px;
+                    VerticalLayout {
+                        spacing: 4px;
+                        Text { text: "Année minimum"; }
+                        TextField { placeholder: "ex: 1980"; value <=> root.filter-year-min-text; }
+                    }
+                    VerticalLayout {
+                        spacing: 4px;
+                        Text { text: "Année maximum"; }
+                        TextField { placeholder: "ex: 1999"; value <=> root.filter-year-max-text; }
+                    }
                 }
-                VerticalLayout {
-                    spacing: 4px;
-                    Text { text: "Année maximum"; }
-                    TextField { placeholder: "ex: 1999"; value <=> root.filter-year-max-text; }
+
+                Text { text: "Statut de fonctionnement"; font-weight: 600; }
+                HorizontalLayout {
+                    spacing: 16px;
+                    ToggleOption { text: "Bon"; checked <=> root.filter-status-good; }
+                    ToggleOption { text: "Imparfait"; checked <=> root.filter-status-imperfect; }
+                    ToggleOption { text: "Préliminaire"; checked <=> root.filter-status-preliminary; }
+                    ToggleOption { text: "Non fonctionnel"; checked <=> root.filter-status-unknown; }
                 }
             }
 
-            Text { text: "Statut de fonctionnement"; font-weight: 600; }
-            HorizontalLayout {
-                spacing: 16px;
-                ToggleOption { text: "Bon"; checked <=> root.filter-status-good; }
-                ToggleOption { text: "Imparfait"; checked <=> root.filter-status-imperfect; }
-                ToggleOption { text: "Préliminaire"; checked <=> root.filter-status-preliminary; }
-                ToggleOption { text: "Non fonctionnel"; checked <=> root.filter-status-unknown; }
+            SectionCard {
+                Text { text: "Types de contenu"; font-weight: 600; font-size: Theme.font-size-heading; }
+                HorizontalLayout {
+                    spacing: 16px;
+                    ToggleOption { text: "BIOS"; checked <=> root.filter-include-bios; }
+                    ToggleOption { text: "Devices"; checked <=> root.filter-include-device; }
+                    ToggleOption { text: "Mécaniques"; checked <=> root.filter-include-mechanical; }
+                    ToggleOption { text: "Adulte"; checked <=> root.filter-include-adult; }
+                }
             }
 
-            Text { text: "Types de contenu"; font-weight: 600; }
-            HorizontalLayout {
-                spacing: 16px;
-                ToggleOption { text: "BIOS"; checked <=> root.filter-include-bios; }
-                ToggleOption { text: "Devices"; checked <=> root.filter-include-device; }
-                ToggleOption { text: "Mécaniques"; checked <=> root.filter-include-mechanical; }
-                ToggleOption { text: "Adulte"; checked <=> root.filter-include-adult; }
+            SectionCard {
+                Text { text: "Profils enregistrés"; font-weight: 600; font-size: Theme.font-size-heading; }
+
+                HorizontalLayout {
+                    spacing: 8px;
+                    TextField {
+                        horizontal-stretch: 1;
+                        placeholder: "Nom du profil";
+                        value <=> root.profile-name-text;
+                    }
+                    AppButton {
+                        width: 130px;
+                        text: "Enregistrer";
+                        clicked => { root.save-profile(root.profile-name-text); }
+                    }
+                }
+
+                if root.profile-names.length == 0: Text {
+                    text: "Aucun profil enregistré pour l'instant.";
+                    color: Theme.color-placeholder;
+                    font-size: Theme.font-size-caption;
+                }
+
+                for name in root.profile-names: HorizontalLayout {
+                    spacing: 8px;
+                    Text {
+                        horizontal-stretch: 1;
+                        text: name;
+                        vertical-alignment: center;
+                        overflow: elide;
+                    }
+                    AppButton {
+                        width: 100px;
+                        text: "Charger";
+                        clicked => { root.load-profile(name); }
+                    }
+                    AppButton {
+                        width: 100px;
+                        text: "Supprimer";
+                        clicked => { root.delete-profile(name); }
+                    }
+                }
+
+                if root.profile-status-text != "": Text {
+                    text: root.profile-status-text;
+                    color: Theme.color-text-secondary;
+                    font-size: Theme.font-size-caption;
+                    wrap: word-wrap;
+                }
             }
 
             AppButton {

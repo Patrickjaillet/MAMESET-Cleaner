@@ -1,0 +1,16 @@
+import { Theme } from "../theme.slint";
+
+export component SectionCard inherits Rectangle {
+    background: Theme.color-surface;
+    border-width: 1px;
+    border-color: Theme.color-border-subtle;
+    border-radius: Theme.radius-lg;
+
+    VerticalLayout {
+        padding: Theme.space-lg;
+        spacing: Theme.space-sm;
+        alignment: start;
+
+        @children
+    }
+}

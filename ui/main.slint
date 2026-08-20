@@ -55,6 +55,10 @@ export component AppWindow inherits Window {
     in-out property <bool> filter-include-mechanical: true;
     in-out property <bool> filter-include-adult: true;
     in property <string> filter-summary-text;
+    in property <string> filter-live-count-text;
+    in-out property <string> profile-name-text;
+    in property <[string]> profile-names;
+    in property <string> profile-status-text;
 
     in-out property <string> search-text;
     in property <[ResultRow]> result-rows;
@@ -95,6 +99,11 @@ export component AppWindow inherits Window {
     callback toggle-language(string);
     callback toggle-region(string);
     callback toggle-manufacturer(string);
+    callback clear-all-filters();
+    callback filters-changed();
+    callback save-profile(string);
+    callback load-profile(string);
+    callback delete-profile(string);
 
     HorizontalLayout {
         Sidebar {
@@ -146,7 +155,16 @@ export component AppWindow inherits Window {
                 filter-include-mechanical <=> root.filter-include-mechanical;
                 filter-include-adult <=> root.filter-include-adult;
                 filter-summary-text: root.filter-summary-text;
+                filter-live-count-text: root.filter-live-count-text;
                 apply-filters => { root.apply-filters(); }
+                clear-all-filters => { root.clear-all-filters(); }
+                filters-changed => { root.filters-changed(); }
+                profile-name-text <=> root.profile-name-text;
+                profile-names: root.profile-names;
+                profile-status-text: root.profile-status-text;
+                save-profile(name) => { root.save-profile(name); }
+                load-profile(name) => { root.load-profile(name); }
+                delete-profile(name) => { root.delete-profile(name); }
             }
             if current-view == 2: ResultsView {
                 search-text <=> root.search-text;

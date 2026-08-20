@@ -8,11 +8,11 @@ MAMESET Cleaner is a Windows desktop application that helps clean and organize a
 
 - **Scan** the ROM folder (`.zip`, `.7z` files and uncompressed folders), detecting ROMs that are correct, missing, corrupted, or unreferenced
 - **Duplicate detection** (1G1R logic: 1 game = 1 ROM) based on a customizable region priority (e.g. World > USA > Europe > Japan), working status and the most recent revision
-- **Filtering** by genre, language, region, working status, manufacturer, year and content type (BIOS, mechanical, adult)
+- **Filtering** by genre, language, region, working status, manufacturer, year and content type (BIOS, mechanical, adult), picked from real values found in your loaded ROM set, with reusable saved filter profiles
 - **Cleanup** of duplicate ROMs: moved to the Windows Recycle Bin by default (or permanently deleted), with an optional backup beforehand and mandatory confirmation before any deletion
 - **Detailed report** for every cleanup operation (JSON and CSV)
 - **Automatic integrity check** of the set after a cleanup
-- **French and English** interface, **light and dark** theme
+- **French and English** interface, with a polished, single-theme design
 - **Multi-console plugin system**: beyond its native MAME support, the application can load a plugin to clean ROM sets for other consoles. As of v3.0.0, 87 systems are available for download directly from the in-app "Plugins" section — every major Nintendo, Sega, Sony, SNK and Atari console, plus dozens of classic 8/16-bit computers and handhelds. The "Plugins" section and the active-system selector in Settings are both grouped by manufacturer with a search box. See the [full list](https://patrickjaillet.github.io/MAMESET-Cleaner) on the project website
 
 ![MAMESET Cleaner Results view](docs/screenshots/results_view.png)
