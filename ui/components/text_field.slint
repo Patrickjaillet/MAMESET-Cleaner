@@ -1,27 +1,31 @@
+import { Theme } from "../theme.slint";
+
 export component TextField inherits Rectangle {
     in property <string> placeholder;
     in-out property <string> value;
 
     height: 34px;
-    background: white;
+    background: Theme.color-surface;
     border-width: 1px;
-    border-radius: 4px;
-    border-color: input.has-focus ? #0078d4 : #c8c8c8;
+    border-radius: Theme.radius-sm;
+    border-color: input.has-focus ? Theme.color-accent : Theme.color-border;
 
     input := TextInput {
         x: 8px;
         width: parent.width - 16px;
         height: parent.height;
         vertical-alignment: center;
-        font-size: 14px;
+        font-size: Theme.font-size-body;
+        color: Theme.color-text;
         text <=> root.value;
     }
 
     Text {
         x: 8px;
         vertical-alignment: center;
+        font-size: Theme.font-size-body;
         text: root.placeholder;
-        color: #999999;
+        color: Theme.color-placeholder;
         visible: root.value == "";
     }
 }

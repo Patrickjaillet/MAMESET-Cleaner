@@ -1,3 +1,5 @@
+import { Theme } from "../theme.slint";
+
 export component AppButton inherits Rectangle {
     in property <string> text;
     in property <bool> primary: false;
@@ -5,16 +7,16 @@ export component AppButton inherits Rectangle {
     callback clicked();
 
     height: 36px;
-    border-radius: 6px;
+    border-radius: Theme.radius-md;
     border-width: primary ? 0px : 1px;
-    border-color: #d0d0d0;
+    border-color: Theme.color-border;
     background: !enabled
-        ? #cfcfcf
+        ? Theme.color-disabled
         : (touch.pressed
-            ? (primary ? #005a9e : #e2e2e2)
+            ? (primary ? Theme.color-accent-pressed : Theme.color-border-subtle)
             : (touch.has-hover
-                ? (primary ? #106ebe : #ececec)
-                : (primary ? #0078d4 : #f6f6f6)));
+                ? (primary ? Theme.color-accent-hover : Theme.color-surface-alt)
+                : (primary ? Theme.color-accent : Theme.color-surface-alt)));
 
     touch := TouchArea {
         enabled: root.enabled;
@@ -23,7 +25,8 @@ export component AppButton inherits Rectangle {
 
     Text {
         text: root.text;
-        color: root.primary ? white : #202020;
+        font-size: Theme.font-size-body;
+        color: root.primary ? Theme.color-text-on-accent : Theme.color-text;
         horizontal-alignment: center;
         vertical-alignment: center;
     }

@@ -1,4 +1,4 @@
-import { ListView } from "std-widgets.slint";
+import { Theme } from "../theme.slint";
 
 export struct NavEntry {
     label: string,
@@ -11,19 +11,19 @@ export component Sidebar inherits Rectangle {
     callback selected(int);
 
     width: 220px;
-    background: Colors.transparent;
+    background: transparent;
 
     VerticalLayout {
-        padding: 8px;
-        spacing: 4px;
+        padding: Theme.space-sm;
+        spacing: Theme.space-xs;
         alignment: start;
 
         for entry[index] in entries: Rectangle {
             height: 44px;
-            border-radius: 6px;
+            border-radius: Theme.radius-md;
             background: index == selected-index
-                ? rgba(0, 95, 184, 0.15)
-                : (touch.has-hover ? rgba(128, 128, 128, 0.08) : transparent);
+                ? Theme.color-accent-soft
+                : (touch.has-hover ? Theme.color-hover-tint : transparent);
 
             touch := TouchArea {
                 clicked => {
@@ -33,7 +33,7 @@ export component Sidebar inherits Rectangle {
             }
 
             HorizontalLayout {
-                padding-left: 12px;
+                padding-left: Theme.space-md;
                 spacing: 10px;
                 alignment: start;
 
@@ -44,6 +44,8 @@ export component Sidebar inherits Rectangle {
 
                 Text {
                     text: entry.label;
+                    font-size: Theme.font-size-body;
+                    color: Theme.color-text;
                     vertical-alignment: center;
                     font-weight: index == selected-index ? 600 : 400;
                 }

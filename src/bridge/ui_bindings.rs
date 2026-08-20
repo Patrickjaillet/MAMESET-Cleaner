@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex};
 use slint::{ModelRc, VecModel, Weak};
 
 use crate::core::cleanup_engine::{CleanupOptions, CleanupTarget};
-use crate::core::config_manager::{AppConfig, AppLanguage, AppTheme};
+use crate::core::config_manager::{AppConfig, AppLanguage};
 use crate::core::i18n::Translator;
 use crate::core::{
     catver_parser, cleanup_engine, dat_parser, dedup_engine, filter_engine, languages_parser,
@@ -74,7 +74,6 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     window.set_backup_dir_path(config.backup_dir_path.clone().unwrap_or_default().into());
     window.set_use_recycle_bin(config.use_recycle_bin);
     window.set_language_is_english(config.language == AppLanguage::En);
-    window.set_dark_theme(config.theme == AppTheme::Dark);
     window.set_scan_progress(0.0);
     window.set_scan_status_text("Aucun scan effectué.".into());
     window.set_scan_counts_text(String::new().into());
@@ -178,15 +177,8 @@ fn setup_save_settings(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
         } else {
             AppLanguage::Fr
         };
-        let theme = if window.get_dark_theme() {
-            AppTheme::Dark
-        } else {
-            AppTheme::Light
-        };
-
         let config = AppConfig {
             language,
-            theme,
             rom_set_path: non_empty(window.get_rom_set_path().to_string()),
             dat_file_path: non_empty(window.get_dat_file_path().to_string()),
             catver_ini_path: non_empty(window.get_catver_ini_path().to_string()),

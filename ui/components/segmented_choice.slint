@@ -1,17 +1,19 @@
+import { Theme } from "../theme.slint";
+
 export component SegmentedChoice inherits Rectangle {
     in property <string> option-a;
     in property <string> option-b;
     in-out property <bool> selected-b;
 
     height: 34px;
-    border-radius: 6px;
+    border-radius: Theme.radius-md;
     border-width: 1px;
-    border-color: #c8c8c8;
+    border-color: Theme.color-border;
     clip: true;
 
     HorizontalLayout {
         Rectangle {
-            background: !root.selected-b ? #0078d4 : #f3f3f3;
+            background: !root.selected-b ? Theme.color-accent : Theme.color-bg;
 
             TouchArea {
                 clicked => { root.selected-b = false; }
@@ -19,14 +21,15 @@ export component SegmentedChoice inherits Rectangle {
 
             Text {
                 text: root.option-a;
-                color: !root.selected-b ? white : #202020;
+                font-size: Theme.font-size-body;
+                color: !root.selected-b ? Theme.color-text-on-accent : Theme.color-text;
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }
         }
 
         Rectangle {
-            background: root.selected-b ? #0078d4 : #f3f3f3;
+            background: root.selected-b ? Theme.color-accent : Theme.color-bg;
 
             TouchArea {
                 clicked => { root.selected-b = true; }
@@ -34,7 +37,8 @@ export component SegmentedChoice inherits Rectangle {
 
             Text {
                 text: root.option-b;
-                color: root.selected-b ? white : #202020;
+                font-size: Theme.font-size-body;
+                color: root.selected-b ? Theme.color-text-on-accent : Theme.color-text;
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }

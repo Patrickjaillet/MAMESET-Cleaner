@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.1.0
+- Removed the dark theme in favor of a single, more consistent visual design (the dark theme had grown inconsistent over time, with several elements not actually changing color when toggled).
+- Laid the groundwork for further visual improvements to the interface, coming in upcoming releases.
+
 ## v3.0.0
 - First stable release with full multi-console catalog coverage: 87 systems, spanning every major Nintendo, Sega, Sony, SNK and Atari console plus dozens of classic 8/16-bit computers and handhelds, all available for download from the "Plugins" section.
 - The project website now lists every supported system, grouped by manufacturer.

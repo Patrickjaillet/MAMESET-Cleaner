@@ -1,3 +1,5 @@
+import { Theme } from "../theme.slint";
+
 export component ToggleOption inherits Rectangle {
     in property <string> text;
     in-out property <bool> checked;
@@ -5,20 +7,20 @@ export component ToggleOption inherits Rectangle {
     height: 26px;
 
     HorizontalLayout {
-        spacing: 8px;
+        spacing: Theme.space-sm;
         alignment: start;
 
         box := Rectangle {
             width: 18px;
             height: 18px;
-            border-radius: 3px;
+            border-radius: Theme.radius-sm;
             border-width: 1px;
-            border-color: #888888;
-            background: root.checked ? #0078d4 : white;
+            border-color: root.checked ? Theme.color-accent : #888888;
+            background: root.checked ? Theme.color-accent : Theme.color-surface;
 
             Text {
                 text: "✓";
-                color: white;
+                color: Theme.color-text-on-accent;
                 visible: root.checked;
                 horizontal-alignment: center;
                 vertical-alignment: center;
@@ -31,6 +33,8 @@ export component ToggleOption inherits Rectangle {
 
         Text {
             text: root.text;
+            font-size: Theme.font-size-body;
+            color: Theme.color-text;
             vertical-alignment: center;
         }
     }

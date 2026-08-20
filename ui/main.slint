@@ -6,6 +6,7 @@ import { SettingsView } from "views/settings_view.slint";
 import { PluginsView } from "views/plugins_view.slint";
 import { AboutView } from "views/about_view.slint";
 import { ResultRow, PluginRow, SystemOption } from "common.slint";
+import { Theme } from "theme.slint";
 
 export component AppWindow inherits Window {
     title: "MAMESET Cleaner";
@@ -13,7 +14,7 @@ export component AppWindow inherits Window {
     preferred-height: 720px;
     min-width: 800px;
     min-height: 560px;
-    background: dark-theme ? #1f1f1f : #f3f3f3;
+    background: Theme.color-bg;
 
     in-out property <int> current-view: 0;
     in property <string> app-version: "0.1.0";
@@ -25,7 +26,6 @@ export component AppWindow inherits Window {
     in-out property <string> backup-dir-path;
     in-out property <bool> use-recycle-bin: true;
     in-out property <bool> language-is-english;
-    in-out property <bool> dark-theme;
     in property <string> settings-status-text;
     in-out property <string> selected-system-id: "mame";
     in property <[SystemOption]> available-systems;
@@ -152,7 +152,6 @@ export component AppWindow inherits Window {
                 backup-dir-path <=> root.backup-dir-path;
                 use-recycle-bin <=> root.use-recycle-bin;
                 language-is-english <=> root.language-is-english;
-                dark-theme <=> root.dark-theme;
                 settings-status-text: root.settings-status-text;
                 selected-system-id <=> root.selected-system-id;
                 available-systems: root.available-systems;

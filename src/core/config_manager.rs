@@ -4,12 +4,6 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
-pub enum AppTheme {
-    Light,
-    Dark,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum AppLanguage {
     Fr,
     En,
@@ -26,7 +20,6 @@ fn default_selected_system() -> String {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub language: AppLanguage,
-    pub theme: AppTheme,
     pub rom_set_path: Option<String>,
     pub dat_file_path: Option<String>,
     pub catver_ini_path: Option<String>,
@@ -43,7 +36,6 @@ impl Default for AppConfig {
     fn default() -> Self {
         Self {
             language: AppLanguage::Fr,
-            theme: AppTheme::Light,
             rom_set_path: None,
             dat_file_path: None,
             catver_ini_path: None,
@@ -94,10 +86,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn default_config_has_french_language_and_light_theme() {
+    fn default_config_has_french_language() {
         let config = AppConfig::default();
         assert_eq!(config.language, AppLanguage::Fr);
-        assert_eq!(config.theme, AppTheme::Light);
         assert!(config.rom_set_path.is_none());
     }
 
@@ -105,7 +96,6 @@ mod tests {
     fn config_round_trips_through_json() {
         let config = AppConfig {
             language: AppLanguage::En,
-            theme: AppTheme::Dark,
             rom_set_path: Some("C:/roms".to_string()),
             dat_file_path: None,
             catver_ini_path: None,
@@ -117,9 +107,24 @@ mod tests {
         let json = serde_json::to_string(&config).unwrap();
         let restored: AppConfig = serde_json::from_str(&json).unwrap();
         assert_eq!(restored.language, AppLanguage::En);
-        assert_eq!(restored.theme, AppTheme::Dark);
         assert_eq!(restored.rom_set_path.as_deref(), Some("C:/roms"));
         assert_eq!(restored.selected_system, "nes");
+    }
+
+    #[test]
+    fn a_config_file_saved_by_an_older_version_with_a_theme_field_still_loads() {
+        let json = r#"{
+            "language": "Fr",
+            "theme": "Dark",
+            "rom_set_path": null,
+            "dat_file_path": null,
+            "catver_ini_path": null,
+            "languages_ini_path": null,
+            "use_recycle_bin": true,
+            "selected_system": "mame"
+        }"#;
+        let restored: AppConfig = serde_json::from_str(json).unwrap();
+        assert_eq!(restored.language, AppLanguage::Fr);
     }
 
     #[test]
