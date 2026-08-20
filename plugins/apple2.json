@@ -1,0 +1,10 @@
+{
+  "id": "apple2",
+  "name": "Apple II",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Apple",
+  "version": "2.7.0",
+  "dat_format": "TOSEC",
+  "sha256": "531ce8a4abfc765c10e819c8772ee1c3a10867484c14b7afffe629ce099603fc",
+  "min_app_version": "2.7.0"
+}

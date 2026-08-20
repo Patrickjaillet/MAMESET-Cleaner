@@ -65,6 +65,7 @@ export component AppWindow inherits Window {
     in property <bool> plugin-install-active;
     in property <float> plugin-install-progress;
     in property <string> plugin-install-status-text;
+    in-out property <string> plugins-search-text;
 
     callback browse-rom-set-path();
     callback browse-dat-file-path();
@@ -81,6 +82,7 @@ export component AppWindow inherits Window {
     callback confirm-cleanup();
     callback cancel-cleanup();
     callback refresh-plugins();
+    callback search-plugins();
     callback install-plugin(string);
     callback remove-plugin(string);
 
@@ -168,7 +170,9 @@ export component AppWindow inherits Window {
                 plugin-install-active: root.plugin-install-active;
                 plugin-install-progress: root.plugin-install-progress;
                 plugin-install-status-text: root.plugin-install-status-text;
+                plugins-search-text <=> root.plugins-search-text;
                 refresh-plugins => { root.refresh-plugins(); }
+                search-plugins => { root.search-plugins(); }
                 install-plugin(id) => { root.install-plugin(id); }
                 remove-plugin(id) => { root.remove-plugin(id); }
             }

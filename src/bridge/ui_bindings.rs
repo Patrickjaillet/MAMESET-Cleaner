@@ -683,14 +683,17 @@ fn status_text(status: PluginStatus) -> &'static str {
 
 /// Rebuilds the plugin list shown in the UI from the currently known remote
 /// plugins (last fetched from GitHub) combined with what is actually
-/// installed locally.
+/// installed locally, filtered by the "Plugins" view's search box (matching
+/// against name or console family, case-insensitive) and grouped into
+/// per-family sections. Grouping and search were added once the catalog
+/// reached ~90 systems, at which point a flat list was no longer usable.
 fn refresh_plugin_rows(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
     let guard = state.lock().unwrap();
     let installed = registry::list_installed(&guard.plugins_dir);
     let installed_by_id: HashMap<&str, &StoredManifest> =
         installed.iter().map(|m| (m.id.as_str(), m)).collect();
 
-    let mut rows: Vec<PluginRow> = guard
+    let mut entries: Vec<PluginRow> = guard
         .remote_plugins
         .values()
         .map(|remote| {
@@ -703,24 +706,58 @@ fn refresh_plugin_rows(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
                 version: remote.manifest.version.clone().into(),
                 status_text: status_text(status).into(),
                 status_kind: status_kind(status),
+                is_header: false,
             }
         })
         .collect();
 
     for local in &installed {
         if !guard.remote_plugins.contains_key(&local.id) {
-            rows.push(PluginRow {
+            entries.push(PluginRow {
                 id: local.id.clone().into(),
                 name: local.name.clone().into(),
                 console_family: local.console_family.clone().into(),
                 version: local.version.clone().into(),
                 status_text: status_text(PluginStatus::Installed).into(),
                 status_kind: status_kind(PluginStatus::Installed),
+                is_header: false,
             });
         }
     }
 
-    rows.sort_by(|a, b| a.name.cmp(&b.name));
+    let search = window.get_plugins_search_text().to_string().to_ascii_lowercase();
+    if !search.is_empty() {
+        entries.retain(|row| {
+            row.name.to_ascii_lowercase().contains(&search)
+                || row.console_family.to_ascii_lowercase().contains(&search)
+        });
+    }
+
+    entries.sort_by(|a, b| {
+        a.console_family
+            .cmp(&b.console_family)
+            .then_with(|| a.name.cmp(&b.name))
+    });
+
+    let mut rows: Vec<PluginRow> = Vec::with_capacity(entries.len());
+    let mut current_family: Option<String> = None;
+    for entry in entries {
+        let family = entry.console_family.to_string();
+        if current_family.as_deref() != Some(family.as_str()) {
+            rows.push(PluginRow {
+                id: String::new().into(),
+                name: String::new().into(),
+                console_family: family.clone().into(),
+                version: String::new().into(),
+                status_text: String::new().into(),
+                status_kind: 0,
+                is_header: true,
+            });
+            current_family = Some(family);
+        }
+        rows.push(entry);
+    }
+
     drop(guard);
 
     window.set_plugin_rows(ModelRc::new(VecModel::from(rows)));
@@ -728,21 +765,51 @@ fn refresh_plugin_rows(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
 }
 
 /// Rebuilds the "Système actif" selector shown in Settings: the built-in
-/// MAME support plus every plugin currently installed on disk.
+/// MAME support plus every plugin currently installed on disk, grouped by
+/// console family (the same scaling need as the "Plugins" view, once the
+/// number of installed systems grows beyond a handful).
 fn refresh_available_systems(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
     let plugins_dir = state.lock().unwrap().plugins_dir.clone();
-    let mut systems = vec![SystemOption {
+
+    let mut entries = vec![SystemOption {
         id: "mame".into(),
         name: "MAME".into(),
+        console_family: "MAME".into(),
+        is_header: false,
     }];
-    systems.extend(
+    entries.extend(
         registry::list_installed(&plugins_dir)
             .into_iter()
             .map(|manifest| SystemOption {
                 id: manifest.id.into(),
                 name: manifest.name.into(),
+                console_family: manifest.console_family.into(),
+                is_header: false,
             }),
     );
+
+    entries.sort_by(|a, b| {
+        a.console_family
+            .cmp(&b.console_family)
+            .then_with(|| a.name.cmp(&b.name))
+    });
+
+    let mut systems: Vec<SystemOption> = Vec::with_capacity(entries.len());
+    let mut current_family: Option<String> = None;
+    for entry in entries {
+        let family = entry.console_family.to_string();
+        if current_family.as_deref() != Some(family.as_str()) {
+            systems.push(SystemOption {
+                id: String::new().into(),
+                name: String::new().into(),
+                console_family: family.clone().into(),
+                is_header: true,
+            });
+            current_family = Some(family);
+        }
+        systems.push(entry);
+    }
+
     window.set_available_systems(ModelRc::new(VecModel::from(systems)));
 }
 
@@ -836,6 +903,14 @@ fn setup_plugins(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
                 }
             });
         });
+    });
+
+    let weak = window.as_weak();
+    let state_search = Arc::clone(state);
+    window.on_search_plugins(move || {
+        if let Some(window) = weak.upgrade() {
+            refresh_plugin_rows(&window, &state_search);
+        }
     });
 
     let weak = window.as_weak();

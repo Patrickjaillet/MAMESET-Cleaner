@@ -1,0 +1,10 @@
+{
+  "id": "oric",
+  "name": "Oric-1 / Atmos",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Oric",
+  "version": "2.8.0",
+  "dat_format": "TOSEC",
+  "sha256": "c1be22a5b9d883ce568699e58c910ddd557c9b385802226695e5bea5c46bfaaa",
+  "min_app_version": "2.8.0"
+}

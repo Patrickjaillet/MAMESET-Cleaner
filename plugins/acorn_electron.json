@@ -1,0 +1,10 @@
+{
+  "id": "acorn_electron",
+  "name": "Acorn Electron",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Acorn",
+  "version": "2.8.0",
+  "dat_format": "TOSEC",
+  "sha256": "4aa7ab61a1e01509d2936d7a46d99509489e863d34766764e0f89c7b2d45e3fa",
+  "min_app_version": "2.8.0"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "fm7",
+  "name": "Fujitsu FM-7",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Fujitsu",
+  "version": "2.7.0",
+  "dat_format": "TOSEC",
+  "sha256": "06ac455a35a2c5b79b0f472cf57f144752f2ac686b55048796bb086c9552076e",
+  "min_app_version": "2.7.0"
+}

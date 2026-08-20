@@ -1,0 +1,10 @@
+{
+  "id": "pc88",
+  "name": "NEC PC-88",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "NEC",
+  "version": "2.9.0",
+  "dat_format": "TOSEC",
+  "sha256": "41403553f8a6868464d727f2ff1c1dbf29f81880a19f37736b94b3e5045b1eb9",
+  "min_app_version": "2.9.0"
+}

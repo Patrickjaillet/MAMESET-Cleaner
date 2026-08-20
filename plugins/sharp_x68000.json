@@ -1,0 +1,10 @@
+{
+  "id": "sharp_x68000",
+  "name": "Sharp X68000",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sharp",
+  "version": "2.7.0",
+  "dat_format": "TOSEC",
+  "sha256": "68fb8d0183dfae8c69a92a3a828ffccca476519c6df27644dbeb581172f04a9e",
+  "min_app_version": "2.7.0"
+}

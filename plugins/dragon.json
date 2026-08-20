@@ -1,0 +1,10 @@
+{
+  "id": "dragon",
+  "name": "Dragon 32/64",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Dragon",
+  "version": "2.8.0",
+  "dat_format": "TOSEC",
+  "sha256": "d4beba72a68aaed9bdb3f07458f523886f9fef0eade1ce874cd77c86f958bc98",
+  "min_app_version": "2.8.0"
+}

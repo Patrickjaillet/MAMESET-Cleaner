@@ -77,11 +77,26 @@ members = [
     "crates/plus4_plugin",
     "crates/sinclair_ql_plugin",
     "crates/sord_m5_plugin",
+    "crates/apple2_plugin",
+    "crates/apple2gs_plugin",
+    "crates/atari_st_plugin",
+    "crates/sharp_x1_plugin",
+    "crates/sharp_x68000_plugin",
+    "crates/fm7_plugin",
+    "crates/bbc_micro_plugin",
+    "crates/acorn_electron_plugin",
+    "crates/acorn_archimedes_plugin",
+    "crates/oric_plugin",
+    "crates/dragon_plugin",
+    "crates/sam_coupe_plugin",
+    "crates/enterprise128_plugin",
+    "crates/pc88_plugin",
+    "crates/pc98_plugin",
 ]
 
 [package]
 name = "mameset_cleaner"
-version = "2.6.0"
+version = "2.9.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -426,6 +441,66 @@ path = "test/sinclair_ql_plugin_test.rs"
 [[test]]
 name = "sord_m5_plugin_test"
 path = "test/sord_m5_plugin_test.rs"
+
+[[test]]
+name = "apple2_plugin_test"
+path = "test/apple2_plugin_test.rs"
+
+[[test]]
+name = "apple2gs_plugin_test"
+path = "test/apple2gs_plugin_test.rs"
+
+[[test]]
+name = "atari_st_plugin_test"
+path = "test/atari_st_plugin_test.rs"
+
+[[test]]
+name = "sharp_x1_plugin_test"
+path = "test/sharp_x1_plugin_test.rs"
+
+[[test]]
+name = "sharp_x68000_plugin_test"
+path = "test/sharp_x68000_plugin_test.rs"
+
+[[test]]
+name = "fm7_plugin_test"
+path = "test/fm7_plugin_test.rs"
+
+[[test]]
+name = "bbc_micro_plugin_test"
+path = "test/bbc_micro_plugin_test.rs"
+
+[[test]]
+name = "acorn_electron_plugin_test"
+path = "test/acorn_electron_plugin_test.rs"
+
+[[test]]
+name = "acorn_archimedes_plugin_test"
+path = "test/acorn_archimedes_plugin_test.rs"
+
+[[test]]
+name = "oric_plugin_test"
+path = "test/oric_plugin_test.rs"
+
+[[test]]
+name = "dragon_plugin_test"
+path = "test/dragon_plugin_test.rs"
+
+[[test]]
+name = "sam_coupe_plugin_test"
+path = "test/sam_coupe_plugin_test.rs"
+
+[[test]]
+name = "enterprise128_plugin_test"
+path = "test/enterprise128_plugin_test.rs"
+
+[[test]]
+name = "pc88_plugin_test"
+path = "test/pc88_plugin_test.rs"
+
+[[test]]
+name = "pc98_plugin_test"
+path = "test/pc98_plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

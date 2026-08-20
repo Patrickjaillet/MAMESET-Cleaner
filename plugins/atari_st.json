@@ -1,0 +1,10 @@
+{
+  "id": "atari_st",
+  "name": "Atari ST",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Atari",
+  "version": "2.7.0",
+  "dat_format": "TOSEC",
+  "sha256": "f06c8d3f733db50fb8b85db7ae0c4c68aa0e97804aab5ce711898d5eab1bc92b",
+  "min_app_version": "2.7.0"
+}

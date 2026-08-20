@@ -15,9 +15,12 @@ export struct PluginRow {
     version: string,
     status-text: string,
     status-kind: int,
+    is-header: bool,
 }
 
 export struct SystemOption {
     id: string,
     name: string,
+    console-family: string,
+    is-header: bool,
 }

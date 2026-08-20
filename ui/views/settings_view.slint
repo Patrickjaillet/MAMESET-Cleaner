@@ -36,13 +36,22 @@ export component SettingsView inherits Rectangle {
             }
 
             Text { text: "Système actif"; font-weight: 600; }
-            HorizontalLayout {
-                spacing: 8px;
-                for system in root.available-systems: AppButton {
-                    width: 160px;
-                    text: system.name;
-                    primary: system.id == root.selected-system-id;
-                    clicked => { root.selected-system-id = system.id; }
+            VerticalLayout {
+                spacing: 6px;
+                for system[i] in root.available-systems: VerticalLayout {
+                    if system.is-header: Text {
+                        text: system.console-family;
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: #0078d4;
+                    }
+                    if !system.is-header: AppButton {
+                        width: 260px;
+                        height: 30px;
+                        text: system.name;
+                        primary: system.id == root.selected-system-id;
+                        clicked => { root.selected-system-id = system.id; }
+                    }
                 }
             }
 

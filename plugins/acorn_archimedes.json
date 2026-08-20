@@ -1,0 +1,10 @@
+{
+  "id": "acorn_archimedes",
+  "name": "Acorn Archimedes",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Acorn",
+  "version": "2.8.0",
+  "dat_format": "TOSEC",
+  "sha256": "5eb8ebac7ec37ac2fd60ab39686738441778c1eb0a487eb9e641ca3aec8efda2",
+  "min_app_version": "2.8.0"
+}

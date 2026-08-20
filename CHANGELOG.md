@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.9.0
+- Added support for 15 more systems — Apple II, Apple IIGS, Atari ST, Sharp X1, Sharp X68000, Fujitsu FM-7, Acorn BBC Micro, Acorn Electron, Acorn Archimedes, Oric-1/Atmos, Dragon 32/64, SAM Coupé, Enterprise 128, NEC PC-88 and NEC PC-98 — available for download from the "Plugins" section.
+- The "Plugins" section now groups systems by manufacturer and has a search box, and the "Système actif" selector in Settings does the same, now that the catalog has grown to 87 systems.
+
 ## v2.6.0
 - Added support for 20 more systems — Neo Geo CD, PC-FX, TurboGrafx-CD/PC Engine CD, CD-i, Amiga CD32, CDTV, Jaguar CD, FM Towns, Playdia, Pippin, PlayStation 3, Xbox, Xbox 360, Wii U, Atari 8-bit, Commodore VIC-20, Commodore 128, Commodore Plus/4, Sinclair QL and Sord M5 — available for download from the "Plugins" section.
 

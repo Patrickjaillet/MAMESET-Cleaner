@@ -1,0 +1,10 @@
+{
+  "id": "enterprise128",
+  "name": "Enterprise 128",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Enterprise",
+  "version": "2.8.0",
+  "dat_format": "TOSEC",
+  "sha256": "4860d21b7b11bc077cf9e5d6cdafd9c51b261cee2576d6710babb389f3617f82",
+  "min_app_version": "2.8.0"
+}

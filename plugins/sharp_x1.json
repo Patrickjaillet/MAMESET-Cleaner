@@ -1,0 +1,10 @@
+{
+  "id": "sharp_x1",
+  "name": "Sharp X1",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Sharp",
+  "version": "2.7.0",
+  "dat_format": "TOSEC",
+  "sha256": "59aae1998605e9188348ec5d4d9f155fc5ab4c58eb0ac2b3e491e27865019cc2",
+  "min_app_version": "2.7.0"
+}

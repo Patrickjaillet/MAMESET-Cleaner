@@ -1,0 +1,10 @@
+{
+  "id": "bbc_micro",
+  "name": "Acorn BBC Micro",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "Acorn",
+  "version": "2.8.0",
+  "dat_format": "TOSEC",
+  "sha256": "563afbba9eb3b251f330712681265783fa7799c4527cbaa4ea1bd56866a3868d",
+  "min_app_version": "2.8.0"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "sam_coupe",
+  "name": "SAM Coupe",
+  "emulator_frontend": "Batocera/Lakka/Recalbox",
+  "console_family": "MGT",
+  "version": "2.8.0",
+  "dat_format": "TOSEC",
+  "sha256": "b0451bd8eb39b9ca319882061f42595e2644860fc5581ec8af85b300bda8e6c1",
+  "min_app_version": "2.8.0"
+}
