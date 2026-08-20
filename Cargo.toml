@@ -17,11 +17,14 @@ members = [
     "crates/sega_cd_plugin",
     "crates/saturn_plugin",
     "crates/dreamcast_plugin",
+    "crates/psx_plugin",
+    "crates/ps2_plugin",
+    "crates/psp_plugin",
 ]
 
 [package]
 name = "mameset_cleaner"
-version = "1.4.0"
+version = "1.5.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -126,6 +129,18 @@ path = "test/saturn_plugin_test.rs"
 [[test]]
 name = "dreamcast_plugin_test"
 path = "test/dreamcast_plugin_test.rs"
+
+[[test]]
+name = "psx_plugin_test"
+path = "test/psx_plugin_test.rs"
+
+[[test]]
+name = "ps2_plugin_test"
+path = "test/ps2_plugin_test.rs"
+
+[[test]]
+name = "psp_plugin_test"
+path = "test/psp_plugin_test.rs"
 
 [build-dependencies]
 slint-build = "1.8"

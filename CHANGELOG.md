@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.5.0
+- Added support for three Sony systems — PlayStation, PlayStation 2 and PSP — each installable from the "Plugins" section once published to the repository.
+
 ## v1.4.0
 - Added support for six Sega systems — Master System, Mega Drive/Genesis, Game Gear, Sega CD/Mega-CD, Sega Saturn and Dreamcast — each installable from the "Plugins" section once published to the repository.
 
