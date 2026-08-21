@@ -1,0 +1,91 @@
+import { Theme } from "../theme.slint";
+import { AppButton } from "app_button.slint";
+import { TextField } from "text_field.slint";
+
+// A reorderable, editable ordered list — used for the 1G1R region and
+// language priority settings. Items are shown most-preferred first; an
+// empty list means "no preference" (matches the engine's own semantics).
+export component PriorityList inherits Rectangle {
+    in property <string> label;
+    in property <[string]> items;
+    in property <string> add-placeholder: "Ajouter...";
+    in-out property <string> new-item-text;
+    callback move-up(int);
+    callback move-down(int);
+    callback remove-item(int);
+    callback add-item(string);
+
+    border-width: 1px;
+    border-color: Theme.color-border-subtle;
+    border-radius: Theme.radius-md;
+    background: Theme.color-surface;
+
+    VerticalLayout {
+        padding: Theme.space-sm;
+        spacing: Theme.space-xs;
+
+        Text { text: root.label; font-weight: 600; }
+
+        if root.items.length == 0: Text {
+            text: "Aucune préférence — tous les candidats sont à égalité sur ce critère.";
+            color: Theme.color-placeholder;
+            font-size: Theme.font-size-caption;
+            wrap: word-wrap;
+        }
+
+        for value[index] in root.items: Rectangle {
+            height: 32px;
+            background: row-touch.has-hover ? Theme.color-hover-tint : transparent;
+            animate background { duration: Theme.duration-fast; easing: ease-out; }
+
+            row-touch := TouchArea {}
+
+            HorizontalLayout {
+                padding-left: Theme.space-xs;
+                spacing: Theme.space-xs;
+
+                Text {
+                    horizontal-stretch: 1;
+                    text: (index + 1) + ". " + value;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+
+                AppButton {
+                    width: 34px;
+                    text: "↑";
+                    enabled: index > 0;
+                    clicked => { root.move-up(index); }
+                }
+                AppButton {
+                    width: 34px;
+                    text: "↓";
+                    enabled: index < root.items.length - 1;
+                    clicked => { root.move-down(index); }
+                }
+                AppButton {
+                    width: 34px;
+                    text: "✕";
+                    clicked => { root.remove-item(index); }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: Theme.space-xs;
+            TextField {
+                horizontal-stretch: 1;
+                placeholder: root.add-placeholder;
+                value <=> root.new-item-text;
+            }
+            AppButton {
+                width: 90px;
+                text: "Ajouter";
+                clicked => {
+                    root.add-item(root.new-item-text);
+                    root.new-item-text = "";
+                }
+            }
+        }
+    }
+}

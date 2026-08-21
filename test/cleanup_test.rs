@@ -64,7 +64,10 @@ fn full_cleanup_cycle_on_an_isolated_rom_set() {
         entry("pacman", "Pac-Man (World)", Some("puckman")),
     );
 
-    let plan = dedup_engine::build_dedup_plan(&entries, &dedup_engine::RegionPriority::default_profile());
+    let region_priority = dedup_engine::RegionPriority::default_profile();
+    let language_priority = dedup_engine::LanguagePriority::none();
+    let options = dedup_engine::DedupOptions::new(&region_priority, &language_priority);
+    let plan = dedup_engine::build_dedup_plan(&entries, &options);
     assert_eq!(plan.roms_to_keep(), vec!["pacman".to_string()]);
     assert_eq!(plan.roms_to_remove(), vec!["puckman".to_string()]);
 

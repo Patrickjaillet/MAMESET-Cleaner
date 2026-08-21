@@ -31,6 +31,13 @@ export component AppWindow inherits Window {
     in-out property <string> selected-system-id: "mame";
     in property <[SystemOption]> available-systems;
 
+    in property <[string]> region-priority-items;
+    in-out property <string> new-region-text;
+    in property <[string]> language-priority-items;
+    in-out property <string> new-language-text;
+    in-out property <bool> treat-unofficial-as-official;
+    in-out property <bool> deep-verify-sha1;
+
     in property <bool> scan-running;
     in property <float> scan-progress;
     in property <string> scan-status-text;
@@ -104,6 +111,14 @@ export component AppWindow inherits Window {
     callback save-profile(string);
     callback load-profile(string);
     callback delete-profile(string);
+    callback move-region-up(int);
+    callback move-region-down(int);
+    callback remove-region(int);
+    callback add-region(string);
+    callback move-language-up(int);
+    callback move-language-down(int);
+    callback remove-language(int);
+    callback add-language(string);
 
     HorizontalLayout {
         Sidebar {
@@ -197,6 +212,20 @@ export component AppWindow inherits Window {
                 browse-languages-ini-path => { root.browse-languages-ini-path(); }
                 browse-backup-dir-path => { root.browse-backup-dir-path(); }
                 save-settings => { root.save-settings(); }
+                region-priority-items: root.region-priority-items;
+                new-region-text <=> root.new-region-text;
+                move-region-up(i) => { root.move-region-up(i); }
+                move-region-down(i) => { root.move-region-down(i); }
+                remove-region(i) => { root.remove-region(i); }
+                add-region(value) => { root.add-region(value); }
+                language-priority-items: root.language-priority-items;
+                new-language-text <=> root.new-language-text;
+                move-language-up(i) => { root.move-language-up(i); }
+                move-language-down(i) => { root.move-language-down(i); }
+                remove-language(i) => { root.remove-language(i); }
+                add-language(value) => { root.add-language(value); }
+                treat-unofficial-as-official <=> root.treat-unofficial-as-official;
+                deep-verify-sha1 <=> root.deep-verify-sha1;
             }
             if current-view == 4: PluginsView {
                 plugins-loading: root.plugins-loading;

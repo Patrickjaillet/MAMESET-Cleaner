@@ -96,7 +96,7 @@ members = [
 
 [package]
 name = "mameset_cleaner"
-version = "5.0.0"
+version = "6.0.0"
 edition = "2021"
 description = "Logiciel de nettoyage et d'organisation de sets de ROMs MAME"
 license = "MIT"
@@ -121,6 +121,7 @@ trash = "5.2"
 abi_stable = "0.11.3"
 libloading = "0.9.0"
 sha2 = "0.10"
+sha1 = "0.10"
 
 [lib]
 name = "mameset_cleaner"

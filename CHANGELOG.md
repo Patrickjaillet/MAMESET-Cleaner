@@ -1,5 +1,12 @@
 # Changelog
 
+## v6.0.0
+- **1G1R duplicate detection now works correctly across all 87 supported systems, not just MAME.** Previously, the region-priority logic only ever activated for MAME, because non-MAME reference databases (No-Intro, TOSEC, Redump) don't declare the parent/clone relationships MAME's own files do — so regional duplicates on every other system were silently never grouped together at all. This is fixed: the app now groups regional releases correctly everywhere, while being careful to never merge different discs of the same multi-disc game.
+- Region priority is now fully configurable in Settings (add, remove, and reorder regions), instead of being fixed to World > USA > Europe > Japan. A new optional preferred-language setting can break ties within a region.
+- Official releases are now always preferred over prototypes, betas, demos, and unlicensed copies when picking which copy of a game to keep — with a Settings toggle to disable this if you deliberately collect unofficial releases.
+- Added an optional deep-verification mode that recomputes SHA1 (not just CRC32 and size) for every scanned ROM, for extra confidence on top of the existing checks. Off by default since it's slower on large sets.
+- The Results view now explains *why* a ROM was flagged as corrupted (wrong size, wrong CRC32, or wrong SHA1 in deep-verify mode) instead of a bare "Corrompue".
+
 ## v5.0.0
 - Scanning is now dramatically faster on repeat runs: the DAT file (and catver.ini/languages.ini) is no longer re-read and re-parsed from scratch every time you click "Lancer le scan" — if the files haven't changed, MAMESET Cleaner reuses what it already loaded, cutting repeat scans down to a fraction of a second instead of several seconds. This also now works across app restarts: the first scan after reopening the app skips the full re-parse too, as long as your DAT file hasn't changed since last time.
 - The scan progress display now updates more smoothly on very large ROM sets instead of refreshing on every single file.

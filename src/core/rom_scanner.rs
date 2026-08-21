@@ -6,7 +6,7 @@ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use rayon::prelude::*;
 
-use crate::core::checksum::crc32_of_reader;
+use crate::core::checksum::hash_reader;
 use crate::models::rom_entry::RomEntry;
 use crate::models::rom_set::{RomSet, RomStatus, ScannedEntry};
 
@@ -63,10 +63,18 @@ struct ScanCandidate {
     loose_files: Vec<PathBuf>,
 }
 
+#[derive(Debug, Clone)]
+struct FileDigest {
+    name: String,
+    crc32: u32,
+    size: u64,
+    sha1: Option<String>,
+}
+
 struct CandidateResult {
     name: String,
     path: PathBuf,
-    files: Vec<(String, u32)>,
+    files: Vec<FileDigest>,
     error: Option<String>,
 }
 
@@ -80,6 +88,7 @@ pub fn scan_rom_directory<F>(
     directory: &Path,
     dat_entries: &HashMap<String, RomEntry>,
     cancel_flag: &AtomicBool,
+    deep_verify_sha1: bool,
     on_progress: F,
 ) -> Result<RomSet, ScanError>
 where
@@ -96,7 +105,7 @@ where
             if cancel_flag.load(Ordering::Relaxed) {
                 return None;
             }
-            let result = process_candidate(candidate);
+            let result = process_candidate(candidate, deep_verify_sha1);
             let done = processed.fetch_add(1, Ordering::SeqCst) + 1;
             on_progress(ScanProgress {
                 processed: done,
@@ -113,7 +122,7 @@ where
     for result in results {
         found_names.insert(result.name.clone());
         let metadata = dat_entries.get(&result.name);
-        let status = classify_status(&result, metadata);
+        let (status, mismatch_reason) = classify_status(&result, metadata);
 
         rom_set.entries.insert(
             result.name.clone(),
@@ -121,6 +130,7 @@ where
                 name: result.name,
                 file_path: Some(result.path),
                 status,
+                mismatch_reason,
             },
         );
     }
@@ -134,6 +144,7 @@ where
                         name: name.clone(),
                         file_path: None,
                         status: RomStatus::Missing,
+                        mismatch_reason: None,
                     },
                 );
             }
@@ -169,25 +180,42 @@ pub fn verify_integrity(rom_set: &RomSet, expected_keep: &HashSet<String>) -> In
     report
 }
 
-fn classify_status(result: &CandidateResult, metadata: Option<&RomEntry>) -> RomStatus {
-    if result.error.is_some() {
-        return RomStatus::Corrupted;
+/// Classifies a scanned candidate against its DAT metadata, checking
+/// everything the DAT actually provides: filename + CRC32 (as before),
+/// plus size (free — already known from the archive reader, no extra I/O),
+/// plus SHA1 when both the DAT and the scan (deep-verify mode) provide one.
+/// Returns a human-readable reason alongside `Corrupted` so the UI can say
+/// more than a bare "Corrompue".
+fn classify_status(result: &CandidateResult, metadata: Option<&RomEntry>) -> (RomStatus, Option<String>) {
+    if let Some(err) = &result.error {
+        return (RomStatus::Corrupted, Some(err.clone()));
     }
 
     match metadata {
-        None => RomStatus::Unreferenced,
+        None => (RomStatus::Unreferenced, None),
         Some(entry) => {
-            let all_match = entry.roms.iter().all(|expected| {
-                result.files.iter().any(|(name, crc)| {
-                    *name == expected.name && expected.crc32.is_none_or(|c| c == *crc)
-                })
-            });
-
-            if all_match {
-                RomStatus::Ok
-            } else {
-                RomStatus::Corrupted
+            for expected in &entry.roms {
+                let Some(actual) = result.files.iter().find(|file| file.name == expected.name) else {
+                    return (
+                        RomStatus::Corrupted,
+                        Some(format!("fichier « {} » manquant dans l'archive", expected.name)),
+                    );
+                };
+                if let Some(expected_crc) = expected.crc32 {
+                    if expected_crc != actual.crc32 {
+                        return (RomStatus::Corrupted, Some("CRC32 incorrect".to_string()));
+                    }
+                }
+                if expected.size != 0 && expected.size != actual.size {
+                    return (RomStatus::Corrupted, Some("taille incorrecte".to_string()));
+                }
+                if let (Some(expected_sha1), Some(actual_sha1)) = (&expected.sha1, &actual.sha1) {
+                    if !expected_sha1.eq_ignore_ascii_case(actual_sha1) {
+                        return (RomStatus::Corrupted, Some("SHA1 incorrect".to_string()));
+                    }
+                }
             }
+            (RomStatus::Ok, None)
         }
     }
 }
@@ -253,11 +281,11 @@ fn visit_directory(dir: &Path, candidates: &mut Vec<ScanCandidate>) -> Result<()
     Ok(())
 }
 
-fn process_candidate(candidate: &ScanCandidate) -> CandidateResult {
+fn process_candidate(candidate: &ScanCandidate, deep_verify_sha1: bool) -> CandidateResult {
     let outcome = match candidate.kind {
-        ArchiveKind::Zip => process_zip(&candidate.path),
-        ArchiveKind::SevenZip => process_seven_zip(&candidate.path),
-        ArchiveKind::Directory => process_directory(&candidate.loose_files),
+        ArchiveKind::Zip => process_zip(&candidate.path, deep_verify_sha1),
+        ArchiveKind::SevenZip => process_seven_zip(&candidate.path, deep_verify_sha1),
+        ArchiveKind::Directory => process_directory(&candidate.loose_files, deep_verify_sha1),
     };
 
     match outcome {
@@ -276,12 +304,13 @@ fn process_candidate(candidate: &ScanCandidate) -> CandidateResult {
     }
 }
 
-/// Décompresse réellement chaque entrée du zip et recalcule son CRC32 à
-/// partir des octets décompressés, plutôt que de faire confiance à la
-/// valeur stockée dans l'en-tête. Cela permet de détecter à la fois une
-/// ROM différente de celle attendue et une corruption du flux compressé
-/// lui-même (en-tête intact mais données illisibles ou modifiées).
-fn process_zip(path: &Path) -> Result<Vec<(String, u32)>, String> {
+/// Décompresse réellement chaque entrée du zip et recalcule son CRC32 (et,
+/// en mode vérification approfondie, son SHA1) à partir des octets
+/// décompressés, plutôt que de faire confiance à la valeur stockée dans
+/// l'en-tête. Cela permet de détecter à la fois une ROM différente de
+/// celle attendue et une corruption du flux compressé lui-même (en-tête
+/// intact mais données illisibles ou modifiées).
+fn process_zip(path: &Path, deep_verify_sha1: bool) -> Result<Vec<FileDigest>, String> {
     let file = fs::File::open(path).map_err(|e| e.to_string())?;
     let mut archive = zip::ZipArchive::new(file).map_err(|e| e.to_string())?;
 
@@ -292,8 +321,13 @@ fn process_zip(path: &Path) -> Result<Vec<(String, u32)>, String> {
             continue;
         }
         let name = entry.name().to_string();
-        let actual_crc = crc32_of_reader(&mut entry).map_err(|e| e.to_string())?;
-        files.push((name, actual_crc));
+        let digest = hash_reader(&mut entry, deep_verify_sha1).map_err(|e| e.to_string())?;
+        files.push(FileDigest {
+            name,
+            crc32: digest.crc32,
+            size: entry.size(),
+            sha1: digest.sha1,
+        });
     }
 
     Ok(files)
@@ -301,8 +335,9 @@ fn process_zip(path: &Path) -> Result<Vec<(String, u32)>, String> {
 
 /// Décompresse réellement chaque entrée du 7z (le décodeur de blocs de
 /// `sevenz-rust` vérifie lui-même l'intégrité interne du flux) et
-/// recalcule le CRC32 à partir des octets obtenus.
-fn process_seven_zip(path: &Path) -> Result<Vec<(String, u32)>, String> {
+/// recalcule le CRC32 (et, en mode vérification approfondie, le SHA1) à
+/// partir des octets obtenus.
+fn process_seven_zip(path: &Path, deep_verify_sha1: bool) -> Result<Vec<FileDigest>, String> {
     let mut reader = sevenz_rust::SevenZReader::open(path, sevenz_rust::Password::empty())
         .map_err(|e| e.to_string())?;
 
@@ -314,9 +349,14 @@ fn process_seven_zip(path: &Path) -> Result<Vec<(String, u32)>, String> {
             if entry.is_directory {
                 return Ok(true);
             }
-            match crc32_of_reader(source) {
-                Ok(crc) => {
-                    files.push((entry.name.clone(), crc));
+            match hash_reader(source, deep_verify_sha1) {
+                Ok(digest) => {
+                    files.push(FileDigest {
+                        name: entry.name.clone(),
+                        crc32: digest.crc32,
+                        size: entry.size,
+                        sha1: digest.sha1,
+                    });
                     Ok(true)
                 }
                 Err(err) => {
@@ -334,17 +374,23 @@ fn process_seven_zip(path: &Path) -> Result<Vec<(String, u32)>, String> {
     Ok(files)
 }
 
-fn process_directory(loose_files: &[PathBuf]) -> Result<Vec<(String, u32)>, String> {
+fn process_directory(loose_files: &[PathBuf], deep_verify_sha1: bool) -> Result<Vec<FileDigest>, String> {
     let mut files = Vec::with_capacity(loose_files.len());
     for path in loose_files {
         let mut file = fs::File::open(path).map_err(|e| e.to_string())?;
-        let crc = crc32_of_reader(&mut file).map_err(|e| e.to_string())?;
+        let digest = hash_reader(&mut file, deep_verify_sha1).map_err(|e| e.to_string())?;
+        let size = file.metadata().map_err(|e| e.to_string())?.len();
         let name = path
             .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or_default()
             .to_string();
-        files.push((name, crc));
+        files.push(FileDigest {
+            name,
+            crc32: digest.crc32,
+            size,
+            sha1: digest.sha1,
+        });
     }
     Ok(files)
 }
@@ -387,7 +433,12 @@ mod tests {
             languages: Vec::new(),
             roms: vec![RomFile {
                 name: rom_name.to_string(),
-                size: 4,
+                // 0 = "unknown size, don't check" (matches parse_rom_attributes'
+                // own default) — this generic helper is shared by tests using
+                // content of different lengths, and isn't meant to also encode
+                // an exact expected size; tests that specifically exercise size
+                // verification set `roms[0].size` explicitly.
+                size: 0,
                 crc32: Some(crc),
                 sha1: None,
             }],
@@ -445,7 +496,7 @@ mod tests {
         );
 
         let cancel = AtomicBool::new(false);
-        let rom_set = scan_rom_directory(&tmp, &dat, &cancel, |_| {}).unwrap();
+        let rom_set = scan_rom_directory(&tmp, &dat, &cancel, false, |_| {}).unwrap();
 
         assert_eq!(rom_set.entries["gamea"].status, RomStatus::Ok);
         assert_eq!(rom_set.entries["gameb"].status, RomStatus::Corrupted);
@@ -477,9 +528,76 @@ mod tests {
         dat.insert("gamea".to_string(), make_dat_entry("gamea", "gamea.bin", crc));
 
         let cancel = AtomicBool::new(false);
-        let rom_set = scan_rom_directory(&tmp, &dat, &cancel, |_| {}).unwrap();
+        let rom_set = scan_rom_directory(&tmp, &dat, &cancel, false, |_| {}).unwrap();
 
         assert_eq!(rom_set.entries["gamea"].status, RomStatus::Corrupted);
+
+        fs::remove_dir_all(&tmp).unwrap();
+    }
+
+    #[test]
+    fn detects_a_size_mismatch_even_when_the_crc_field_is_absent_from_the_dat() {
+        let tmp = std::env::temp_dir().join(format!(
+            "mameset_cleaner_scan_size_test_{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&tmp);
+        fs::create_dir_all(&tmp).unwrap();
+
+        let content = b"data";
+        write_zip(&tmp.join("gamea.zip"), "gamea.bin", content);
+
+        let mut entry = make_dat_entry("gamea", "gamea.bin", 0);
+        entry.roms[0].crc32 = None; // DAT declares no CRC — size must still be checked
+        entry.roms[0].size = 999; // wrong on purpose
+
+        let mut dat = HashMap::new();
+        dat.insert("gamea".to_string(), entry);
+
+        let cancel = AtomicBool::new(false);
+        let rom_set = scan_rom_directory(&tmp, &dat, &cancel, false, |_| {}).unwrap();
+
+        assert_eq!(rom_set.entries["gamea"].status, RomStatus::Corrupted);
+        assert_eq!(
+            rom_set.entries["gamea"].mismatch_reason.as_deref(),
+            Some("taille incorrecte")
+        );
+
+        fs::remove_dir_all(&tmp).unwrap();
+    }
+
+    #[test]
+    fn deep_verify_mode_catches_a_sha1_mismatch_that_crc32_alone_would_miss() {
+        let tmp = std::env::temp_dir().join(format!(
+            "mameset_cleaner_scan_sha1_test_{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&tmp);
+        fs::create_dir_all(&tmp).unwrap();
+
+        let content = b"data";
+        let crc = crc32fast::hash(content);
+        write_zip(&tmp.join("gamea.zip"), "gamea.bin", content);
+
+        let mut entry = make_dat_entry("gamea", "gamea.bin", crc);
+        entry.roms[0].sha1 = Some("0000000000000000000000000000000000000a".to_string());
+
+        let mut dat = HashMap::new();
+        dat.insert("gamea".to_string(), entry);
+
+        let cancel = AtomicBool::new(false);
+
+        // Without deep-verify, only CRC32 is checked — still Ok.
+        let shallow = scan_rom_directory(&tmp, &dat, &cancel, false, |_| {}).unwrap();
+        assert_eq!(shallow.entries["gamea"].status, RomStatus::Ok);
+
+        // With deep-verify, the real SHA1 is computed and compared too.
+        let deep = scan_rom_directory(&tmp, &dat, &cancel, true, |_| {}).unwrap();
+        assert_eq!(deep.entries["gamea"].status, RomStatus::Corrupted);
+        assert_eq!(
+            deep.entries["gamea"].mismatch_reason.as_deref(),
+            Some("SHA1 incorrect")
+        );
 
         fs::remove_dir_all(&tmp).unwrap();
     }
@@ -501,7 +619,7 @@ mod tests {
         dat.insert("gamea".to_string(), make_dat_entry("gamea", "gamea.bin", crc));
 
         let cancel = AtomicBool::new(true);
-        let rom_set = scan_rom_directory(&tmp, &dat, &cancel, |_| {}).unwrap();
+        let rom_set = scan_rom_directory(&tmp, &dat, &cancel, false, |_| {}).unwrap();
 
         assert!(
             rom_set.entries.is_empty(),
@@ -520,6 +638,7 @@ mod tests {
                 name: "gamea".to_string(),
                 file_path: Some(PathBuf::from("gamea.zip")),
                 status: RomStatus::Ok,
+                mismatch_reason: None,
             },
         );
         rom_set.entries.insert(
@@ -528,6 +647,7 @@ mod tests {
                 name: "gameb".to_string(),
                 file_path: None,
                 status: RomStatus::Missing,
+                mismatch_reason: None,
             },
         );
 
@@ -573,7 +693,7 @@ mod tests {
 
         let cancel = AtomicBool::new(false);
         let started = std::time::Instant::now();
-        let rom_set = scan_rom_directory(&tmp, &dat, &cancel, |_| {}).unwrap();
+        let rom_set = scan_rom_directory(&tmp, &dat, &cancel, false, |_| {}).unwrap();
         let elapsed = started.elapsed();
 
         assert_eq!(rom_set.entries.len(), ROM_COUNT);

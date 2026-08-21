@@ -2,6 +2,7 @@ import { AppButton } from "../components/app_button.slint";
 import { TextField } from "../components/text_field.slint";
 import { SegmentedChoice } from "../components/segmented_choice.slint";
 import { ToggleOption } from "../components/toggle_option.slint";
+import { PriorityList } from "../components/priority_list.slint";
 import { SystemOption } from "../common.slint";
 import { Theme } from "../theme.slint";
 
@@ -26,6 +27,23 @@ export component SettingsView inherits Rectangle {
     callback browse-languages-ini-path();
     callback browse-backup-dir-path();
     callback save-settings();
+
+    in property <[string]> region-priority-items;
+    in-out property <string> new-region-text;
+    callback move-region-up(int);
+    callback move-region-down(int);
+    callback remove-region(int);
+    callback add-region(string);
+
+    in property <[string]> language-priority-items;
+    in-out property <string> new-language-text;
+    callback move-language-up(int);
+    callback move-language-down(int);
+    callback remove-language(int);
+    callback add-language(string);
+
+    in-out property <bool> treat-unofficial-as-official;
+    in-out property <bool> deep-verify-sha1;
 
     Flickable {
         VerticalLayout {
@@ -97,6 +115,46 @@ export component SettingsView inherits Rectangle {
             ToggleOption {
                 text: "Déplacer vers la corbeille Windows plutôt que supprimer définitivement";
                 checked <=> root.use-recycle-bin;
+            }
+
+            Text { text: "1G1R — précision du dédoublonnage"; font-weight: 600; }
+
+            HorizontalLayout {
+                spacing: 12px;
+
+                PriorityList {
+                    horizontal-stretch: 1;
+                    label: "Priorité des régions";
+                    items: root.region-priority-items;
+                    add-placeholder: "ex: Brazil";
+                    new-item-text <=> root.new-region-text;
+                    move-up(i) => { root.move-region-up(i); }
+                    move-down(i) => { root.move-region-down(i); }
+                    remove-item(i) => { root.remove-region(i); }
+                    add-item(value) => { root.add-region(value); }
+                }
+
+                PriorityList {
+                    horizontal-stretch: 1;
+                    label: "Langues préférées (départage)";
+                    items: root.language-priority-items;
+                    add-placeholder: "ex: French";
+                    new-item-text <=> root.new-language-text;
+                    move-up(i) => { root.move-language-up(i); }
+                    move-down(i) => { root.move-language-down(i); }
+                    remove-item(i) => { root.remove-language(i); }
+                    add-item(value) => { root.add-language(value); }
+                }
+            }
+
+            ToggleOption {
+                text: "Traiter les prototypes/bêtas/démos/versions non officielles comme des versions valides à conserver";
+                checked <=> root.treat-unofficial-as-official;
+            }
+
+            ToggleOption {
+                text: "Vérification approfondie (SHA1) lors du scan — plus précis, plus lent sur de gros sets";
+                checked <=> root.deep-verify-sha1;
             }
 
             Text { text: "Langue de l'interface"; font-weight: 600; }

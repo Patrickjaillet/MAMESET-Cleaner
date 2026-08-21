@@ -431,10 +431,11 @@
   <section>
     <h2>Overview</h2>
     <p>
-      MAMESET Cleaner is a Windows desktop application that helps clean and organize a MAME ROM set.
-      It detects and removes duplicates (clones/parents) using the <strong>1G1R</strong> logic (1 game = 1 ROM),
-      filters by genre, language, region, working status, manufacturer and year, and relies on the official
-      MAME reference files (DAT, catver.ini, languages.ini) for a reliable result.
+      MAMESET Cleaner is a Windows desktop application that helps clean and organize a MAME ROM set — and,
+      through plugins, 87 other console systems. It detects and removes duplicates using precise
+      <strong>1G1R</strong> logic (1 game = 1 ROM) with a fully configurable region and language priority,
+      filters by genre, language, region, working status, manufacturer and year, and relies on official
+      reference files (DAT, catver.ini, languages.ini) for a reliable result.
     </p>
   </section>
 
@@ -446,8 +447,8 @@
         <p>Analyzes the ROM folder (.zip, .7z, uncompressed folders) and detects files that are correct, missing, corrupted, or unreferenced. The reference database is cached, so repeat scans skip re-parsing large DAT files and finish dramatically faster.</p>
       </div>
       <div class="feature">
-        <h3>Duplicate detection</h3>
-        <p>Automatically picks the best copy of each game based on a customizable region priority and working status.</p>
+        <h3>Precise 1G1R</h3>
+        <p>Works correctly across all 87 systems, not just MAME. Fully reorderable region priority, a language tie-breaker, and official releases always preferred over prototypes and betas. Multi-disc releases are never merged.</p>
       </div>
       <div class="feature">
         <h3>Advanced filters</h3>
@@ -459,7 +460,7 @@
       </div>
       <div class="feature">
         <h3>Detailed reports</h3>
-        <p>Every cleanup generates a JSON and CSV report listing deleted and kept ROMs, with their reason.</p>
+        <p>Every cleanup generates a JSON and CSV report listing deleted and kept ROMs, with their reason. An optional deep-verification mode recomputes SHA1, not just CRC32 and size.</p>
       </div>
       <div class="feature">
         <h3>Clean interface</h3>

@@ -14,6 +14,11 @@ pub struct ScannedEntry {
     pub name: String,
     pub file_path: Option<PathBuf>,
     pub status: RomStatus,
+    /// Human-readable reason `status` is `Corrupted` (e.g. "taille
+    /// incorrecte", "CRC32 incorrect", "SHA1 incorrect"), or `None` for any
+    /// other status. Lets the UI say something more useful than a bare
+    /// "Corrompue".
+    pub mismatch_reason: Option<String>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -49,6 +54,7 @@ mod tests {
                 name: "pacman".to_string(),
                 file_path: Some(PathBuf::from("pacman.zip")),
                 status: RomStatus::Ok,
+                mismatch_reason: None,
             },
         );
         set.entries.insert(
@@ -57,6 +63,7 @@ mod tests {
                 name: "missing".to_string(),
                 file_path: None,
                 status: RomStatus::Missing,
+                mismatch_reason: None,
             },
         );
 

@@ -17,6 +17,20 @@ fn default_selected_system() -> String {
     "mame".to_string()
 }
 
+/// `World > USA > Europe > Japan` — the priority order used unmodified
+/// since v0.1.0, kept as the default so nobody's ROM set changes shape
+/// unless they deliberately customize it in Settings.
+pub fn default_region_priority() -> Vec<String> {
+    ["World", "USA", "Europe", "Japan"]
+        .into_iter()
+        .map(String::from)
+        .collect()
+}
+
+fn default_treat_unofficial_as_official() -> bool {
+    false
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub language: AppLanguage,
@@ -30,6 +44,26 @@ pub struct AppConfig {
     pub use_recycle_bin: bool,
     #[serde(default = "default_selected_system")]
     pub selected_system: String,
+    /// 1G1R region priority, most-preferred first. Empty entries are never
+    /// stored (see Settings UI) but an empty list overall is tolerated and
+    /// treated as "no preference" (every region ties).
+    #[serde(default = "default_region_priority")]
+    pub region_priority: Vec<String>,
+    /// 1G1R language tie-breaker, most-preferred first. Empty by default
+    /// (no language preference — today's exact behavior).
+    #[serde(default)]
+    pub preferred_languages: Vec<String>,
+    /// When false (the default — a correctness improvement over the old
+    /// behavior), prototypes/betas/demos/unlicensed releases are never
+    /// picked as the 1G1R "keep" copy over an official release in the same
+    /// group. When true, they're treated as equally valid candidates.
+    #[serde(default = "default_treat_unofficial_as_official")]
+    pub treat_unofficial_as_official: bool,
+    /// When true, verification also recomputes and compares SHA1 (not just
+    /// CRC32 + size) for every scanned ROM. Slower — requires decompressing
+    /// every archive entry — so it's opt-in.
+    #[serde(default)]
+    pub deep_verify_sha1: bool,
 }
 
 impl Default for AppConfig {
@@ -43,6 +77,10 @@ impl Default for AppConfig {
             backup_dir_path: None,
             use_recycle_bin: true,
             selected_system: default_selected_system(),
+            region_priority: default_region_priority(),
+            preferred_languages: Vec::new(),
+            treat_unofficial_as_official: default_treat_unofficial_as_official(),
+            deep_verify_sha1: false,
         }
     }
 }
@@ -103,6 +141,10 @@ mod tests {
             backup_dir_path: None,
             use_recycle_bin: false,
             selected_system: "nes".to_string(),
+            region_priority: default_region_priority(),
+            preferred_languages: Vec::new(),
+            treat_unofficial_as_official: false,
+            deep_verify_sha1: false,
         };
         let json = serde_json::to_string(&config).unwrap();
         let restored: AppConfig = serde_json::from_str(&json).unwrap();
@@ -125,6 +167,18 @@ mod tests {
         }"#;
         let restored: AppConfig = serde_json::from_str(json).unwrap();
         assert_eq!(restored.language, AppLanguage::Fr);
+        assert_eq!(restored.region_priority, default_region_priority());
+        assert!(restored.preferred_languages.is_empty());
+        assert!(!restored.treat_unofficial_as_official);
+        assert!(!restored.deep_verify_sha1);
+    }
+
+    #[test]
+    fn default_config_uses_world_usa_europe_japan_region_priority() {
+        assert_eq!(
+            AppConfig::default().region_priority,
+            vec!["World", "USA", "Europe", "Japan"]
+        );
     }
 
     #[test]

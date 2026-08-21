@@ -95,6 +95,10 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     window.set_selected_system_id(config.selected_system.clone().into());
     window.set_filter_live_count_text(String::new().into());
     window.set_profile_status_text(String::new().into());
+    window.set_region_priority_items(string_list_model(&config.region_priority));
+    window.set_language_priority_items(string_list_model(&config.preferred_languages));
+    window.set_treat_unofficial_as_official(config.treat_unofficial_as_official);
+    window.set_deep_verify_sha1(config.deep_verify_sha1);
 
     let state = Arc::new(Mutex::new(AppState::new(config.clone())));
 
@@ -107,6 +111,7 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     setup_browse_callbacks(&window);
     setup_open_url(&window);
     setup_save_settings(&window, &state);
+    setup_priority_lists(&window);
     setup_start_scan(&window, &state);
     setup_cancel_scan(&window, &state);
     setup_filter_option_toggles(&window, &state);
@@ -213,6 +218,18 @@ fn setup_save_settings(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
             backup_dir_path: non_empty(window.get_backup_dir_path().to_string()),
             use_recycle_bin: window.get_use_recycle_bin(),
             selected_system: window.get_selected_system_id().to_string(),
+            region_priority: window
+                .get_region_priority_items()
+                .iter()
+                .map(|item| item.to_string())
+                .collect(),
+            preferred_languages: window
+                .get_language_priority_items()
+                .iter()
+                .map(|item| item.to_string())
+                .collect(),
+            treat_unofficial_as_official: window.get_treat_unofficial_as_official(),
+            deep_verify_sha1: window.get_deep_verify_sha1(),
         };
 
         let status = match config.save() {
@@ -480,10 +497,13 @@ fn run_scan_pipeline(
     let scan_started = Instant::now();
     let last_update_ms = AtomicU64::new(0);
 
+    let deep_verify_sha1 = state.lock().unwrap().config.deep_verify_sha1;
+
     let rom_set = rom_scanner::scan_rom_directory(
         Path::new(input.rom_set_path),
         &dat_entries,
         cancel_flag,
+        deep_verify_sha1,
         move |progress: rom_scanner::ScanProgress| {
             let is_final = progress.processed >= progress.total;
             if !is_final {
@@ -521,8 +541,22 @@ fn run_scan_pipeline(
     )
     .map_err(|e| e.to_string())?;
 
-    let dedup_plan =
-        dedup_engine::build_dedup_plan(&dat_entries, &dedup_engine::RegionPriority::default_profile());
+    let (region_priority, preferred_languages, treat_unofficial_as_official) = {
+        let guard = state.lock().unwrap();
+        (
+            guard.config.region_priority.clone(),
+            guard.config.preferred_languages.clone(),
+            guard.config.treat_unofficial_as_official,
+        )
+    };
+    let region_priority = dedup_engine::RegionPriority::new(region_priority);
+    let language_priority = dedup_engine::LanguagePriority::new(preferred_languages);
+    let dedup_options = dedup_engine::DedupOptions {
+        region_priority: &region_priority,
+        language_priority: &language_priority,
+        treat_unofficial_as_official,
+    };
+    let dedup_plan = dedup_engine::build_dedup_plan(&dat_entries, &dedup_options);
     let dedup_remove: HashSet<String> = dedup_plan.roms_to_remove().into_iter().collect();
     let dedup_keep: HashSet<String> = dedup_plan.roms_to_keep().into_iter().collect();
 
@@ -655,8 +689,128 @@ fn setup_clear_all_filters(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
 
 fn refresh_profile_list(window: &AppWindow) {
     let names = profile_manager::list_profiles().unwrap_or_default();
-    let items: Vec<slint::SharedString> = names.into_iter().map(Into::into).collect();
-    window.set_profile_names(ModelRc::new(VecModel::from(items)));
+    window.set_profile_names(string_list_model(&names));
+}
+
+fn string_list_model(items: &[String]) -> ModelRc<slint::SharedString> {
+    let items: Vec<slint::SharedString> = items.iter().map(|s| s.clone().into()).collect();
+    ModelRc::new(VecModel::from(items))
+}
+
+/// Generic reorder/add/remove helper shared by the region- and
+/// language-priority lists: both are just an ordered `Vec<String>` in
+/// Settings with identical editing semantics.
+fn edit_priority_list(
+    items: &ModelRc<slint::SharedString>,
+    edit: impl FnOnce(&mut Vec<String>),
+) -> ModelRc<slint::SharedString> {
+    let mut values: Vec<String> = items.iter().map(|item| item.to_string()).collect();
+    edit(&mut values);
+    string_list_model(&values)
+}
+
+fn setup_priority_lists(window: &AppWindow) {
+    let weak = window.as_weak();
+    window.on_move_region_up(move |index| {
+        if let Some(window) = weak.upgrade() {
+            let updated = edit_priority_list(&window.get_region_priority_items(), |values| {
+                move_up(values, index as usize);
+            });
+            window.set_region_priority_items(updated);
+        }
+    });
+    let weak = window.as_weak();
+    window.on_move_region_down(move |index| {
+        if let Some(window) = weak.upgrade() {
+            let updated = edit_priority_list(&window.get_region_priority_items(), |values| {
+                move_down(values, index as usize);
+            });
+            window.set_region_priority_items(updated);
+        }
+    });
+    let weak = window.as_weak();
+    window.on_remove_region(move |index| {
+        if let Some(window) = weak.upgrade() {
+            let updated = edit_priority_list(&window.get_region_priority_items(), |values| {
+                remove_at(values, index as usize);
+            });
+            window.set_region_priority_items(updated);
+        }
+    });
+    let weak = window.as_weak();
+    window.on_add_region(move |value| {
+        if let Some(window) = weak.upgrade() {
+            let updated = edit_priority_list(&window.get_region_priority_items(), |values| {
+                add_unique(values, value.as_str());
+            });
+            window.set_region_priority_items(updated);
+        }
+    });
+
+    let weak = window.as_weak();
+    window.on_move_language_up(move |index| {
+        if let Some(window) = weak.upgrade() {
+            let updated = edit_priority_list(&window.get_language_priority_items(), |values| {
+                move_up(values, index as usize);
+            });
+            window.set_language_priority_items(updated);
+        }
+    });
+    let weak = window.as_weak();
+    window.on_move_language_down(move |index| {
+        if let Some(window) = weak.upgrade() {
+            let updated = edit_priority_list(&window.get_language_priority_items(), |values| {
+                move_down(values, index as usize);
+            });
+            window.set_language_priority_items(updated);
+        }
+    });
+    let weak = window.as_weak();
+    window.on_remove_language(move |index| {
+        if let Some(window) = weak.upgrade() {
+            let updated = edit_priority_list(&window.get_language_priority_items(), |values| {
+                remove_at(values, index as usize);
+            });
+            window.set_language_priority_items(updated);
+        }
+    });
+    let weak = window.as_weak();
+    window.on_add_language(move |value| {
+        if let Some(window) = weak.upgrade() {
+            let updated = edit_priority_list(&window.get_language_priority_items(), |values| {
+                add_unique(values, value.as_str());
+            });
+            window.set_language_priority_items(updated);
+        }
+    });
+}
+
+fn move_up(values: &mut [String], index: usize) {
+    if index > 0 && index < values.len() {
+        values.swap(index, index - 1);
+    }
+}
+
+fn move_down(values: &mut [String], index: usize) {
+    if index + 1 < values.len() {
+        values.swap(index, index + 1);
+    }
+}
+
+fn remove_at(values: &mut Vec<String>, index: usize) {
+    if index < values.len() {
+        values.remove(index);
+    }
+}
+
+fn add_unique(values: &mut Vec<String>, value: &str) {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return;
+    }
+    if !values.iter().any(|existing| existing.eq_ignore_ascii_case(trimmed)) {
+        values.push(trimmed.to_string());
+    }
 }
 
 fn setup_profile_management(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
@@ -1359,12 +1513,13 @@ fn setup_plugins(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
 /// les ROMs qui devaient être conservées (plan 1G1R) sont bien présentes
 /// et intactes sur le disque final.
 fn run_post_cleanup_verification(state: &Arc<Mutex<AppState>>) -> String {
-    let (rom_set_path, dat_entries, dedup_keep) = {
+    let (rom_set_path, dat_entries, dedup_keep, deep_verify_sha1) = {
         let guard = state.lock().unwrap();
         (
             guard.config.rom_set_path.clone(),
             guard.dat_entries.clone(),
             guard.dedup_keep.clone(),
+            guard.config.deep_verify_sha1,
         )
     };
 
@@ -1377,6 +1532,7 @@ fn run_post_cleanup_verification(state: &Arc<Mutex<AppState>>) -> String {
         Path::new(&rom_set_path),
         &dat_entries,
         &cancel_flag,
+        deep_verify_sha1,
         |_| {},
     ) {
         Ok(rom_set) => rom_set,
@@ -1436,7 +1592,10 @@ fn refresh_results(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
                 .rom_set
                 .entries
                 .get(&entry.name)
-                .map(|scanned| format_rom_status(scanned.status))
+                .map(|scanned| match &scanned.mismatch_reason {
+                    Some(reason) => format!("{} ({reason})", format_rom_status(scanned.status)),
+                    None => format_rom_status(scanned.status),
+                })
                 .unwrap_or_else(|| "Non scannée".to_string());
             let action_text = if guard.dedup_remove.contains(&entry.name) {
                 "À supprimer".to_string()
