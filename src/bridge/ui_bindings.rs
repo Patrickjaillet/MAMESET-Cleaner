@@ -95,6 +95,8 @@ pub fn run(config: &AppConfig, translator: &Translator) -> Result<(), slint::Pla
     window.set_selected_system_id(config.selected_system.clone().into());
     window.set_filter_live_count_text(String::new().into());
     window.set_profile_status_text(String::new().into());
+    window.set_current_sort_column("name".into());
+    window.set_sort_ascending(true);
     window.set_region_priority_items(string_list_model(&config.region_priority));
     window.set_language_priority_items(string_list_model(&config.preferred_languages));
     window.set_treat_unofficial_as_official(config.treat_unofficial_as_official);
@@ -1584,19 +1586,20 @@ fn refresh_results(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
 
     let total_scanned = guard.dat_entries.len();
     let match_count = matched.len();
+    let sort_column = guard.sort_column.clone();
+    let sort_ascending = guard.sort_ascending;
 
     let rows: Vec<ResultRow> = matched
         .iter()
         .map(|entry| {
-            let status_text = guard
-                .rom_set
-                .entries
-                .get(&entry.name)
+            let scanned = guard.rom_set.entries.get(&entry.name);
+            let status_text = scanned
                 .map(|scanned| match &scanned.mismatch_reason {
                     Some(reason) => format!("{} ({reason})", format_rom_status(scanned.status)),
                     None => format_rom_status(scanned.status),
                 })
                 .unwrap_or_else(|| "Non scannée".to_string());
+            let status_kind = scanned.map(|scanned| rom_status_kind(scanned.status)).unwrap_or(4);
             let action_text = if guard.dedup_remove.contains(&entry.name) {
                 "À supprimer".to_string()
             } else {
@@ -1610,7 +1613,10 @@ fn refresh_results(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
                 manufacturer: entry.manufacturer.clone().into(),
                 category: entry.category.clone().unwrap_or_default().into(),
                 status: status_text.into(),
+                status_kind,
                 action: action_text.into(),
+                crc: format_crc_summary(entry).into(),
+                size: format_size_summary(entry).into(),
             }
         })
         .collect();
@@ -1619,6 +1625,8 @@ fn refresh_results(window: &AppWindow, state: &Arc<Mutex<AppState>>) {
 
     window.set_result_rows(ModelRc::new(VecModel::from(rows)));
     window.set_result_count_text(format!("{match_count} / {total_scanned} ROMs affichées").into());
+    window.set_current_sort_column(sort_column.into());
+    window.set_sort_ascending(sort_ascending);
 }
 
 fn format_rom_status(status: RomStatus) -> String {
@@ -1627,6 +1635,54 @@ fn format_rom_status(status: RomStatus) -> String {
         RomStatus::Missing => "Manquante".to_string(),
         RomStatus::Corrupted => "Corrompue".to_string(),
         RomStatus::Unreferenced => "Non référencée".to_string(),
+    }
+}
+
+/// 0=OK, 1=Manquante, 2=Corrompue, 3=Non référencée — matches the status
+/// badge color mapping in `ui/components/status_badge.slint`. Kept as a
+/// plain `int` (like `PluginRow.status-kind` already does) rather than a
+/// Slint enum, consistent with the rest of this codebase's UI-struct style.
+fn rom_status_kind(status: RomStatus) -> i32 {
+    match status {
+        RomStatus::Ok => 0,
+        RomStatus::Missing => 1,
+        RomStatus::Corrupted => 2,
+        RomStatus::Unreferenced => 3,
+    }
+}
+
+fn format_crc_summary(entry: &RomEntry) -> String {
+    let Some(first) = entry.roms.first() else {
+        return String::new();
+    };
+    let Some(crc) = first.crc32 else {
+        return String::new();
+    };
+    let extra = if entry.roms.len() > 1 {
+        format!(" (+{})", entry.roms.len() - 1)
+    } else {
+        String::new()
+    };
+    format!("{crc:08X}{extra}")
+}
+
+fn format_size_summary(entry: &RomEntry) -> String {
+    let total: u64 = entry.roms.iter().map(|rom| rom.size).sum();
+    format_bytes(total)
+}
+
+fn format_bytes(bytes: u64) -> String {
+    if bytes == 0 {
+        return String::new();
+    }
+    const KIB: u64 = 1024;
+    const MIB: u64 = KIB * 1024;
+    if bytes >= MIB {
+        format!("{:.1} Mo", bytes as f64 / MIB as f64)
+    } else if bytes >= KIB {
+        format!("{:.0} Ko", bytes as f64 / KIB as f64)
+    } else {
+        format!("{bytes} o")
     }
 }
 

@@ -1,4 +1,5 @@
 import { Sidebar, NavEntry } from "components/sidebar.slint";
+import { StatusBar } from "components/status_bar.slint";
 import { ScanView } from "views/scan_view.slint";
 import { FilterView } from "views/filter_view.slint";
 import { ResultsView } from "views/results_view.slint";
@@ -70,6 +71,8 @@ export component AppWindow inherits Window {
     in-out property <string> search-text;
     in property <[ResultRow]> result-rows;
     in property <string> result-count-text;
+    in property <string> current-sort-column: "name";
+    in property <bool> sort-ascending: true;
     in property <bool> cleanup-confirm-visible;
     in property <string> cleanup-target-count-text;
     in property <string> cleanup-status-text;
@@ -120,8 +123,11 @@ export component AppWindow inherits Window {
     callback remove-language(int);
     callback add-language(string);
 
-    HorizontalLayout {
-        Sidebar {
+    VerticalLayout {
+        HorizontalLayout {
+            vertical-stretch: 1;
+
+            Sidebar {
             entries: [
                 { label: "Scan", icon: "🔍", group-start: false },
                 { label: "Filtres", icon: "🧰", group-start: false },
@@ -185,6 +191,8 @@ export component AppWindow inherits Window {
                 search-text <=> root.search-text;
                 result-rows: root.result-rows;
                 result-count-text: root.result-count-text;
+                current-sort-column: root.current-sort-column;
+                sort-ascending: root.sort-ascending;
                 cleanup-confirm-visible: root.cleanup-confirm-visible;
                 cleanup-target-count-text: root.cleanup-target-count-text;
                 cleanup-status-text: root.cleanup-status-text;
@@ -244,6 +252,11 @@ export component AppWindow inherits Window {
                 app-version: root.app-version;
                 open-url(url) => { root.open-url(url); }
             }
+        }
+        }
+
+        StatusBar {
+            counts-text: root.scan-counts-text;
         }
     }
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## v7.0.0
+- Redesigned the interface toward a denser, classic ROM-manager look, inspired by RomCenter: the Results view is now a compact grid with a colored status column (green/red/amber/grey, always paired with a short code so it's never color-only) and new CRC/size columns; the sidebar is now a flatter toolbar; and a status bar at the bottom of the window now always shows live scan counts, no matter which section you're in.
+- This is a layout and density change only — the app's existing color theme is unchanged.
+
 ## v6.0.0
 - **1G1R duplicate detection now works correctly across all 87 supported systems, not just MAME.** Previously, the region-priority logic only ever activated for MAME, because non-MAME reference databases (No-Intro, TOSEC, Redump) don't declare the parent/clone relationships MAME's own files do — so regional duplicates on every other system were silently never grouped together at all. This is fixed: the app now groups regional releases correctly everywhere, while being careful to never merge different discs of the same multi-disc game.
 - Region priority is now fully configurable in Settings (add, remove, and reorder regions), instead of being fixed to World > USA > Europe > Japan. A new optional preferred-language setting can break ties within a region.

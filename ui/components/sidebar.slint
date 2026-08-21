@@ -6,89 +6,68 @@ export struct NavEntry {
     group-start: bool,
 }
 
+// Flat classic toolbar (ROADMAP7 v6.3.0): square-cornered rows, a thin
+// divider between groups, and a solid pressed-in outline for the active
+// view instead of the previous sliding accent-pill indicator. Same
+// existing theme colors throughout — no new palette.
 export component Sidebar inherits Rectangle {
     in property <[NavEntry]> entries;
     in-out property <int> selected-index: 0;
     callback selected(int);
 
-    width: 220px;
-    background: transparent;
+    width: 170px;
+    background: Theme.color-surface-alt;
 
-    property <length> row-height: 44px;
-    property <length> row-spacing: Theme.space-xs;
-    property <length> indicator-height: 22px;
+    Rectangle {
+        x: parent.width - 1px;
+        width: 1px;
+        background: Theme.color-border;
+    }
 
     VerticalLayout {
-        padding: Theme.space-sm;
-        spacing: root.row-spacing;
         alignment: start;
 
-        for entry[index] in entries: Rectangle {
-            height: root.row-height;
-            border-radius: Theme.radius-md;
-            background: index == selected-index
-                ? Theme.color-accent-soft
-                : (touch.has-hover ? Theme.color-hover-tint : transparent);
-            animate background { duration: Theme.duration-fast; easing: ease-out; }
-
-            touch := TouchArea {
-                clicked => {
-                    selected-index = index;
-                    selected(index);
-                }
+        for entry[index] in entries: VerticalLayout {
+            if entry.group-start: Rectangle {
+                height: 1px;
+                background: Theme.color-border-subtle;
             }
 
-            HorizontalLayout {
-                padding-left: Theme.space-md;
-                spacing: 10px;
-                alignment: start;
+            Rectangle {
+                height: 32px;
+                background: index == selected-index
+                    ? Theme.color-accent-soft
+                    : (touch.has-hover ? Theme.color-hover-tint : transparent);
+                border-width: index == selected-index ? 1px : 0px;
+                border-color: Theme.color-accent;
 
-                Text {
-                    text: entry.icon;
-                    vertical-alignment: center;
+                touch := TouchArea {
+                    clicked => {
+                        selected-index = index;
+                        selected(index);
+                    }
                 }
 
-                Text {
-                    text: entry.label;
-                    font-size: Theme.font-size-body;
-                    color: Theme.color-text;
-                    vertical-alignment: center;
-                    font-weight: index == selected-index ? 600 : 400;
+                HorizontalLayout {
+                    padding-left: Theme.space-sm;
+                    spacing: Theme.space-xs;
+                    alignment: start;
+
+                    Text {
+                        text: entry.icon;
+                        vertical-alignment: center;
+                        font-size: Theme.font-size-body;
+                    }
+
+                    Text {
+                        text: entry.label;
+                        font-size: Theme.font-size-caption;
+                        color: Theme.color-text;
+                        vertical-alignment: center;
+                        font-weight: index == selected-index ? 700 : 400;
+                    }
                 }
             }
         }
-    }
-
-    // Group-divider lines, drawn as absolutely-positioned overlays rather than
-    // flow content, so they don't perturb the row spacing the indicator's
-    // position math below depends on.
-    for entry[index] in entries: Rectangle {
-        x: 0px;
-        y: 0px;
-        width: 0px;
-        height: 0px;
-
-        if entry.group-start: Rectangle {
-            x: Theme.space-sm;
-            y: Theme.space-sm + index * (root.row-height + root.row-spacing) - root.row-spacing / 2 - 0.5px;
-            width: root.width - 2 * Theme.space-sm;
-            height: 1px;
-            background: Theme.color-border-subtle;
-        }
-    }
-
-    // Animated accent pill that slides to track the selected row. Positioned
-    // independently of the VerticalLayout above so it can move smoothly across
-    // row boundaries instead of jumping between per-row highlight states.
-    indicator := Rectangle {
-        x: 0px;
-        y: Theme.space-sm
-            + root.selected-index * (root.row-height + root.row-spacing)
-            + (root.row-height - root.indicator-height) / 2;
-        width: 3px;
-        height: root.indicator-height;
-        border-radius: 1.5px;
-        background: Theme.color-accent;
-        animate y { duration: Theme.duration-medium; easing: ease-out; }
     }
 }

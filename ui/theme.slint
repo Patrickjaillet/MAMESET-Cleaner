@@ -53,4 +53,18 @@ export global Theme {
 
     // Modal backdrop
     out property <color> scrim-color: rgba(0, 0, 0, 0.45);
+
+    // Status badge colors (ROADMAP7 v6.1.0) — additive only, every token
+    // above this point keeps its pre-existing value unchanged. Fluent-style
+    // "severe" hues, consistent with the existing accent's design language.
+    out property <color> color-status-ok: #107c10;
+    out property <color> color-status-missing: #d13438;
+    out property <color> color-status-corrupted: #9d5d00;
+    out property <color> color-status-unreferenced: #605e5c;
+
+    // Density scale (ROADMAP7 v6.1.0) — used only by newly-densified
+    // surfaces (grid rows, toolbar, status bar); existing views keep using
+    // the space-* scale above unchanged.
+    out property <length> space-2xs: 2px;
+    out property <length> row-height-dense: 22px;
 }

@@ -95,23 +95,19 @@ export component PluginsView inherits Rectangle {
                 }
 
                 if !row.is-header: Rectangle {
-                    height: 64px;
-                    background: Theme.color-surface;
+                    height: 44px;
+                    background: card-touch.has-hover ? Theme.color-hover-tint : Theme.color-surface;
                     border-width: 1px;
                     border-color: Theme.color-border-subtle;
-                    border-radius: Theme.radius-md;
-                    drop-shadow-color: card-touch.has-hover ? Theme.shadow-color-strong : Theme.shadow-color;
-                    drop-shadow-blur: card-touch.has-hover ? 10px : 4px;
-                    drop-shadow-offset-y: card-touch.has-hover ? 3px : 1px;
-                    animate drop-shadow-blur, drop-shadow-offset-y { duration: Theme.duration-fast; easing: ease-out; }
+                    border-radius: Theme.radius-sm;
 
                     card-touch := TouchArea {
-                        // Purely for hover elevation; no click behavior of its own.
+                        // Purely for hover highlight; no click behavior of its own.
                     }
 
                     HorizontalLayout {
-                        padding: 10px;
-                        spacing: 10px;
+                        padding: Theme.space-xs;
+                        spacing: Theme.space-sm;
 
                         VerticalLayout {
                             alignment: center;

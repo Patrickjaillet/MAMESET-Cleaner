@@ -1,6 +1,7 @@
 import { AppButton } from "../components/app_button.slint";
 import { TextField } from "../components/text_field.slint";
 import { EmptyState } from "../components/empty_state.slint";
+import { StatusBadge } from "../components/status_badge.slint";
 import { ResultRow } from "../common.slint";
 import { Theme } from "../theme.slint";
 
@@ -12,6 +13,8 @@ export component ResultsView inherits Rectangle {
     in-out property <string> search-text;
     in property <[ResultRow]> result-rows;
     in property <string> result-count-text;
+    in property <string> current-sort-column: "name";
+    in property <bool> sort-ascending: true;
     in property <bool> cleanup-confirm-visible;
     in property <string> cleanup-target-count-text;
     in property <string> cleanup-status-text;
@@ -23,6 +26,10 @@ export component ResultsView inherits Rectangle {
     callback cancel-cleanup();
 
     property <bool> has-content: root.result-count-text != "" || root.result-rows.length > 0;
+
+    function sort-arrow(column: string) -> string {
+        return root.current-sort-column != column ? "" : (root.sort-ascending ? " ▲" : " ▼");
+    }
 
     VerticalLayout {
         padding: 24px;
@@ -68,29 +75,31 @@ export component ResultsView inherits Rectangle {
             border-width: 1px;
             border-color: Theme.color-border-subtle;
             background: Theme.color-surface-alt;
-            height: 32px;
+            height: Theme.row-height-dense;
 
             HorizontalLayout {
-                padding-left: 8px;
-                padding-right: 8px;
-                spacing: 8px;
+                padding-left: Theme.space-xs;
+                padding-right: Theme.space-xs;
+                spacing: Theme.space-xs;
 
+                Text { horizontal-stretch: 8; min-width: 55px; text: "Statut"; font-weight: 600; font-size: Theme.font-size-caption; vertical-alignment: center; }
                 TouchArea {
-                    horizontal-stretch: 26;
+                    horizontal-stretch: 20;
                     min-width: 60px;
                     clicked => { root.sort-by("name"); }
-                    Text { text: "Nom"; font-weight: 600; vertical-alignment: center; }
+                    Text { text: "Nom" + root.sort-arrow("name"); font-weight: 600; font-size: Theme.font-size-caption; vertical-alignment: center; }
                 }
                 TouchArea {
-                    horizontal-stretch: 9;
+                    horizontal-stretch: 6;
                     min-width: 40px;
                     clicked => { root.sort-by("year"); }
-                    Text { text: "Année"; font-weight: 600; vertical-alignment: center; }
+                    Text { text: "Année" + root.sort-arrow("year"); font-weight: 600; font-size: Theme.font-size-caption; vertical-alignment: center; }
                 }
-                Text { horizontal-stretch: 19; min-width: 60px; text: "Fabricant"; font-weight: 600; vertical-alignment: center; }
-                Text { horizontal-stretch: 16; min-width: 60px; text: "Genre"; font-weight: 600; vertical-alignment: center; }
-                Text { horizontal-stretch: 14; min-width: 60px; text: "Statut"; font-weight: 600; vertical-alignment: center; }
-                Text { horizontal-stretch: 15; min-width: 60px; text: "Action"; font-weight: 600; vertical-alignment: center; }
+                Text { horizontal-stretch: 14; min-width: 60px; text: "Fabricant"; font-weight: 600; font-size: Theme.font-size-caption; vertical-alignment: center; }
+                Text { horizontal-stretch: 12; min-width: 55px; text: "Genre"; font-weight: 600; font-size: Theme.font-size-caption; vertical-alignment: center; }
+                Text { horizontal-stretch: 8; min-width: 65px; text: "CRC32"; font-weight: 600; font-size: Theme.font-size-caption; vertical-alignment: center; }
+                Text { horizontal-stretch: 7; min-width: 55px; text: "Taille"; font-weight: 600; font-size: Theme.font-size-caption; vertical-alignment: center; }
+                Text { horizontal-stretch: 10; min-width: 65px; text: "Action"; font-weight: 600; font-size: Theme.font-size-caption; vertical-alignment: center; }
             }
         }
 
@@ -98,29 +107,83 @@ export component ResultsView inherits Rectangle {
             vertical-stretch: 1;
             VerticalLayout {
                 for row in root.result-rows: Rectangle {
-                    height: 30px;
+                    height: Theme.row-height-dense;
                     border-width: 1px;
                     border-color: Theme.color-border-subtle;
-                    background: row-touch.has-hover ? Theme.color-hover-tint : transparent;
-                    animate background { duration: Theme.duration-fast; easing: ease-out; }
+                    background: row-touch.has-hover ? Theme.color-accent : Theme.color-surface;
 
-                    row-touch := TouchArea {
-                        // Hover highlight only; a full drop-shadow per row was
-                        // considered but skipped for performance reasons on
-                        // sets with thousands of rows (see ROADMAP4 v3.2.0 notes).
-                    }
+                    row-touch := TouchArea {}
 
                     HorizontalLayout {
-                        padding-left: 8px;
-                        padding-right: 8px;
-                        spacing: 8px;
+                        padding-left: Theme.space-xs;
+                        padding-right: Theme.space-xs;
+                        spacing: Theme.space-xs;
 
-                        Text { horizontal-stretch: 26; min-width: 60px; text: row.name; vertical-alignment: center; overflow: elide; }
-                        Text { horizontal-stretch: 9; min-width: 40px; text: row.year; vertical-alignment: center; }
-                        Text { horizontal-stretch: 19; min-width: 60px; text: row.manufacturer; vertical-alignment: center; overflow: elide; }
-                        Text { horizontal-stretch: 16; min-width: 60px; text: row.category; vertical-alignment: center; overflow: elide; }
-                        Text { horizontal-stretch: 14; min-width: 60px; text: row.status; vertical-alignment: center; }
-                        Text { horizontal-stretch: 15; min-width: 60px; text: row.action; vertical-alignment: center; }
+                        StatusBadge {
+                            horizontal-stretch: 8;
+                            min-width: 55px;
+                            kind: row.status-kind;
+                        }
+                        Text {
+                            horizontal-stretch: 20;
+                            min-width: 60px;
+                            text: row.name;
+                            font-size: Theme.font-size-caption;
+                            color: row-touch.has-hover ? Theme.color-text-on-accent : Theme.color-text;
+                            vertical-alignment: center;
+                            overflow: elide;
+                        }
+                        Text {
+                            horizontal-stretch: 6;
+                            min-width: 40px;
+                            text: row.year;
+                            font-size: Theme.font-size-caption;
+                            color: row-touch.has-hover ? Theme.color-text-on-accent : Theme.color-text;
+                            vertical-alignment: center;
+                        }
+                        Text {
+                            horizontal-stretch: 14;
+                            min-width: 60px;
+                            text: row.manufacturer;
+                            font-size: Theme.font-size-caption;
+                            color: row-touch.has-hover ? Theme.color-text-on-accent : Theme.color-text;
+                            vertical-alignment: center;
+                            overflow: elide;
+                        }
+                        Text {
+                            horizontal-stretch: 12;
+                            min-width: 55px;
+                            text: row.category;
+                            font-size: Theme.font-size-caption;
+                            color: row-touch.has-hover ? Theme.color-text-on-accent : Theme.color-text;
+                            vertical-alignment: center;
+                            overflow: elide;
+                        }
+                        Text {
+                            horizontal-stretch: 8;
+                            min-width: 65px;
+                            text: row.crc;
+                            font-size: Theme.font-size-caption;
+                            color: row-touch.has-hover ? Theme.color-text-on-accent : Theme.color-text-secondary;
+                            vertical-alignment: center;
+                            overflow: elide;
+                        }
+                        Text {
+                            horizontal-stretch: 7;
+                            min-width: 55px;
+                            text: row.size;
+                            font-size: Theme.font-size-caption;
+                            color: row-touch.has-hover ? Theme.color-text-on-accent : Theme.color-text-secondary;
+                            vertical-alignment: center;
+                        }
+                        Text {
+                            horizontal-stretch: 10;
+                            min-width: 65px;
+                            text: row.action;
+                            font-size: Theme.font-size-caption;
+                            color: row-touch.has-hover ? Theme.color-text-on-accent : Theme.color-text;
+                            vertical-alignment: center;
+                        }
                     }
                 }
             }

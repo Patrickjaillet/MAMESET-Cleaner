@@ -1,14 +1,16 @@
 import { Theme } from "../theme.slint";
 
+// Flattened/tightened toward a classic "group box" proportion (ROADMAP7
+// v6.4.0): less rounding, less padding, same existing colors.
 export component SectionCard inherits Rectangle {
     background: Theme.color-surface;
     border-width: 1px;
     border-color: Theme.color-border-subtle;
-    border-radius: Theme.radius-lg;
+    border-radius: Theme.radius-sm;
 
     VerticalLayout {
-        padding: Theme.space-lg;
-        spacing: Theme.space-sm;
+        padding: Theme.space-sm;
+        spacing: Theme.space-2xs;
         alignment: start;
 
         @children

@@ -1,0 +1,27 @@
+import { Theme } from "../theme.slint";
+
+// Persistent bottom status bar (ROADMAP7 v6.3.0): always visible across
+// every view, showing the live scan counts the app already computes —
+// previously this text only appeared inside the Scan view and disappeared
+// as soon as you switched tabs.
+export component StatusBar inherits Rectangle {
+    in property <string> counts-text;
+
+    height: 24px;
+    background: Theme.color-surface-alt;
+
+    Rectangle {
+        y: 0px;
+        height: 1px;
+        background: Theme.color-border;
+    }
+
+    Text {
+        x: Theme.space-sm;
+        text: root.counts-text == "" ? "Aucun scan effectué." : root.counts-text;
+        font-size: Theme.font-size-caption;
+        color: Theme.color-text-secondary;
+        vertical-alignment: center;
+        height: 100%;
+    }
+}

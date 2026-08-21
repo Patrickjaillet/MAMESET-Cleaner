@@ -1,0 +1,40 @@
+import { Theme } from "../theme.slint";
+
+// A small colored square plus a short text code — RomCenter's glanceable
+// status signal. Color is never the only signal (accessibility): the text
+// code is always shown alongside it. `kind`: 0=OK, 1=MISS, 2=BAD, 3=N/A,
+// anything else = not scanned yet (neutral).
+export component StatusBadge inherits HorizontalLayout {
+    in property <int> kind: 4;
+
+    spacing: Theme.space-2xs;
+    alignment: start;
+
+    property <color> badge-color: root.kind == 0 ? Theme.color-status-ok
+        : root.kind == 1 ? Theme.color-status-missing
+        : root.kind == 2 ? Theme.color-status-corrupted
+        : root.kind == 3 ? Theme.color-status-unreferenced
+        : Theme.color-border-strong;
+
+    property <string> code: root.kind == 0 ? "OK"
+        : root.kind == 1 ? "MISS"
+        : root.kind == 2 ? "BAD"
+        : root.kind == 3 ? "N/A"
+        : "—";
+
+    Rectangle {
+        width: 10px;
+        height: 10px;
+        y: (parent.height - self.height) / 2;
+        background: root.badge-color;
+        border-radius: 2px;
+    }
+
+    Text {
+        text: root.code;
+        color: root.badge-color;
+        font-weight: 700;
+        font-size: Theme.font-size-caption;
+        vertical-alignment: center;
+    }
+}

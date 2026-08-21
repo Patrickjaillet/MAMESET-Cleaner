@@ -3,7 +3,7 @@
 ; (compiler d'abord le logiciel en mode release : cargo build --release)
 
 #define MyAppName "MAMESET Cleaner"
-#define MyAppVersion "6.0.0"
+#define MyAppVersion "7.0.0"
 #define MyAppPublisher "Patrick JAILLET"
 #define MyAppURL "https://patrickjaillet.github.io/MAMESET-Cleaner"
 #define MyAppExeName "mameset_cleaner.exe"

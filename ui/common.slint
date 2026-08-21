@@ -5,7 +5,11 @@ export struct ResultRow {
     manufacturer: string,
     category: string,
     status: string,
+    // 0=OK, 1=Manquante, 2=Corrompue, 3=Non référencée, 4=Non scannée
+    status-kind: int,
     action: string,
+    crc: string,
+    size: string,
 }
 
 export struct PluginRow {
